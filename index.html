@@ -18,23 +18,54 @@
       --accent: #8e83ff;
       --accentText: #ffffff;
       --danger: #ff453a;
+      --success: #30d158;
 
       --radius: 18px;
       --radius2: 14px;
-      --pad: 14px;
-      --gap: 12px;
       --shadow: 0 16px 50px rgba(0,0,0,.35);
     }
 
     html, body {
       height: 100%;
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
-                   system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+                   "SF Pro Rounded", system-ui, "Helvetica Neue", Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      font-feature-settings: "kern" 1;
+      text-rendering: optimizeLegibility;
+    }
+
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(142, 131, 255, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(142, 131, 255, 0.6); }
     }
 
     .app {
@@ -80,17 +111,21 @@
       border: 0;
       background: transparent;
       color: var(--accent);
-      font-weight: 700;
+      font-weight: 600;
       font-size: 15px;
       padding: 8px 10px;
       border-radius: 12px;
+      transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
-    .topbar .back:active { background: rgba(127,127,127,.14); }
+    .topbar .back:active { 
+      background: rgba(127,127,127,.14);
+      transform: scale(0.95);
+    }
 
     .topbar .title {
       font-size: 17px;
-      font-weight: 800;
-      letter-spacing: -0.2px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
       margin: 0;
       flex: 1;
       text-align: center;
@@ -100,9 +135,46 @@
       height: 1px;
     }
 
-    .content { padding: 14px; }
+    .content { 
+      padding: 14px;
+      animation: fadeIn 0.35s ease-out;
+    }
 
-    .muted { color: var(--subtext); font-size: 13px; }
+    .muted { color: var(--subtext); font-size: 13px; font-weight: 500; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      padding: 6px;
+      background: rgba(0,0,0,.25);
+      border-radius: 14px;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      flex: 1;
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 14px;
+      background: transparent;
+      color: var(--subtext);
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: -0.2px;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: var(--accentText);
+      box-shadow: 0 4px 16px rgba(142, 131, 255, 0.35);
+    }
+
+    .tab:active {
+      transform: scale(0.97);
+    }
 
     .inset {
       background: color-mix(in oklab, var(--card) 92%, transparent);
@@ -112,12 +184,12 @@
     }
 
     .insetHeader {
-      padding: 12px 12px 8px;
+      padding: 14px 14px 10px;
       font-size: 13px;
       color: var(--hint);
-      font-weight: 700;
-      letter-spacing: .2px;
-      text-transform: none;
+      font-weight: 600;
+      letter-spacing: .3px;
+      text-transform: uppercase;
     }
 
     .grid {
@@ -138,8 +210,20 @@
       gap: 8px;
       user-select: none;
       cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      animation: scaleIn 0.4s ease-out backwards;
     }
-    .giftCard:active { transform: scale(.99); }
+    
+    .giftCard:nth-child(1) { animation-delay: 0.05s; }
+    .giftCard:nth-child(2) { animation-delay: 0.1s; }
+    .giftCard:nth-child(3) { animation-delay: 0.15s; }
+    .giftCard:nth-child(4) { animation-delay: 0.2s; }
+    .giftCard:nth-child(5) { animation-delay: 0.25s; }
+    .giftCard:nth-child(6) { animation-delay: 0.3s; }
+    
+    .giftCard:active { 
+      transform: scale(0.95);
+    }
 
     .giftImg {
       width: 100%;
@@ -155,17 +239,22 @@
       height: 84%;
       object-fit: contain;
       display: block;
+      transition: transform 0.3s ease;
+    }
+    
+    .giftCard:active .giftImg img {
+      transform: scale(1.08);
     }
 
     .pricePill {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       padding: 6px 10px;
       border-radius: 999px;
-      background: rgba(0,0,0,.18);
+      background: rgba(0,0,0,.22);
       border: 1px solid var(--separator);
-      font-weight: 900;
+      font-weight: 700;
       font-size: 13px;
       color: color-mix(in oklab, var(--accent) 80%, white);
     }
@@ -183,6 +272,7 @@
       overflow: hidden;
       display: grid;
       place-items: center;
+      animation: scaleIn 0.35s ease-out;
     }
     .preview img {
       width: 100%;
@@ -191,46 +281,107 @@
       display: block;
     }
 
-    .rows { margin-top: 10px; }
     .row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 12px;
+      padding: 14px 14px;
       border-top: 1px solid var(--separator);
       font-size: 15px;
     }
     .row:first-child { border-top: 0; }
     .row .right { color: var(--subtext); font-weight: 700; }
 
+    /* Toggle switch iOS style */
+    .toggleRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 14px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    
+    .toggleRow:active {
+      background: rgba(127,127,127,.08);
+    }
+
+    .toggle {
+      width: 51px;
+      height: 31px;
+      background: rgba(120, 120, 128, 0.32);
+      border-radius: 16px;
+      position: relative;
+      transition: background 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      flex-shrink: 0;
+    }
+
+    .toggle.on {
+      background: var(--success);
+    }
+
+    .toggle::after {
+      content: "";
+      position: absolute;
+      width: 27px;
+      height: 27px;
+      background: #fff;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: 0 3px 8px rgba(0,0,0,.2), 0 1px 2px rgba(0,0,0,.1);
+    }
+
+    .toggle.on::after {
+      transform: translateX(20px);
+    }
+
     .selectRow {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      padding: 12px 12px;
+      padding: 14px 14px;
       border-top: 1px solid var(--separator);
       cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .selectRow:first-child { border-top: 0; }
+    
+    .selectRow:active {
+      background: rgba(127,127,127,.08);
+    }
+
+    .senderOptions {
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      max-height: 0;
+      opacity: 0;
+    }
+    
+    .senderOptions.expanded {
+      max-height: 200px;
+      opacity: 1;
+    }
+
     .check {
-      width: 22px; height: 22px;
+      width: 24px; height: 24px;
       border-radius: 999px;
-      border: 2px solid rgba(255,255,255,.18);
+      border: 2px solid rgba(255,255,255,.2);
       display: grid;
       place-items: center;
       flex: 0 0 auto;
+      transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
     .check.on {
-      border-color: color-mix(in oklab, var(--accent) 70%, white);
-      background: color-mix(in oklab, var(--accent) 50%, transparent);
+      border-color: var(--accent);
+      background: var(--accent);
     }
     .check.on:after{
-      content:"";
-      width: 10px; height: 10px;
-      border-radius: 999px;
-      background: color-mix(in oklab, var(--accent) 78%, white);
-      box-shadow: 0 6px 14px rgba(0,0,0,.28);
+      content:"✓";
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
     }
 
     .buyBar {
@@ -244,17 +395,285 @@
     }
     .buyBtn {
       width: 100%;
-      height: 46px;
+      height: 52px;
       border: 0;
-      border-radius: 16px;
-      font-weight: 900;
-      letter-spacing: -0.2px;
-      font-size: 15px;
+      border-radius: 14px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      font-size: 17px;
       background: var(--accent);
       color: var(--accentText);
       cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
-    .buyBtn:active { transform: scale(.99); }
+    .buyBtn:active { 
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+
+    /* Case Cards */
+    .caseGrid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .caseCard {
+      background: linear-gradient(145deg, rgba(127,127,127,.12), rgba(127,127,127,.04));
+      border: 1px solid var(--separator);
+      border-radius: 20px;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      animation: scaleIn 0.4s ease-out backwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .caseCard::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        60deg,
+        transparent 40%,
+        rgba(255,255,255,.04) 50%,
+        transparent 60%
+      );
+      animation: shimmer 4s infinite linear;
+    }
+
+    .caseCard:nth-child(1) { animation-delay: 0.05s; }
+    .caseCard:nth-child(2) { animation-delay: 0.12s; }
+    .caseCard:nth-child(3) { animation-delay: 0.19s; }
+    .caseCard:nth-child(4) { animation-delay: 0.26s; }
+
+    .caseCard:active {
+      transform: scale(0.96);
+    }
+
+    .caseCard.free {
+      background: linear-gradient(145deg, rgba(48, 209, 88, 0.18), rgba(48, 209, 88, 0.04));
+      border-color: rgba(48, 209, 88, 0.25);
+    }
+
+    .caseCard.premium {
+      background: linear-gradient(145deg, rgba(142, 131, 255, 0.18), rgba(142, 131, 255, 0.04));
+      border-color: rgba(142, 131, 255, 0.25);
+    }
+
+    .caseCard.rich {
+      background: linear-gradient(145deg, rgba(255, 214, 10, 0.18), rgba(255, 214, 10, 0.04));
+      border-color: rgba(255, 214, 10, 0.25);
+    }
+
+    .caseCard.ultra {
+      background: linear-gradient(145deg, rgba(255, 69, 58, 0.18), rgba(175, 82, 222, 0.18));
+      border-color: rgba(255, 69, 58, 0.25);
+      animation: glow 3s infinite ease-in-out;
+    }
+
+    .caseIcon {
+      font-size: 52px;
+      position: relative;
+      z-index: 1;
+      animation: float 3s infinite ease-in-out;
+    }
+
+    .caseCard:nth-child(2) .caseIcon { animation-delay: 0.5s; }
+    .caseCard:nth-child(3) .caseIcon { animation-delay: 1s; }
+    .caseCard:nth-child(4) .caseIcon { animation-delay: 1.5s; }
+
+    .caseName {
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.3px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .casePrice {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.28);
+      font-weight: 700;
+      font-size: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .caseCard.free .casePrice {
+      color: var(--success);
+    }
+
+    .caseCard.disabled {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    .cooldown {
+      font-size: 12px;
+      color: var(--subtext);
+      position: relative;
+      z-index: 1;
+      font-weight: 500;
+    }
+
+    /* Roulette Overlay */
+    .rouletteOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .rouletteOverlay.hidden {
+      display: none;
+    }
+
+    .rouletteContainer {
+      width: 100%;
+      max-width: 360px;
+      background: var(--card);
+      border-radius: 28px;
+      padding: 24px;
+      border: 1px solid var(--separator);
+      box-shadow: 0 32px 100px rgba(0,0,0,.6);
+      animation: scaleIn 0.35s ease-out;
+    }
+
+    .rouletteTitle {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      margin-bottom: 24px;
+    }
+
+    .rouletteWindow {
+      position: relative;
+      height: 140px;
+      overflow: hidden;
+      border-radius: 20px;
+      background: rgba(0,0,0,.35);
+      border: 2px solid var(--accent);
+      box-shadow: inset 0 0 30px rgba(0,0,0,.3);
+    }
+
+    .rouletteWindow::before,
+    .rouletteWindow::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 50px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .rouletteWindow::before {
+      top: 0;
+      background: linear-gradient(to bottom, var(--card), transparent);
+    }
+
+    .rouletteWindow::after {
+      bottom: 0;
+      background: linear-gradient(to top, var(--card), transparent);
+    }
+
+    .roulettePointer {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: calc(100% - 16px);
+      height: 90px;
+      border: 2.5px solid var(--accent);
+      border-radius: 16px;
+      background: rgba(142, 131, 255, 0.12);
+      z-index: 3;
+      pointer-events: none;
+      box-shadow: 0 0 20px rgba(142, 131, 255, 0.25);
+    }
+
+    .rouletteStrip {
+      display: flex;
+      flex-direction: column;
+      transition: transform 5s cubic-bezier(0.12, 0.8, 0.3, 1);
+    }
+
+    .rouletteItem {
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .rouletteItem img {
+      height: 66px;
+      width: 66px;
+      object-fit: contain;
+    }
+
+    .rouletteResult {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      min-height: 30px;
+    }
+
+    .rouletteResult.win {
+      color: var(--success);
+    }
+
+    .rouletteResult.lose {
+      color: var(--subtext);
+    }
+
+    .rouletteClose {
+      margin-top: 20px;
+      width: 100%;
+      padding: 16px;
+      border: 0;
+      border-radius: 16px;
+      background: var(--accent);
+      color: var(--accentText);
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.2px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .rouletteClose:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
 
     .hidden { display: none; }
   </style>
@@ -274,9 +693,26 @@
           </div>
 
           <div class="content">
-            <div class="inset">
-              <div class="insetHeader">Подарки</div>
-              <div id="giftGrid" class="grid"></div>
+            <!-- Tabs -->
+            <div class="tabs">
+              <button class="tab active" id="tabGifts">🎁 Подарки</button>
+              <button class="tab" id="tabLuck">🎰 Удача</button>
+            </div>
+
+            <!-- Gifts Section -->
+            <div id="sectionGifts">
+              <div class="inset">
+                <div class="insetHeader">Выбери подарок</div>
+                <div id="giftGrid" class="grid"></div>
+              </div>
+            </div>
+
+            <!-- Luck Section -->
+            <div id="sectionLuck" class="hidden">
+              <div class="inset">
+                <div class="insetHeader">Испытай удачу</div>
+                <div class="caseGrid" id="caseGrid"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -294,25 +730,31 @@
               <img id="detailsGif" alt="gift" />
             </div>
 
-            <div style="height:12px"></div>
+            <div style="height:14px"></div>
 
             <div class="inset">
-              <div class="insetHeader">Подписать подарок от</div>
-
-              <div id="optFree" class="selectRow">
+              <!-- Toggle for signature -->
+              <div class="toggleRow" id="toggleSignature">
                 <div>
-                  <div style="font-weight:800">@echoaxxs</div>
+                  <div style="font-weight:700; font-size: 16px;">Добавить подпись</div>
                   <div class="muted">+1 ⭐ к стоимости</div>
                 </div>
-                <div class="check on" id="checkFree"></div>
+                <div class="toggle" id="signatureToggle"></div>
               </div>
 
-              <div id="optPaid" class="selectRow">
-                <div>
-                  <div style="font-weight:800">@bogclm</div>
-                  <div class="muted">+1 ⭐ к стоимости</div>
+              <!-- Sender Options (collapsible) -->
+              <div id="senderOptions" class="senderOptions">
+                <div class="insetHeader" style="border-top: 1px solid var(--separator); padding-top: 14px;">Подписать от</div>
+
+                <div id="optFree" class="selectRow">
+                  <div style="font-weight:600; font-size: 16px;">@echoaxxs</div>
+                  <div class="check on" id="checkFree"></div>
                 </div>
-                <div class="check" id="checkPaid"></div>
+
+                <div id="optPaid" class="selectRow">
+                  <div style="font-weight:600; font-size: 16px;">@bogclm</div>
+                  <div class="check" id="checkPaid"></div>
+                </div>
               </div>
 
               <div class="row">
@@ -331,14 +773,26 @@
     </div>
   </div>
 
+  <!-- Roulette Overlay -->
+  <div id="rouletteOverlay" class="rouletteOverlay hidden">
+    <div class="rouletteContainer">
+      <div class="rouletteTitle" id="rouletteTitle">Открываем кейс...</div>
+      <div class="rouletteWindow">
+        <div class="roulettePointer"></div>
+        <div class="rouletteStrip" id="rouletteStrip"></div>
+      </div>
+      <div class="rouletteResult" id="rouletteResult"></div>
+      <button class="rouletteClose hidden" id="rouletteClose">Забрать</button>
+    </div>
+  </div>
+
 <script>
   const tg = window.Telegram?.WebApp;
-
   const API_BASE = "";
 
   const FREE_SENDER = "@echoaxxs";
   const PAID_SENDER = "@bogclm";
-  const SENDER_EXTRA = 1; // Оба варианта стоят +1 звезду
+  const SIGNATURE_COST = 1;
 
   const GIFTS = [
     { id: "rose",  title: "Роза",     price: 25, gif_url: "/rose.gif" },
@@ -346,22 +800,60 @@
     { id: "heart", title: "Сердце",   price: 15, gif_url: "/heart.gif" },
   ];
 
+  const CASES = [
+    { 
+      id: "weekly", 
+      name: "Еженедельный", 
+      price: 0, 
+      priceText: "Бесплатно",
+      type: "free",
+      drops: []
+    },
+    { 
+      id: "premium", 
+      name: "Премиум", 
+      price: 30, 
+      priceText: "30 ⭐",
+      type: "premium",
+      drops: ["rose", "box", "heart"]
+    },
+    { 
+      id: "rich", 
+      name: "Богач", 
+      price: 100, 
+      priceText: "100 ⭐",
+      type: "rich",
+      drops: ["rose", "box", "heart"]
+    },
+    { 
+      id: "ultra", 
+      name: "Ультра", 
+      price: 500, 
+      priceText: "500 ⭐",
+      type: "ultra",
+      drops: ["rose", "box", "heart"]
+    },
+  ];
+
+  const CASE_ICONS = {
+    free: "📦",
+    premium: "💎",
+    rich: "💰",
+    ultra: "🔥"
+  };
+
   let selectedGift = null;
   let sender = FREE_SENDER;
+  let addSignature = false;
+  let weeklyUsed = localStorage.getItem('weeklyUsed') || null;
 
-  const starSvg = `
-    <svg class="star" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M12 2.4l2.7 6.1 6.6.6-5 4.3 1.5 6.4L12 16.9 6.2 19.8l1.5-6.4-5-4.3 6.6-.6L12 2.4z"
-        fill="currentColor" opacity="0.95"/>
-    </svg>
-  `;
+  const starSvg = `<svg class="star" viewBox="0 0 24 24" fill="none"><path d="M12 2.4l2.7 6.1 6.6.6-5 4.3 1.5 6.4L12 16.9 6.2 19.8l1.5-6.4-5-4.3 6.6-.6L12 2.4z" fill="currentColor" opacity="0.95"/></svg>`;
 
   function setVar(name, val){ if(val) document.documentElement.style.setProperty(name, val); }
 
   function applyTheme(){
     if (!tg) return;
     const p = tg.themeParams || {};
-
     setVar("--bg", p.bg_color);
     setVar("--section", p.secondary_bg_color || p.section_bg_color);
     setVar("--card", p.section_bg_color || p.secondary_bg_color);
@@ -371,17 +863,32 @@
     setVar("--accent", p.button_color || p.link_color);
     setVar("--accentText", p.button_text_color);
     setVar("--danger", p.destructive_text_color);
-
     try {
       tg.setBackgroundColor(p.bg_color || "#000000");
       tg.setHeaderColor(p.secondary_bg_color || p.bg_color || "#000000");
     } catch (e) {}
   }
 
+  function isWeeklyAvailable() {
+    if (!weeklyUsed) return true;
+    const lastUsed = new Date(weeklyUsed);
+    const now = new Date();
+    return (now - lastUsed) >= 7 * 24 * 60 * 60 * 1000;
+  }
+
+  function getWeeklyCooldown() {
+    if (!weeklyUsed || isWeeklyAvailable()) return null;
+    const lastUsed = new Date(weeklyUsed);
+    const nextAvailable = new Date(lastUsed.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const diff = nextAvailable - new Date();
+    const days = Math.floor(diff / (24 * 60 * 60 * 1000));
+    const hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+    return days > 0 ? `${days}д ${hours}ч` : `${hours}ч`;
+  }
+
   function renderGrid(){
     const grid = document.getElementById("giftGrid");
     grid.innerHTML = "";
-
     GIFTS.forEach(g => {
       const el = document.createElement("div");
       el.className = "giftCard";
@@ -394,16 +901,36 @@
     });
   }
 
+  function renderCases() {
+    const grid = document.getElementById("caseGrid");
+    grid.innerHTML = "";
+    CASES.forEach(c => {
+      const isWeekly = c.id === "weekly";
+      const available = !isWeekly || isWeeklyAvailable();
+      const cooldown = isWeekly ? getWeeklyCooldown() : null;
+      const el = document.createElement("div");
+      el.className = `caseCard ${c.type}${!available ? ' disabled' : ''}`;
+      el.innerHTML = `
+        <div class="caseIcon">${CASE_ICONS[c.type]}</div>
+        <div class="caseName">${c.name}</div>
+        <div class="casePrice">${c.priceText}</div>
+        ${cooldown ? `<div class="cooldown">Через ${cooldown}</div>` : ''}
+      `;
+      if (available) el.onclick = () => openCase(c);
+      grid.appendChild(el);
+    });
+  }
+
   function openDetails(g){
     selectedGift = g;
     sender = FREE_SENDER;
-
+    addSignature = false;
     document.getElementById("screenCatalog").classList.add("hidden");
     document.getElementById("screenDetails").classList.remove("hidden");
-
     document.getElementById("detailsTitle").textContent = g.title;
     document.getElementById("detailsGif").src = g.gif_url;
-
+    document.getElementById("signatureToggle").classList.remove("on");
+    document.getElementById("senderOptions").classList.remove("expanded");
     syncSenderUI();
     updateTotalUI();
   }
@@ -420,7 +947,7 @@
 
   function totalPrice(){
     if(!selectedGift) return 0;
-    return selectedGift.price + SENDER_EXTRA;
+    return selectedGift.price + (addSignature ? SIGNATURE_COST : 0);
   }
 
   function updateTotalUI(){
@@ -429,43 +956,117 @@
     document.getElementById("btnBuy").textContent = `Купить за ${t} ⭐`;
   }
 
-  document.getElementById("optFree").onclick = () => {
-    sender = FREE_SENDER;
-    syncSenderUI(); updateTotalUI();
-  };
-  document.getElementById("optPaid").onclick = () => {
-    sender = PAID_SENDER;
-    syncSenderUI(); updateTotalUI();
+  // Tabs
+  document.getElementById("tabGifts").onclick = () => {
+    document.getElementById("tabGifts").classList.add("active");
+    document.getElementById("tabLuck").classList.remove("active");
+    document.getElementById("sectionGifts").classList.remove("hidden");
+    document.getElementById("sectionLuck").classList.add("hidden");
+    renderGrid();
   };
 
+  document.getElementById("tabLuck").onclick = () => {
+    document.getElementById("tabLuck").classList.add("active");
+    document.getElementById("tabGifts").classList.remove("active");
+    document.getElementById("sectionLuck").classList.remove("hidden");
+    document.getElementById("sectionGifts").classList.add("hidden");
+    renderCases();
+  };
+
+  // Signature toggle
+  document.getElementById("toggleSignature").onclick = () => {
+    addSignature = !addSignature;
+    document.getElementById("signatureToggle").classList.toggle("on", addSignature);
+    document.getElementById("senderOptions").classList.toggle("expanded", addSignature);
+    updateTotalUI();
+  };
+
+  document.getElementById("optFree").onclick = () => { sender = FREE_SENDER; syncSenderUI(); };
+  document.getElementById("optPaid").onclick = () => { sender = PAID_SENDER; syncSenderUI(); };
   document.getElementById("btnBack").onclick = closeDetails;
 
   document.getElementById("btnBuy").onclick = async () => {
     const t = totalPrice();
-
     if (!tg || !API_BASE) {
-      alert(`Тест: ${selectedGift.title}\nПодпись: от ${sender}\nИтого: ${t}⭐\n\nПодключи Worker API для оплаты.`);
+      const senderText = addSignature ? `\nПодпись: от ${sender}` : '\nБез подписи';
+      alert(`Тест: ${selectedGift.title}${senderText}\nИтого: ${t}⭐`);
       return;
     }
-
     const resp = await fetch(`${API_BASE}/api/create-invoice`, {
       method: "POST",
       headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({
-        initData: tg.initData,
-        giftId: selectedGift.id,
-        sender
-      })
+      body: JSON.stringify({ initData: tg.initData, giftId: selectedGift.id, sender: addSignature ? sender : null })
+    });
+    if (!resp.ok) { alert("Ошибка создания инвойса"); return; }
+    const { link } = await resp.json();
+    tg.openInvoice(link, (status) => { if (status === "paid") tg.close(); });
+  };
+
+  // Case opening
+  function openCase(caseData) {
+    const overlay = document.getElementById("rouletteOverlay");
+    const strip = document.getElementById("rouletteStrip");
+    const title = document.getElementById("rouletteTitle");
+    const result = document.getElementById("rouletteResult");
+    const closeBtn = document.getElementById("rouletteClose");
+
+    overlay.classList.remove("hidden");
+    title.textContent = `${caseData.name} кейс`;
+    result.textContent = "";
+    result.className = "rouletteResult";
+    closeBtn.classList.add("hidden");
+
+    const items = [];
+    for (let i = 0; i < 40; i++) {
+      items.push(GIFTS[Math.floor(Math.random() * GIFTS.length)]);
+    }
+
+    const winIndex = 32;
+    let winItem;
+    
+    if (caseData.id === "weekly") {
+      winItem = GIFTS[Math.floor(Math.random() * GIFTS.length)];
+    } else {
+      const dropId = caseData.drops[Math.floor(Math.random() * caseData.drops.length)];
+      winItem = GIFTS.find(g => g.id === dropId) || GIFTS[0];
+    }
+    items[winIndex] = winItem;
+
+    strip.innerHTML = items.map(item => `
+      <div class="rouletteItem">
+        <img src="${item.gif_url}" alt="${item.title}">
+      </div>
+    `).join("");
+
+    strip.style.transition = "none";
+    strip.style.transform = "translateY(0)";
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        strip.style.transition = "transform 5s cubic-bezier(0.12, 0.8, 0.3, 1)";
+        const offset = (winIndex * 90) - 25;
+        strip.style.transform = `translateY(-${offset}px)`;
+      });
     });
 
-    if (!resp.ok) {
-      alert("Не удалось создать инвойс");
-      return;
-    }
-    const { link } = await resp.json();
-    tg.openInvoice(link, (status) => {
-      if (status === "paid") tg.close();
-    });
+    setTimeout(() => {
+      if (caseData.id === "weekly") {
+        result.textContent = "😔 Ничего не выпало...";
+        result.classList.add("lose");
+        weeklyUsed = new Date().toISOString();
+        localStorage.setItem('weeklyUsed', weeklyUsed);
+      } else {
+        result.textContent = `🎉 Выпало: ${winItem.title}!`;
+        result.classList.add("win");
+      }
+      closeBtn.classList.remove("hidden");
+      closeBtn.textContent = caseData.id === "weekly" ? "Закрыть" : "Забрать";
+    }, 5500);
+  }
+
+  document.getElementById("rouletteClose").onclick = () => {
+    document.getElementById("rouletteOverlay").classList.add("hidden");
+    renderCases();
   };
 
   if (tg) {
