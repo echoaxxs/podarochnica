@@ -20,6 +20,7 @@
       --danger: #ff453a;
       --success: #30d158;
       --starColor: #FFD60A;
+      --creditColor: #5AC8FA;
 
       --radius: 18px;
       --radius2: 14px;
@@ -64,6 +65,11 @@
     @keyframes glow {
       0%, 100% { box-shadow: 0 0 20px rgba(142, 131, 255, 0.3); }
       50% { box-shadow: 0 0 40px rgba(142, 131, 255, 0.6); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
     }
 
     .app {
@@ -389,7 +395,7 @@
       background: linear-gradient(145deg, rgba(127,127,127,.12), rgba(127,127,127,.04));
       border: 1px solid var(--separator);
       border-radius: 20px;
-      padding: 20px 16px;
+      padding: 20px 16px 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -492,6 +498,45 @@
       position: relative;
       z-index: 1;
       font-weight: 500;
+    }
+
+    /* === НОВОЕ: Плашка кредитов === */
+    .creditBadge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(90, 200, 250, 0.15);
+      border: 1px solid rgba(90, 200, 250, 0.3);
+      font-weight: 600;
+      font-size: 11px;
+      color: var(--creditColor);
+      position: relative;
+      z-index: 1;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    .creditBadge svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .caseCard.hasCredit {
+      border-color: rgba(90, 200, 250, 0.4);
+      box-shadow: 0 0 20px rgba(90, 200, 250, 0.15);
+    }
+
+    .caseCard.hasCredit::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 20px;
+      border: 2px solid rgba(90, 200, 250, 0.3);
+      pointer-events: none;
     }
 
     .rouletteOverlay {
@@ -648,6 +693,30 @@
     .testBtn:active { transform: scale(0.97); }
 
     .hidden { display: none; }
+
+    /* Лоадер */
+    .loader {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: var(--subtext);
+      font-size: 14px;
+      gap: 8px;
+    }
+    
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--separator);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 
@@ -707,7 +776,7 @@
               <div class="toggleRow" id="toggleSignature">
                 <div>
                   <div style="font-weight:700; font-size: 16px;">Добавить подпись</div>
-                  <div class="muted">+1 к стоимости</div>
+                  <div class="muted">+1 ⭐ к стоимости</div>
                 </div>
                 <div class="toggle" id="signatureToggle"></div>
               </div>
@@ -756,7 +825,9 @@
 
 <script>
   const tg = window.Telegram?.WebApp;
-  const API_BASE = "";
+  
+  // ⚠️ ВАЖНО: Замени на URL твоего сервера!
+  const API_BASE = "https://твой-сервер.com"; // например: "https://mybot.onrender.com"
 
   const FREE_SENDER = "@echoaxxs";
   const PAID_SENDER = "@bogclm";
@@ -770,7 +841,8 @@
     diamond: `<svg viewBox="0 0 48 48" fill="none"><path d="M24 4L42 18L24 44L6 18L24 4Z" fill="#A78BFA"/><path d="M24 4L6 18H42L24 4Z" fill="#C4B5FD"/><path d="M6 18L24 44L24 18H6Z" fill="#8B5CF6"/><path d="M42 18L24 44V18H42Z" fill="#9F7AEA"/><path d="M14 18L24 4L34 18H14Z" fill="#DDD6FE"/></svg>`,
     money: `<svg viewBox="0 0 48 48" fill="none"><ellipse cx="24" cy="26" rx="18" ry="14" fill="#34D399"/><ellipse cx="24" cy="22" rx="18" ry="14" fill="#6EE7B7"/><ellipse cx="24" cy="22" rx="14" ry="10" fill="#34D399"/><text x="24" y="27" text-anchor="middle" fill="white" font-size="16" font-weight="bold">$</text></svg>`,
     fire: `<svg viewBox="0 0 48 48" fill="none"><path d="M24 4C24 4 12 16 12 28C12 36 17 44 24 44C31 44 36 36 36 28C36 16 24 4 24 4Z" fill="#FF6B35"/><path d="M24 16C24 16 18 22 18 30C18 36 21 40 24 40C27 40 30 36 30 30C30 22 24 16 24 16Z" fill="#FFD93D"/><path d="M24 26C24 26 21 30 21 34C21 37 22.5 39 24 39C25.5 39 27 37 27 34C27 30 24 26 24 26Z" fill="#FFF"/></svg>`,
-    nothing: `<svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" stroke="#666" stroke-width="3" fill="none"/><line x1="12" y1="12" x2="36" y2="36" stroke="#666" stroke-width="3"/></svg>`
+    nothing: `<svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" stroke="#666" stroke-width="3" fill="none"/><line x1="12" y1="12" x2="36" y2="36" stroke="#666" stroke-width="3"/></svg>`,
+    ticket: `<svg viewBox="0 0 24 24" fill="none"><path d="M2 9V6a2 2 0 012-2h16a2 2 0 012 2v3" stroke="currentColor" stroke-width="2"/><path d="M2 15v3a2 2 0 002 2h16a2 2 0 002-2v-3" stroke="currentColor" stroke-width="2"/><path d="M22 9a3 3 0 00-3 3 3 3 0 003 3" stroke="currentColor" stroke-width="2"/><path d="M2 9a3 3 0 013 3 3 3 0 01-3 3" stroke="currentColor" stroke-width="2"/><line x1="10" y1="8" x2="10" y2="16" stroke="currentColor" stroke-width="2" stroke-dasharray="2 2"/></svg>`
   };
 
   const GIFTS = [
@@ -799,6 +871,9 @@
   let sender = FREE_SENDER;
   let addSignature = false;
   let weeklyUsed = localStorage.getItem('weeklyUsed') || null;
+  
+  // === КРЕДИТЫ ===
+  let userCredits = { cases: {}, gifts: {} };
 
   function setVar(name, val){ if(val) document.documentElement.style.setProperty(name, val); }
 
@@ -818,6 +893,74 @@
       tg.setBackgroundColor(p.bg_color || "#000000");
       tg.setHeaderColor(p.secondary_bg_color || p.bg_color || "#000000");
     } catch (e) {}
+  }
+
+  // === ЗАГРУЗКА КРЕДИТОВ С СЕРВЕРА ===
+  async function loadCredits() {
+    if (!tg || !API_BASE) {
+      console.log("Тестовый режим: кредиты не загружаются");
+      return;
+    }
+    
+    try {
+      const resp = await fetch(`${API_BASE}/api/get-credits`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ initData: tg.initData })
+      });
+      
+      if (resp.ok) {
+        const data = await resp.json();
+        userCredits = data;
+        console.log("Кредиты загружены:", userCredits);
+        renderCases(); // Перерисовываем кейсы с кредитами
+      }
+    } catch (e) {
+      console.error("Ошибка загрузки кредитов:", e);
+    }
+  }
+
+  // === ИСПОЛЬЗОВАНИЕ КРЕДИТА ===
+  async function useCredit(itemType, itemId) {
+    if (!tg || !API_BASE) {
+      console.log("Тестовый режим: кредит не списывается");
+      return true;
+    }
+    
+    try {
+      const resp = await fetch(`${API_BASE}/api/use-credit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          initData: tg.initData,
+          itemType: itemType,
+          itemId: itemId
+        })
+      });
+      
+      if (resp.ok) {
+        // Уменьшаем локально
+        const category = itemType === "case" ? "cases" : "gifts";
+        if (userCredits[category][itemId]) {
+          userCredits[category][itemId]--;
+        }
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error("Ошибка использования кредита:", e);
+      return false;
+    }
+  }
+
+  // Получить количество кредитов для кейса
+  function getCaseCredits(caseId) {
+    return userCredits.cases[caseId] || 0;
+  }
+
+  // Получить количество кредитов для подарка
+  function getGiftCredits(giftId) {
+    return userCredits.gifts[giftId] || 0;
   }
 
   function isWeeklyAvailable() {
@@ -860,22 +1003,37 @@
   function renderCases() {
     const grid = document.getElementById("caseGrid");
     grid.innerHTML = "";
+    
     CASES.forEach(c => {
       const isWeekly = c.id === "weekly";
       const available = !isWeekly || isWeeklyAvailable();
       const cooldown = isWeekly ? getWeeklyCooldown() : null;
+      const credits = getCaseCredits(c.id);
+      const hasCredit = credits > 0;
+      
       const el = document.createElement("div");
-      el.className = `caseCard ${c.type}${!available ? ' disabled' : ''}`;
+      el.className = `caseCard ${c.type}${!available && !hasCredit ? ' disabled' : ''}${hasCredit ? ' hasCredit' : ''}`;
       
       const priceContent = c.price === 0 ? c.priceText : `${ICONS.star}${c.priceText}`;
+      
+      // Формируем плашку кредитов
+      const creditBadge = hasCredit 
+        ? `<div class="creditBadge">${ICONS.ticket} Доступно: ${credits}</div>` 
+        : '';
       
       el.innerHTML = `
         <div class="caseIcon">${CASE_ICONS[c.type]}</div>
         <div class="caseName">${c.name}</div>
         <div class="casePrice">${priceContent}</div>
-        ${cooldown ? `<div class="cooldown">Через ${cooldown}</div>` : ''}
+        ${creditBadge}
+        ${cooldown && !hasCredit ? `<div class="cooldown">Через ${cooldown}</div>` : ''}
       `;
-      if (available) el.onclick = () => openCase(c);
+      
+      // Если есть кредиты или доступен — можно открыть
+      if (available || hasCredit) {
+        el.onclick = () => openCase(c, hasCredit);
+      }
+      
       grid.appendChild(el);
     });
   }
@@ -965,7 +1123,99 @@
     renderCases();
   };
 
-  function openCase(caseData) {
+  async function openCase(caseData, useCredit = false) {
+    const overlay = document.getElementById("rouletteOverlay");
+    const strip = document.getElementById("rouletteStrip");
+    const title = document.getElementById("rouletteTitle");
+    const result = document.getElementById("rouletteResult");
+    const closeBtn = document.getElementById("rouletteClose");
+
+    const isWeekly = caseData.id === "weekly";
+    const isPaid = caseData.price > 0 && !useCredit;
+
+    // Если платный кейс без кредита — создаём инвойс
+    if (isPaid) {
+      if (!tg || !API_BASE) {
+        alert(`Тест: Покупка ${caseData.name} за ${caseData.price}⭐`);
+        return;
+      }
+      
+      try {
+        const resp = await fetch(`${API_BASE}/api/create-invoice`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ initData: tg.initData, caseId: caseData.id })
+        });
+        
+        if (!resp.ok) {
+          alert("Ошибка создания инвойса");
+          return;
+        }
+        
+        const { link } = await resp.json();
+        tg.openInvoice(link, (status) => {
+          if (status === "paid") {
+            // После оплаты показываем рулетку
+            showRoulette(caseData, false);
+          }
+        });
+        return;
+      } catch (e) {
+        alert("Ошибка: " + e.message);
+        return;
+      }
+    }
+
+    // Если используем кредит — списываем его
+    if (useCredit) {
+      const success = await useCreditAPI("case", caseData.id);
+      if (!success) {
+        alert("Не удалось использовать кредит");
+        return;
+      }
+    }
+
+    // Показываем рулетку
+    showRoulette(caseData, isWeekly);
+  }
+
+  async function useCreditAPI(itemType, itemId) {
+    if (!tg || !API_BASE) {
+      // Тестовый режим — просто уменьшаем локально
+      const category = itemType === "case" ? "cases" : "gifts";
+      if (userCredits[category][itemId] && userCredits[category][itemId] > 0) {
+        userCredits[category][itemId]--;
+        return true;
+      }
+      return false;
+    }
+    
+    try {
+      const resp = await fetch(`${API_BASE}/api/use-credit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          initData: tg.initData,
+          itemType: itemType,
+          itemId: itemId
+        })
+      });
+      
+      if (resp.ok) {
+        const category = itemType === "case" ? "cases" : "gifts";
+        if (userCredits[category][itemId]) {
+          userCredits[category][itemId]--;
+        }
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error("Ошибка:", e);
+      return false;
+    }
+  }
+
+  function showRoulette(caseData, isWeekly) {
     const overlay = document.getElementById("rouletteOverlay");
     const strip = document.getElementById("rouletteStrip");
     const title = document.getElementById("rouletteTitle");
@@ -979,7 +1229,6 @@
     closeBtn.classList.add("hidden");
 
     const items = [];
-    const isWeekly = caseData.id === "weekly";
     
     // Заполняем рулетку обычными подарками
     for (let i = 0; i < 40; i++) {
@@ -1040,16 +1289,23 @@
     renderCases();
   };
 
+  // === ИНИЦИАЛИЗАЦИЯ ===
   if (tg) {
     tg.ready();
     tg.expand();
     applyTheme();
     tg.onEvent("themeChanged", applyTheme);
+    
+    // Загружаем кредиты при старте
+    loadCredits();
   }
 
   initTabs();
   renderGrid();
+
+  // === ТЕСТ: Добавить тестовые кредиты (удали в продакшене) ===
+  // userCredits = { cases: { premium: 2, rich: 1 }, gifts: {} };
+  // renderCases();
 </script>
 </body>
 </html>
-
