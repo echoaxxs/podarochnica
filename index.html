@@ -770,7 +770,7 @@
               <div class="toggleRow" id="toggleSignature">
                 <div>
                   <div style="font-weight:700; font-size: 16px;">Добавить подпись</div>
-                  <div class="muted">+2 ⭐ к стоимости</div>
+                  <div class="muted">от +2 ⭐ к стоимости</div>
                 </div>
                 <div class="toggle" id="signatureToggle"></div>
               </div>
@@ -1640,6 +1640,7 @@
   function syncSenderUI() {
     document.getElementById("checkFree").classList.toggle("on", sender === FREE_SENDER);
     document.getElementById("checkPaid").classList.toggle("on", sender === PAID_SENDER);
+    document.getElementById("checkBoth").classList.toggle("on", sender === BOTH_SENDER);
   }
 
   function totalPrice() {
@@ -1679,8 +1680,9 @@
     updateTotalUI();
   };
 
-  document.getElementById("optFree").onclick = () => { sender = FREE_SENDER; syncSenderUI(); };
-  document.getElementById("optPaid").onclick = () => { sender = PAID_SENDER; syncSenderUI(); };
+  document.getElementById("optFree").onclick = () => { sender = FREE_SENDER; syncSenderUI(); updateTotalUI(); };
+  document.getElementById("optPaid").onclick = () => { sender = PAID_SENDER; syncSenderUI(); updateTotalUI(); };
+  document.getElementById("optBoth").onclick = () => { sender = BOTH_SENDER; syncSenderUI(); updateTotalUI(); };
   document.getElementById("btnBack").onclick = closeDetails;
 
   document.getElementById("btnBuy").onclick = async () => {
