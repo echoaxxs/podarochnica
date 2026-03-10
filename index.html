@@ -129,9 +129,6 @@
     .muted { color: var(--subtext); font-size: 13px; font-weight: 500; }
 
     .icon { width: 20px; height: 20px; display: inline-block; vertical-align: middle; }
-    .icon-sm { width: 16px; height: 16px; }
-    .icon-lg { width: 48px; height: 48px; }
-    .icon-xl { width: 64px; height: 64px; }
 
     .tabs {
       display: flex;
@@ -449,6 +446,14 @@
       position: relative;
       z-index: 1;
       animation: float 3s infinite ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .caseIcon svg {
+      width: 100%;
+      height: 100%;
     }
 
     .caseCard:nth-child(2) .caseIcon { animation-delay: 0.5s; }
@@ -577,6 +582,7 @@
       flex-direction: row;
       transition: transform 5s cubic-bezier(0.12, 0.8, 0.3, 1);
       height: 100%;
+      align-items: center;
     }
 
     .rouletteItem {
@@ -585,14 +591,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 12px;
       flex-shrink: 0;
     }
 
-    .rouletteItem img, .rouletteItem svg {
+    .rouletteItem img {
+      height: 70px;
+      width: 70px;
+      object-fit: contain;
+    }
+    
+    .rouletteItem svg {
       height: 60px;
       width: 60px;
-      object-fit: contain;
     }
 
     .rouletteResult {
@@ -646,7 +656,6 @@
     <div class="sheet">
       <div class="panel">
 
-        <!-- Screen: Catalog -->
         <div id="screenCatalog">
           <div class="topbar">
             <button class="back" style="visibility:hidden">←</button>
@@ -680,7 +689,6 @@
           </div>
         </div>
 
-        <!-- Screen: Details -->
         <div id="screenDetails" class="hidden">
           <div class="topbar">
             <button id="btnBack" class="back">← Назад</button>
@@ -734,7 +742,6 @@
     </div>
   </div>
 
-  <!-- Roulette Overlay -->
   <div id="rouletteOverlay" class="rouletteOverlay hidden">
     <div class="rouletteContainer">
       <div class="rouletteTitle" id="rouletteTitle">Открываем кейс...</div>
@@ -755,22 +762,14 @@
   const PAID_SENDER = "@bogclm";
   const SIGNATURE_COST = 1;
 
-  // SVG Icons
   const ICONS = {
     star: `<svg class="star" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FFD60A" stroke="#FFB800" stroke-width="1"/></svg>`,
-    
     gift: `<svg viewBox="0 0 24 24" fill="none" width="20" height="20"><rect x="3" y="10" width="18" height="12" rx="2" fill="currentColor" opacity="0.9"/><rect x="3" y="10" width="18" height="3" fill="currentColor"/><rect x="10.5" y="10" width="3" height="12" fill="#FFE066"/><path d="M12 10C12 10 9 7 9 5C9 3 10.5 2 12 4C13.5 2 15 3 15 5C15 7 12 10 12 10Z" fill="currentColor" stroke="currentColor" stroke-width="1"/><rect x="4" y="6" width="16" height="4" rx="1" fill="currentColor" opacity="0.8"/><rect x="10.5" y="6" width="3" height="4" fill="#FFE066"/></svg>`,
-    
     dice: `<svg viewBox="0 0 24 24" fill="none" width="20" height="20"><rect x="2" y="2" width="20" height="20" rx="4" fill="currentColor" opacity="0.9"/><circle cx="7" cy="7" r="2" fill="white"/><circle cx="12" cy="12" r="2" fill="white"/><circle cx="17" cy="17" r="2" fill="white"/><circle cx="17" cy="7" r="2" fill="white"/><circle cx="7" cy="17" r="2" fill="white"/></svg>`,
-    
-    box: `<svg viewBox="0 0 48 48" fill="none"><path d="M4 16L24 6L44 16V36L24 46L4 36V16Z" fill="#4ECDC4"/><path d="M24 6L44 16L24 26L4 16L24 6Z" fill="#7DE8E1"/><path d="M24 26V46L4 36V16L24 26Z" fill="#3DB9B1"/><path d="M24 26V46L44 36V16L24 26Z" fill="#44C4BC"/><line x1="24" y1="6" x2="24" y2="26" stroke="#2A9D8F" stroke-width="2"/></svg>`,
-    
+    box: `<svg viewBox="0 0 48 48" fill="none"><path d="M4 16L24 6L44 16V36L24 46L4 36V16Z" fill="#4ECDC4"/><path d="M24 6L44 16L24 26L4 16L24 6Z" fill="#7DE8E1"/><path d="M24 26V46L4 36V16L24 26Z" fill="#3DB9B1"/><path d="M24 26V46L44 36V16L24 26Z" fill="#44C4BC"/></svg>`,
     diamond: `<svg viewBox="0 0 48 48" fill="none"><path d="M24 4L42 18L24 44L6 18L24 4Z" fill="#A78BFA"/><path d="M24 4L6 18H42L24 4Z" fill="#C4B5FD"/><path d="M6 18L24 44L24 18H6Z" fill="#8B5CF6"/><path d="M42 18L24 44V18H42Z" fill="#9F7AEA"/><path d="M14 18L24 4L34 18H14Z" fill="#DDD6FE"/></svg>`,
-    
     money: `<svg viewBox="0 0 48 48" fill="none"><ellipse cx="24" cy="26" rx="18" ry="14" fill="#34D399"/><ellipse cx="24" cy="22" rx="18" ry="14" fill="#6EE7B7"/><ellipse cx="24" cy="22" rx="14" ry="10" fill="#34D399"/><text x="24" y="27" text-anchor="middle" fill="white" font-size="16" font-weight="bold">$</text></svg>`,
-    
     fire: `<svg viewBox="0 0 48 48" fill="none"><path d="M24 4C24 4 12 16 12 28C12 36 17 44 24 44C31 44 36 36 36 28C36 16 24 4 24 4Z" fill="#FF6B35"/><path d="M24 16C24 16 18 22 18 30C18 36 21 40 24 40C27 40 30 36 30 30C30 22 24 16 24 16Z" fill="#FFD93D"/><path d="M24 26C24 26 21 30 21 34C21 37 22.5 39 24 39C25.5 39 27 37 27 34C27 30 24 26 24 26Z" fill="#FFF"/></svg>`,
-    
     nothing: `<svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" stroke="#666" stroke-width="3" fill="none"/><line x1="12" y1="12" x2="36" y2="36" stroke="#666" stroke-width="3"/></svg>`
   };
 
@@ -781,7 +780,7 @@
   ];
 
   const CASES = [
-    { id: "weekly", name: "Еженедельный", price: 0, priceText: "Бесплатно", type: "free", drops: [] },
+    { id: "weekly", name: "Еженедельный", price: 0, priceText: "Бесплатно", type: "free", drops: ["rose", "box", "heart"] },
     { id: "premium", name: "Премиум", price: 30, priceText: "30", type: "premium", drops: ["rose", "box", "heart"] },
     { id: "rich", name: "Богач", price: 100, priceText: "100", type: "rich", drops: ["rose", "box", "heart"] },
     { id: "ultra", name: "Ультра", price: 500, priceText: "500", type: "ultra", drops: ["rose", "box", "heart"] },
@@ -866,9 +865,7 @@
       const el = document.createElement("div");
       el.className = `caseCard ${c.type}${!available ? ' disabled' : ''}`;
       
-      const priceContent = c.price === 0 
-        ? c.priceText 
-        : `${ICONS.star}${c.priceText}`;
+      const priceContent = c.price === 0 ? c.priceText : `${ICONS.star}${c.priceText}`;
       
       el.innerHTML = `
         <div class="caseIcon">${CASE_ICONS[c.type]}</div>
@@ -982,18 +979,16 @@
     const items = [];
     const isWeekly = caseData.id === "weekly";
     
+    // Заполняем рулетку обычными подарками
     for (let i = 0; i < 40; i++) {
-      if (isWeekly) {
-        items.push({ id: "nothing", title: "Ничего", isNothing: true });
-      } else {
-        items.push(GIFTS[Math.floor(Math.random() * GIFTS.length)]);
-      }
+      items.push(GIFTS[Math.floor(Math.random() * GIFTS.length)]);
     }
 
     const winIndex = 32;
     let winItem;
     
     if (isWeekly) {
+      // Для еженедельного: на выигрышной позиции всегда "ничего"
       winItem = { id: "nothing", title: "Ничего", isNothing: true };
     } else {
       const dropId = caseData.drops[Math.floor(Math.random() * caseData.drops.length)];
