@@ -28,17 +28,19 @@
     }
 
     html, body {
-      height: 100%;
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
-                   "SF Pro Rounded", system-ui, "Helvetica Neue", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      font-feature-settings: "kern" 1;
-      text-rendering: optimizeLegibility;
-    }
+    min-height: 100%;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+                 "SF Pro Rounded", system-ui, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "kern" 1;
+    text-rendering: optimizeLegibility;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 
     * { -webkit-tap-highlight-color: transparent; }
 
@@ -76,6 +78,7 @@
       padding: calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 16px);
       display: flex;
       justify-content: center;
+      min-height: 100vh;
     }
 
     .sheet {
@@ -84,6 +87,7 @@
       background: color-mix(in oklab, var(--bg) 30%, transparent);
       border-radius: calc(var(--radius) + 6px);
       padding: 10px;
+      padding-bottom: 80px;
     }
 
     .panel {
@@ -91,7 +95,7 @@
       border: 1px solid var(--separator);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      overflow: hidden;
+      overflow: visible;
     }
 
     .topbar {
@@ -101,11 +105,11 @@
       gap: 10px;
       position: sticky;
       top: 0;
-      background: color-mix(in oklab, var(--section) 86%, transparent);
+      background: color-mix(in oklab, var(--section) 92%, transparent);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       border-bottom: 1px solid var(--separator);
-      z-index: 5;
+      z-index: 10;
     }
 
     .topbar .back {
@@ -130,7 +134,14 @@
     }
     .topbar .ghost { width: 44px; height: 1px; }
 
-    .content { padding: 14px; animation: fadeIn 0.35s ease-out; }
+    .content {
+      padding: 14px;
+      animation: fadeIn 0.35s ease-out;
+    }
+    
+    #screenDetails .content {
+      padding-bottom: 80px;
+    }
 
     .muted { color: var(--subtext); font-size: 13px; font-weight: 500; }
 
@@ -328,9 +339,16 @@
       border-top: 1px solid var(--separator);
       cursor: pointer;
       transition: all 0.2s ease;
+      min-height: 52px;
     }
     
-    .selectRow:active { background: rgba(127,127,127,.08); }
+    .selectRow:active {
+      background: rgba(127,127,127,.12);
+    }
+    
+    .selectRow .muted {
+      margin-top: 2px;
+    }
 
     .senderOptions {
       overflow: hidden;
@@ -339,7 +357,10 @@
       opacity: 0;
     }
     
-    .senderOptions.expanded { max-height: 200px; opacity: 1; }
+    .senderOptions.expanded {
+      max-height: 350px;
+      opacity: 1;
+    }
 
     .check {
       width: 24px; height: 24px;
@@ -360,10 +381,13 @@
       position: sticky;
       bottom: 0;
       padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
-      background: color-mix(in oklab, var(--section) 86%, transparent);
+      background: color-mix(in oklab, var(--section) 92%, transparent);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       border-top: 1px solid var(--separator);
+      z-index: 10;
+    }
+    
     }
     .buyBtn {
       width: 100%;
@@ -1915,6 +1939,7 @@
 </script>
 </body>
 </html>
+
 
 
 
