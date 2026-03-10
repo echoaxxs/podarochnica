@@ -1068,36 +1068,49 @@
   }
 
   // === ИСПРАВЛЕНИЕ 4: Безопасные fetch запросы ===
+    // === ИСПРАВЛЕННЫЙ FETCH БЕЗ AbortController ===
   async function safeFetch(url, options = {}) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 сек таймаут
-      
-      const response = await fetch(url, {
-        ...options,
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+    const maxRetries = 2;
+    let lastError;
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`Fetch ${url} (попытка ${attempt + 1})`);
+        
+        const response = await fetch(url, {
+          ...options,
+          // Убираем signal, он вызывает проблемы в Telegram WebView
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        return response;
+      } catch (error) {
+        lastError = error;
+        console.warn(`Fetch ошибка (попытка ${attempt + 1}):`, error.message);
+        
+        // Ждём перед повторной попыткой (кроме последней)
+        if (attempt < maxRetries) {
+          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+        }
       }
-      
-      return response;
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        console.warn("Запрос отменён по таймауту:", url);
-      } else {
-        console.error("Ошибка fetch:", error);
-      }
-      throw error;
     }
+    
+    throw lastError;
   }
 
+  // === ЗАГРУЗКА КРЕДИТОВ С ОБРАБОТКОЙ ОШИБОК ===
   async function loadCredits() {
-    if (!tg?.initData || !API_BASE) {
-      console.log("Тестовый режим: кредиты не загружаются");
+    // Проверяем что есть initData и API
+    if (!tg?.initData) {
+      console.log("Нет initData — тестовый режим");
+      return;
+    }
+    
+    if (!API_BASE) {
+      console.log("API_BASE не настроен");
       return;
     }
     
@@ -1109,7 +1122,7 @@
       });
       
       const data = await resp.json();
-      userCredits = data;
+      userCredits = data || { cases: {}, gifts: {} };
       console.log("Кредиты загружены:", userCredits);
       
       // Перерисовываем кейсы если мы на вкладке "Удача"
@@ -1117,9 +1130,332 @@
         renderCases();
       }
     } catch (e) {
-      console.error("Ошибка загрузки кредитов:", e);
-      // Не блокируем интерфейс при ошибке
+      console.error("Ошибка загрузки кредитов:", e.message);
+      // Продолжаем работать без кредитов
+      userCredits = { cases: {}, gifts: {} };
     }
+  }
+
+  // === ИСПОЛЬЗОВАНИЕ КРЕДИТА ===
+  async function useCreditAPI(itemType, itemId) {
+    // Локальный тестовый режим
+    if (!tg?.initData || !API_BASE) {
+      const category = itemType === "case" ? "cases" : "gifts";
+      if (userCredits[category]?.[itemId] > 0) {
+        userCredits[category][itemId]--;
+        return true;
+      }
+      return false;
+    }
+    
+    try {
+      const resp = await safeFetch(`${API_BASE}/api/use-credit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          initData: tg.initData,
+          itemType: itemType,
+          itemId: itemId
+        })
+      });
+      
+      const result = await resp.json();
+      
+      if (result.success) {
+        const category = itemType === "case" ? "cases" : "gifts";
+        if (userCredits[category]?.[itemId]) {
+          userCredits[category][itemId]--;
+        }
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error("Ошибка использования кредита:", e.message);
+      return false;
+    }
+  }
+
+  // === ПОКУПКА ПОДАРКА ===
+  document.getElementById("btnBuy").onclick = async () => {
+    const t = totalPrice();
+    
+    if (!tg?.initData || !API_BASE) {
+      const senderText = addSignature ? `\nПодпись: от ${sender}` : '\nБез подписи';
+      alert(`Тест: ${selectedGift.title}${senderText}\nИтого: ${t}⭐`);
+      return;
+    }
+    
+    try {
+      const resp = await safeFetch(`${API_BASE}/api/create-invoice`, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ 
+          initData: tg.initData, 
+          giftId: selectedGift.id, 
+          sender: addSignature ? sender : null 
+        })
+      });
+      
+      const data = await resp.json();
+      
+      if (data.link) {
+        tg.openInvoice(data.link, (status) => { 
+          if (status === "paid") tg.close(); 
+        });
+      } else {
+        alert("Не удалось создать счёт");
+      }
+    } catch (e) {
+      console.error("Ошибка:", e);
+      alert("Ошибка соединения с сервером. Попробуй ещё раз.");
+    }
+  };
+
+  // === ОТКРЫТИЕ КЕЙСА ===
+  async function openCase(caseData, useCreditFlag = false) {
+    const isWeekly = caseData.id === "weekly";
+    const isPaid = caseData.price > 0 && !useCreditFlag;
+
+    // Платный кейс без кредита — создаём инвойс
+    if (isPaid) {
+      if (!tg?.initData || !API_BASE) {
+        alert(`Тест: Покупка ${caseData.name} за ${caseData.price}⭐`);
+        showRoulette(caseData, false);
+        return;
+      }
+      
+      try {
+        const resp = await safeFetch(`${API_BASE}/api/create-invoice`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ initData: tg.initData, caseId: caseData.id })
+        });
+        
+        const data = await resp.json();
+        
+        if (data.link) {
+          tg.openInvoice(data.link, (status) => {
+            if (status === "paid") {
+              showRoulette(caseData, false);
+            }
+          });
+        } else {
+          alert("Не удалось создать счёт");
+        }
+        return;
+      } catch (e) {
+        console.error("Ошибка:", e);
+        alert("Ошибка соединения. Попробуй ещё раз.");
+        return;
+      }
+    }
+
+    // Используем кредит
+    if (useCreditFlag) {
+      const success = await useCreditAPI("case", caseData.id);
+      if (!success) {
+        alert("Не удалось использовать кредит");
+        return;
+      }
+    }
+
+    // Показываем рулетку
+    showRoulette(caseData, isWeekly);
+  }
+
+    // === ИСПРАВЛЕННЫЙ FETCH БЕЗ AbortController ===
+  async function safeFetch(url, options = {}) {
+    const maxRetries = 2;
+    let lastError;
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`Fetch ${url} (попытка ${attempt + 1})`);
+        
+        const response = await fetch(url, {
+          ...options,
+          // Убираем signal, он вызывает проблемы в Telegram WebView
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        return response;
+      } catch (error) {
+        lastError = error;
+        console.warn(`Fetch ошибка (попытка ${attempt + 1}):`, error.message);
+        
+        // Ждём перед повторной попыткой (кроме последней)
+        if (attempt < maxRetries) {
+          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+        }
+      }
+    }
+    
+    throw lastError;
+  }
+
+  // === ЗАГРУЗКА КРЕДИТОВ С ОБРАБОТКОЙ ОШИБОК ===
+  async function loadCredits() {
+    // Проверяем что есть initData и API
+    if (!tg?.initData) {
+      console.log("Нет initData — тестовый режим");
+      return;
+    }
+    
+    if (!API_BASE) {
+      console.log("API_BASE не настроен");
+      return;
+    }
+    
+    try {
+      const resp = await safeFetch(`${API_BASE}/api/get-credits`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ initData: tg.initData })
+      });
+      
+      const data = await resp.json();
+      userCredits = data || { cases: {}, gifts: {} };
+      console.log("Кредиты загружены:", userCredits);
+      
+      // Перерисовываем кейсы если мы на вкладке "Удача"
+      if (!document.getElementById("sectionLuck").classList.contains("hidden")) {
+        renderCases();
+      }
+    } catch (e) {
+      console.error("Ошибка загрузки кредитов:", e.message);
+      // Продолжаем работать без кредитов
+      userCredits = { cases: {}, gifts: {} };
+    }
+  }
+
+  // === ИСПОЛЬЗОВАНИЕ КРЕДИТА ===
+  async function useCreditAPI(itemType, itemId) {
+    // Локальный тестовый режим
+    if (!tg?.initData || !API_BASE) {
+      const category = itemType === "case" ? "cases" : "gifts";
+      if (userCredits[category]?.[itemId] > 0) {
+        userCredits[category][itemId]--;
+        return true;
+      }
+      return false;
+    }
+    
+    try {
+      const resp = await safeFetch(`${API_BASE}/api/use-credit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          initData: tg.initData,
+          itemType: itemType,
+          itemId: itemId
+        })
+      });
+      
+      const result = await resp.json();
+      
+      if (result.success) {
+        const category = itemType === "case" ? "cases" : "gifts";
+        if (userCredits[category]?.[itemId]) {
+          userCredits[category][itemId]--;
+        }
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error("Ошибка использования кредита:", e.message);
+      return false;
+    }
+  }
+
+  // === ПОКУПКА ПОДАРКА ===
+  document.getElementById("btnBuy").onclick = async () => {
+    const t = totalPrice();
+    
+    if (!tg?.initData || !API_BASE) {
+      const senderText = addSignature ? `\nПодпись: от ${sender}` : '\nБез подписи';
+      alert(`Тест: ${selectedGift.title}${senderText}\nИтого: ${t}⭐`);
+      return;
+    }
+    
+    try {
+      const resp = await safeFetch(`${API_BASE}/api/create-invoice`, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ 
+          initData: tg.initData, 
+          giftId: selectedGift.id, 
+          sender: addSignature ? sender : null 
+        })
+      });
+      
+      const data = await resp.json();
+      
+      if (data.link) {
+        tg.openInvoice(data.link, (status) => { 
+          if (status === "paid") tg.close(); 
+        });
+      } else {
+        alert("Не удалось создать счёт");
+      }
+    } catch (e) {
+      console.error("Ошибка:", e);
+      alert("Ошибка соединения с сервером. Попробуй ещё раз.");
+    }
+  };
+
+  // === ОТКРЫТИЕ КЕЙСА ===
+  async function openCase(caseData, useCreditFlag = false) {
+    const isWeekly = caseData.id === "weekly";
+    const isPaid = caseData.price > 0 && !useCreditFlag;
+
+    // Платный кейс без кредита — создаём инвойс
+    if (isPaid) {
+      if (!tg?.initData || !API_BASE) {
+        alert(`Тест: Покупка ${caseData.name} за ${caseData.price}⭐`);
+        showRoulette(caseData, false);
+        return;
+      }
+      
+      try {
+        const resp = await safeFetch(`${API_BASE}/api/create-invoice`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ initData: tg.initData, caseId: caseData.id })
+        });
+        
+        const data = await resp.json();
+        
+        if (data.link) {
+          tg.openInvoice(data.link, (status) => {
+            if (status === "paid") {
+              showRoulette(caseData, false);
+            }
+          });
+        } else {
+          alert("Не удалось создать счёт");
+        }
+        return;
+      } catch (e) {
+        console.error("Ошибка:", e);
+        alert("Ошибка соединения. Попробуй ещё раз.");
+        return;
+      }
+    }
+
+    // Используем кредит
+    if (useCreditFlag) {
+      const success = await useCreditAPI("case", caseData.id);
+      if (!success) {
+        alert("Не удалось использовать кредит");
+        return;
+      }
+    }
+
+    // Показываем рулетку
+    showRoulette(caseData, isWeekly);
   }
 
   async function useCreditAPI(itemType, itemId) {
@@ -1555,3 +1891,4 @@
 </script>
 </body>
 </html>
+
