@@ -500,7 +500,6 @@
       font-weight: 500;
     }
 
-    /* === НОВОЕ: Плашка кредитов === */
     .creditBadge {
       display: inline-flex;
       align-items: center;
@@ -694,7 +693,6 @@
 
     .hidden { display: none; }
 
-    /* Лоадер */
     .loader {
       display: flex;
       align-items: center;
@@ -750,12 +748,6 @@
                 <div class="insetHeader">Испытай удачу</div>
                 <div class="caseGrid" id="caseGrid"></div>
               </div>
-              
-              <!--
-              <div style="margin-top: 16px; text-align: center;">
-                  <button class="testBtn" id="resetCooldown">Сбросить кулдаун (тест)</button>
-              </div>
-              -->
             </div>
           </div>
         </div>
@@ -826,10 +818,10 @@
   </div>
 
 <script>
+  // === ИСПРАВЛЕНИЕ 1: Правильная инициализация Telegram WebApp ===
   const tg = window.Telegram?.WebApp;
   
-  // ⚠️ ВАЖНО: Замени на URL твоего сервера!
-  const API_BASE = "https://podarochnica-api.onrender.com"; // например: "https://mybot.onrender.com"
+  const API_BASE = "https://podarochnica-api.onrender.com";
 
   const FREE_SENDER = "@echoaxxs";
   const PAID_SENDER = "@bogclm";
@@ -855,12 +847,168 @@
     { id: "bear",   title: "Мишка",    price: 15, gif_url: "/bear.gif"},
   ];
 
+  // === ИСПРАВЛЕНИЕ 3: Правильные шансы для кейсов ===
+    // === КЕЙСЫ С НАСТРОЙКАМИ ===
   const CASES = [
-    { id: "weekly", name: "Еженедельный", price: 0, priceText: "Бесплатно", type: "free", drops: ["rose", "box", "heart", "bear"] },
-    { id: "premium", name: "Премиум", price: 30, priceText: "30", type: "premium", drops: ["rose", "box", "rocket"] },
-    { id: "rich", name: "Богач", price: 100, priceText: "100", type: "rich", drops: ["rose", "box", "heart"] },
-    { id: "ultra", name: "Ультра", price: 500, priceText: "500", type: "ultra", drops: ["rose", "box", "heart"] },
+    { 
+      id: "weekly", 
+      name: "Еженедельный", 
+      price: 0, 
+      priceText: "Бесплатно", 
+      type: "free", 
+      drops: ["rose", "box", "heart", "bear"],
+      nothingChance: 1.0,      // 100% пусто всегда
+      nothingOnStrip: 0.55     // 55% ячеек "ничего" на ленте (для напряжения)
+    },
+    { 
+      id: "premium", 
+      name: "Премиум", 
+      price: 30, 
+      priceText: "30", 
+      type: "premium", 
+      drops: ["rose", "box", "rocket"],
+      nothingChance: 0.3,
+      nothingOnStrip: 0.2
+    },
+    { 
+      id: "rich", 
+      name: "Богач", 
+      price: 100, 
+      priceText: "100", 
+      type: "rich", 
+      drops: ["rose", "box", "heart", "rocket"],
+      nothingChance: 0.15,
+      nothingOnStrip: 0.1
+    },
+    { 
+      id: "ultra", 
+      name: "Ультра", 
+      price: 500, 
+      priceText: "500", 
+      type: "ultra", 
+      drops: ["rocket", "rose", "box"],
+      nothingChance: 0.05,
+      nothingOnStrip: 0.03      // Почти нет "ничего" на ленте
+    },
   ];
+
+  // === УЛУЧШЕННАЯ РУЛЕТКА ===
+  function showRoulette(caseData, isWeekly) {
+    const overlay = document.getElementById("rouletteOverlay");
+    const strip = document.getElementById("rouletteStrip");
+    const title = document.getElementById("rouletteTitle");
+    const result = document.getElementById("rouletteResult");
+    const closeBtn = document.getElementById("rouletteClose");
+
+    overlay.classList.remove("hidden");
+    title.textContent = `${caseData.name} кейс`;
+    result.textContent = "";
+    result.className = "rouletteResult";
+    closeBtn.classList.add("hidden");
+
+    const nothingItem = { id: "nothing", title: "Ничего", isNothing: true };
+    const items = [];
+    
+    // Получаем шанс появления "ничего" на ленте
+    const nothingOnStrip = caseData.nothingOnStrip || 0.25;
+    
+    // Подарки которые могут выпасть из этого кейса
+    const caseGifts = caseData.drops.map(id => GIFTS.find(g => g.id === id)).filter(Boolean);
+    
+    // Генерируем ленту рулетки (50 ячеек)
+    for (let i = 0; i < 50; i++) {
+      if (Math.random() < nothingOnStrip) {
+        items.push(nothingItem);
+      } else {
+        // Берём случайный подарок из дропов кейса
+        const randomGift = caseGifts[Math.floor(Math.random() * caseGifts.length)];
+        items.push(randomGift);
+      }
+    }
+
+    // Для еженедельного кейса добавляем драматизма:
+    // Ставим подарки рядом с выигрышной позицией, чтобы казалось "почти выпало"
+    if (isWeekly) {
+      const winIndex = 38;
+      
+      // Ставим привлекательный подарок прямо перед "ничего" (типа "почти выиграл!")
+      items[winIndex - 1] = GIFTS.find(g => g.id === "rocket") || GIFTS[0];
+      items[winIndex - 2] = nothingItem;
+      items[winIndex - 3] = GIFTS.find(g => g.id === "rose") || GIFTS[1];
+      
+      // Выигрышная позиция - всегда "ничего"
+      items[winIndex] = nothingItem;
+      
+      // После тоже подарок (для драмы)
+      items[winIndex + 1] = GIFTS.find(g => g.id === "heart") || GIFTS[2];
+      items[winIndex + 2] = nothingItem;
+    }
+
+    // Определяем выигрыш с учётом шансов
+    const winIndex = isWeekly ? 38 : 35;
+    let winItem;
+    
+    const nothingChance = caseData.nothingChance ?? 0.5;
+    const isNothing = Math.random() < nothingChance;
+    
+    if (isNothing) {
+      winItem = nothingItem;
+    } else {
+      // Выбираем случайный подарок из drops кейса
+      const dropId = caseData.drops[Math.floor(Math.random() * caseData.drops.length)];
+      winItem = GIFTS.find(g => g.id === dropId) || GIFTS[0];
+    }
+    
+    // Устанавливаем выигрышный предмет
+    items[winIndex] = winItem;
+    
+    console.log(`Кейс ${caseData.name}: шанс пусто ${nothingChance * 100}%, выпало: ${winItem.title}`);
+
+    // Рендерим ленту
+    strip.innerHTML = items.map(item => {
+      if (item.isNothing) {
+        return `<div class="rouletteItem">${ICONS.nothing}</div>`;
+      }
+      return `<div class="rouletteItem"><img src="${item.gif_url}" alt="${item.title}"></div>`;
+    }).join("");
+
+    // Сбрасываем позицию
+    strip.style.transition = "none";
+    strip.style.transform = "translateX(0)";
+
+    const containerWidth = document.querySelector('.rouletteWindow').offsetWidth;
+    const itemWidth = 90;
+    const centerOffset = (containerWidth / 2) - (itemWidth / 2);
+
+    // Запускаем анимацию
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        strip.style.transition = "transform 5s cubic-bezier(0.12, 0.8, 0.3, 1)";
+        const offset = (winIndex * itemWidth) - centerOffset;
+        strip.style.transform = `translateX(-${offset}px)`;
+      });
+    });
+
+    // Показываем результат
+    setTimeout(() => {
+      if (winItem.isNothing) {
+        result.textContent = "Ничего не выпало...";
+        result.classList.add("lose");
+      } else {
+        result.textContent = `Выпало: ${winItem.title}!`;
+        result.classList.add("win");
+      }
+      
+      // Для еженедельного кейса записываем время использования
+      if (isWeekly) {
+        weeklyUsed = new Date().toISOString();
+        localStorage.setItem('weeklyUsed', weeklyUsed);
+      }
+      
+      closeBtn.classList.remove("hidden");
+      closeBtn.textContent = winItem.isNothing ? "Закрыть" : "Забрать";
+    }, 5500);
+  }
 
   const CASE_ICONS = {
     free: ICONS.box,
@@ -873,67 +1021,123 @@
   let sender = FREE_SENDER;
   let addSignature = false;
   let weeklyUsed = localStorage.getItem('weeklyUsed') || null;
-  
-  // === КРЕДИТЫ ===
   let userCredits = { cases: {}, gifts: {} };
+  let isInitialized = false;
 
-  function setVar(name, val){ if(val) document.documentElement.style.setProperty(name, val); }
+  // === ИСПРАВЛЕНИЕ 2: Улучшенное применение темы ===
+  function setVar(name, val) { 
+    if (val) {
+      document.documentElement.style.setProperty(name, val);
+    }
+  }
 
-  function applyTheme(){
-    if (!tg) return;
+  function applyTheme() {
+    if (!tg) {
+      console.log("Telegram WebApp не найден, используем тёмную тему по умолчанию");
+      return;
+    }
+    
     const p = tg.themeParams || {};
-    setVar("--bg", p.bg_color);
-    setVar("--section", p.secondary_bg_color || p.section_bg_color);
-    setVar("--card", p.section_bg_color || p.secondary_bg_color);
+    console.log("Applying theme:", p);
+    
+    // Применяем цвета с fallback значениями
+    setVar("--bg", p.bg_color || p.secondary_bg_color);
+    setVar("--section", p.secondary_bg_color || p.section_bg_color || p.bg_color);
+    setVar("--card", p.section_bg_color || p.secondary_bg_color || p.bg_color);
     setVar("--text", p.text_color);
     setVar("--subtext", p.subtitle_text_color || p.hint_color);
     setVar("--hint", p.hint_color);
     setVar("--accent", p.button_color || p.link_color);
     setVar("--accentText", p.button_text_color);
     setVar("--danger", p.destructive_text_color);
+    
+    // Устанавливаем цвета хедера и фона
     try {
-      tg.setBackgroundColor(p.bg_color || "#000000");
-      tg.setHeaderColor(p.secondary_bg_color || p.bg_color || "#000000");
-    } catch (e) {}
+      const bgColor = p.bg_color || p.secondary_bg_color || "#0b0b0f";
+      const headerColor = p.secondary_bg_color || p.bg_color || "#0b0b0f";
+      
+      if (typeof tg.setBackgroundColor === 'function') {
+        tg.setBackgroundColor(bgColor);
+      }
+      if (typeof tg.setHeaderColor === 'function') {
+        tg.setHeaderColor(headerColor);
+      }
+    } catch (e) {
+      console.warn("Не удалось установить цвета Telegram:", e);
+    }
   }
 
-  // === ЗАГРУЗКА КРЕДИТОВ С СЕРВЕРА ===
+  // === ИСПРАВЛЕНИЕ 4: Безопасные fetch запросы ===
+  async function safeFetch(url, options = {}) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 сек таймаут
+      
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      return response;
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        console.warn("Запрос отменён по таймауту:", url);
+      } else {
+        console.error("Ошибка fetch:", error);
+      }
+      throw error;
+    }
+  }
+
   async function loadCredits() {
-    if (!tg || !API_BASE) {
+    if (!tg?.initData || !API_BASE) {
       console.log("Тестовый режим: кредиты не загружаются");
       return;
     }
     
     try {
-      const resp = await fetch(`${API_BASE}/api/get-credits`, {
+      const resp = await safeFetch(`${API_BASE}/api/get-credits`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ initData: tg.initData })
       });
       
-      if (resp.ok) {
-        const data = await resp.json();
-        userCredits = data;
-        console.log("Кредиты загружены:", userCredits);
-        renderCases(); // Перерисовываем кейсы с кредитами
+      const data = await resp.json();
+      userCredits = data;
+      console.log("Кредиты загружены:", userCredits);
+      
+      // Перерисовываем кейсы если мы на вкладке "Удача"
+      if (!document.getElementById("sectionLuck").classList.contains("hidden")) {
+        renderCases();
       }
     } catch (e) {
       console.error("Ошибка загрузки кредитов:", e);
+      // Не блокируем интерфейс при ошибке
     }
   }
 
-  // === ИСПОЛЬЗОВАНИЕ КРЕДИТА ===
-  async function useCredit(itemType, itemId) {
-    if (!tg || !API_BASE) {
-      console.log("Тестовый режим: кредит не списывается");
-      return true;
+  async function useCreditAPI(itemType, itemId) {
+    // Локальный тестовый режим
+    if (!tg?.initData || !API_BASE) {
+      const category = itemType === "case" ? "cases" : "gifts";
+      if (userCredits[category]?.[itemId] > 0) {
+        userCredits[category][itemId]--;
+        return true;
+      }
+      return false;
     }
     
     try {
-      const resp = await fetch(`${API_BASE}/api/use-credit`, {
+      const resp = await safeFetch(`${API_BASE}/api/use-credit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           initData: tg.initData,
           itemType: itemType,
           itemId: itemId
@@ -941,9 +1145,8 @@
       });
       
       if (resp.ok) {
-        // Уменьшаем локально
         const category = itemType === "case" ? "cases" : "gifts";
-        if (userCredits[category][itemId]) {
+        if (userCredits[category]?.[itemId]) {
           userCredits[category][itemId]--;
         }
         return true;
@@ -955,14 +1158,12 @@
     }
   }
 
-  // Получить количество кредитов для кейса
   function getCaseCredits(caseId) {
-    return userCredits.cases[caseId] || 0;
+    return userCredits.cases?.[caseId] || 0;
   }
 
-  // Получить количество кредитов для подарка
   function getGiftCredits(giftId) {
-    return userCredits.gifts[giftId] || 0;
+    return userCredits.gifts?.[giftId] || 0;
   }
 
   function isWeeklyAvailable() {
@@ -983,18 +1184,34 @@
   }
 
   function initTabs() {
-    document.getElementById("tabGifts").innerHTML = `${ICONS.gift}<span>Подарки</span>`;
-    document.getElementById("tabLuck").innerHTML = `${ICONS.dice}<span>Удача</span>`;
+    const tabGifts = document.getElementById("tabGifts");
+    const tabLuck = document.getElementById("tabLuck");
+    
+    if (tabGifts) {
+      tabGifts.innerHTML = `${ICONS.gift}<span>Подарки</span>`;
+    }
+    if (tabLuck) {
+      tabLuck.innerHTML = `${ICONS.dice}<span>Удача</span>`;
+    }
   }
 
-  function renderGrid(){
+  // === ИСПРАВЛЕНИЕ 5: Гарантированный рендер подарков ===
+  function renderGrid() {
     const grid = document.getElementById("giftGrid");
+    if (!grid) {
+      console.error("giftGrid не найден!");
+      return;
+    }
+    
+    console.log("Рендерим подарки:", GIFTS.length);
     grid.innerHTML = "";
-    GIFTS.forEach(g => {
+    
+    GIFTS.forEach((g, index) => {
       const el = document.createElement("div");
       el.className = "giftCard";
+      el.style.animationDelay = `${index * 0.05}s`;
       el.innerHTML = `
-        <div class="giftImg"><img src="${g.gif_url}" alt="${g.title}"></div>
+        <div class="giftImg"><img src="${g.gif_url}" alt="${g.title}" loading="lazy"></div>
         <div class="pricePill">${ICONS.star}${g.price}</div>
       `;
       el.onclick = () => openDetails(g);
@@ -1004,9 +1221,15 @@
 
   function renderCases() {
     const grid = document.getElementById("caseGrid");
+    if (!grid) {
+      console.error("caseGrid не найден!");
+      return;
+    }
+    
+    console.log("Рендерим кейсы");
     grid.innerHTML = "";
     
-    CASES.forEach(c => {
+    CASES.forEach((c, index) => {
       const isWeekly = c.id === "weekly";
       const available = !isWeekly || isWeeklyAvailable();
       const cooldown = isWeekly ? getWeeklyCooldown() : null;
@@ -1015,10 +1238,10 @@
       
       const el = document.createElement("div");
       el.className = `caseCard ${c.type}${!available && !hasCredit ? ' disabled' : ''}${hasCredit ? ' hasCredit' : ''}`;
+      el.style.animationDelay = `${index * 0.07}s`;
       
       const priceContent = c.price === 0 ? c.priceText : `${ICONS.star}${c.priceText}`;
       
-      // Формируем плашку кредитов
       const creditBadge = hasCredit 
         ? `<div class="creditBadge">${ICONS.ticket} Доступно: ${credits}</div>` 
         : '';
@@ -1031,7 +1254,6 @@
         ${cooldown && !hasCredit ? `<div class="cooldown">Через ${cooldown}</div>` : ''}
       `;
       
-      // Если есть кредиты или доступен — можно открыть
       if (available || hasCredit) {
         el.onclick = () => openCase(c, hasCredit);
       }
@@ -1040,7 +1262,7 @@
     });
   }
 
-  function openDetails(g){
+  function openDetails(g) {
     selectedGift = g;
     sender = FREE_SENDER;
     addSignature = false;
@@ -1054,27 +1276,28 @@
     updateTotalUI();
   }
 
-  function closeDetails(){
+  function closeDetails() {
     document.getElementById("screenDetails").classList.add("hidden");
     document.getElementById("screenCatalog").classList.remove("hidden");
   }
 
-  function syncSenderUI(){
+  function syncSenderUI() {
     document.getElementById("checkFree").classList.toggle("on", sender === FREE_SENDER);
     document.getElementById("checkPaid").classList.toggle("on", sender === PAID_SENDER);
   }
 
-  function totalPrice(){
-    if(!selectedGift) return 0;
+  function totalPrice() {
+    if (!selectedGift) return 0;
     return selectedGift.price + (addSignature ? SIGNATURE_COST : 0);
   }
 
-  function updateTotalUI(){
+  function updateTotalUI() {
     const t = totalPrice();
     document.getElementById("detailsTotal").innerHTML = `${ICONS.star} ${t}`;
     document.getElementById("btnBuy").innerHTML = `Купить за ${ICONS.star} ${t}`;
   }
 
+  // Вкладки
   document.getElementById("tabGifts").onclick = () => {
     document.getElementById("tabGifts").classList.add("active");
     document.getElementById("tabLuck").classList.remove("active");
@@ -1104,60 +1327,55 @@
 
   document.getElementById("btnBuy").onclick = async () => {
     const t = totalPrice();
-    if (!tg || !API_BASE) {
+    
+    if (!tg?.initData || !API_BASE) {
       const senderText = addSignature ? `\nПодпись: от ${sender}` : '\nБез подписи';
       alert(`Тест: ${selectedGift.title}${senderText}\nИтого: ${t}⭐`);
       return;
     }
-    const resp = await fetch(`${API_BASE}/api/create-invoice`, {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ initData: tg.initData, giftId: selectedGift.id, sender: addSignature ? sender : null })
-    });
-    if (!resp.ok) { alert("Ошибка создания инвойса"); return; }
-    const { link } = await resp.json();
-    tg.openInvoice(link, (status) => { if (status === "paid") tg.close(); });
+    
+    try {
+      const resp = await safeFetch(`${API_BASE}/api/create-invoice`, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ 
+          initData: tg.initData, 
+          giftId: selectedGift.id, 
+          sender: addSignature ? sender : null 
+        })
+      });
+      
+      const { link } = await resp.json();
+      tg.openInvoice(link, (status) => { 
+        if (status === "paid") tg.close(); 
+      });
+    } catch (e) {
+      alert("Ошибка создания инвойса: " + e.message);
+    }
   };
 
-  document.getElementById("resetCooldown").onclick = () => {
-    localStorage.removeItem('weeklyUsed');
-    weeklyUsed = null;
-    renderCases();
-  };
-
-  async function openCase(caseData, useCredit = false) {
-    const overlay = document.getElementById("rouletteOverlay");
-    const strip = document.getElementById("rouletteStrip");
-    const title = document.getElementById("rouletteTitle");
-    const result = document.getElementById("rouletteResult");
-    const closeBtn = document.getElementById("rouletteClose");
-
+  async function openCase(caseData, useCreditFlag = false) {
     const isWeekly = caseData.id === "weekly";
-    const isPaid = caseData.price > 0 && !useCredit;
+    const isPaid = caseData.price > 0 && !useCreditFlag;
 
-    // Если платный кейс без кредита — создаём инвойс
+    // Платный кейс без кредита — создаём инвойс
     if (isPaid) {
-      if (!tg || !API_BASE) {
+      if (!tg?.initData || !API_BASE) {
         alert(`Тест: Покупка ${caseData.name} за ${caseData.price}⭐`);
+        showRoulette(caseData, false);
         return;
       }
       
       try {
-        const resp = await fetch(`${API_BASE}/api/create-invoice`, {
+        const resp = await safeFetch(`${API_BASE}/api/create-invoice`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ initData: tg.initData, caseId: caseData.id })
         });
         
-        if (!resp.ok) {
-          alert("Ошибка создания инвойса");
-          return;
-        }
-        
         const { link } = await resp.json();
         tg.openInvoice(link, (status) => {
           if (status === "paid") {
-            // После оплаты показываем рулетку
             showRoulette(caseData, false);
           }
         });
@@ -1168,8 +1386,8 @@
       }
     }
 
-    // Если используем кредит — списываем его
-    if (useCredit) {
+    // Используем кредит
+    if (useCreditFlag) {
       const success = await useCreditAPI("case", caseData.id);
       if (!success) {
         alert("Не удалось использовать кредит");
@@ -1181,42 +1399,7 @@
     showRoulette(caseData, isWeekly);
   }
 
-  async function useCreditAPI(itemType, itemId) {
-    if (!tg || !API_BASE) {
-      // Тестовый режим — просто уменьшаем локально
-      const category = itemType === "case" ? "cases" : "gifts";
-      if (userCredits[category][itemId] && userCredits[category][itemId] > 0) {
-        userCredits[category][itemId]--;
-        return true;
-      }
-      return false;
-    }
-    
-    try {
-      const resp = await fetch(`${API_BASE}/api/use-credit`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          initData: tg.initData,
-          itemType: itemType,
-          itemId: itemId
-        })
-      });
-      
-      if (resp.ok) {
-        const category = itemType === "case" ? "cases" : "gifts";
-        if (userCredits[category][itemId]) {
-          userCredits[category][itemId]--;
-        }
-        return true;
-      }
-      return false;
-    } catch (e) {
-      console.error("Ошибка:", e);
-      return false;
-    }
-  }
-
+  // === ИСПРАВЛЕНИЕ 6: Правильная логика рулетки с шансами ===
   function showRoulette(caseData, isWeekly) {
     const overlay = document.getElementById("rouletteOverlay");
     const strip = document.getElementById("rouletteStrip");
@@ -1230,25 +1413,41 @@
     result.className = "rouletteResult";
     closeBtn.classList.add("hidden");
 
+    // Генерируем ленту рулетки
     const items = [];
+    const nothingItem = { id: "nothing", title: "Ничего", isNothing: true };
     
-    // Заполняем рулетку обычными подарками
-    for (let i = 0; i < 40; i++) {
-      items.push(GIFTS[Math.floor(Math.random() * GIFTS.length)]);
+    // Заполняем рулетку случайными предметами (подарки + "ничего")
+    for (let i = 0; i < 45; i++) {
+      // С некоторым шансом добавляем "ничего" в ленту для визуала
+      if (Math.random() < 0.25) {
+        items.push(nothingItem);
+      } else {
+        const randomGift = GIFTS[Math.floor(Math.random() * GIFTS.length)];
+        items.push(randomGift);
+      }
     }
 
-    const winIndex = 32;
+    // Определяем выигрыш с учётом шансов
+    const winIndex = 35; // Позиция где остановится рулетка
     let winItem;
     
-    if (isWeekly) {
-      // Для еженедельного: на выигрышной позиции всегда "ничего"
-      winItem = { id: "nothing", title: "Ничего", isNothing: true };
+    const nothingChance = caseData.nothingChance || 0.5;
+    const isNothing = Math.random() < nothingChance;
+    
+    if (isNothing) {
+      winItem = nothingItem;
     } else {
+      // Выбираем случайный подарок из drops кейса
       const dropId = caseData.drops[Math.floor(Math.random() * caseData.drops.length)];
       winItem = GIFTS.find(g => g.id === dropId) || GIFTS[0];
     }
+    
     items[winIndex] = winItem;
+    
+    console.log(`Кейс ${caseData.name}: шанс пусто ${nothingChance * 100}%, выпало: ${winItem.title}`);
 
+    // Рендерим ленту
     strip.innerHTML = items.map(item => {
       if (item.isNothing) {
         return `<div class="rouletteItem">${ICONS.nothing}</div>`;
@@ -1256,6 +1455,7 @@
       return `<div class="rouletteItem"><img src="${item.gif_url}" alt="${item.title}"></div>`;
     }).join("");
 
+    // Сбрасываем позицию
     strip.style.transition = "none";
     strip.style.transform = "translateX(0)";
 
@@ -1263,6 +1463,7 @@
     const itemWidth = 90;
     const centerOffset = (containerWidth / 2) - (itemWidth / 2);
 
+    // Запускаем анимацию
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         strip.style.transition = "transform 5s cubic-bezier(0.12, 0.8, 0.3, 1)";
@@ -1271,18 +1472,24 @@
       });
     });
 
+    // Показываем результат
     setTimeout(() => {
-      if (isWeekly) {
+      if (winItem.isNothing) {
         result.textContent = "Ничего не выпало...";
         result.classList.add("lose");
-        weeklyUsed = new Date().toISOString();
-        localStorage.setItem('weeklyUsed', weeklyUsed);
       } else {
         result.textContent = `Выпало: ${winItem.title}!`;
         result.classList.add("win");
       }
+      
+      // Для еженедельного кейса записываем время использования
+      if (isWeekly) {
+        weeklyUsed = new Date().toISOString();
+        localStorage.setItem('weeklyUsed', weeklyUsed);
+      }
+      
       closeBtn.classList.remove("hidden");
-      closeBtn.textContent = isWeekly ? "Закрыть" : "Забрать";
+      closeBtn.textContent = winItem.isNothing ? "Закрыть" : "Забрать";
     }, 5500);
   }
 
@@ -1291,26 +1498,60 @@
     renderCases();
   };
 
-  // === ИНИЦИАЛИЗАЦИЯ ===
-  if (tg) {
-    tg.ready();
-    tg.expand();
-    applyTheme();
-    tg.onEvent("themeChanged", applyTheme);
+  // === ИСПРАВЛЕНИЕ 7: Правильная инициализация ===
+  function init() {
+    if (isInitialized) return;
+    isInitialized = true;
     
-    // Загружаем кредиты при старте
+    console.log("Инициализация Mini App...");
+    
+    // Применяем тему
+    applyTheme();
+    
+    // Инициализируем табы
+    initTabs();
+    
+    // Рендерим подарки сразу
+    renderGrid();
+    
+    // Загружаем кредиты асинхронно
     loadCredits();
+    
+    console.log("Mini App инициализирован");
   }
 
-  initTabs();
-  renderGrid();
+  // === ИСПРАВЛЕНИЕ 8: Корректная работа с Telegram WebApp ===
+  if (tg) {
+    console.log("Telegram WebApp обнаружен");
+    
+    // Сообщаем что приложение готово
+    tg.ready();
+    
+    // Раскрываем на весь экран
+    tg.expand();
+    
+    // Подписываемся на изменение темы
+    tg.onEvent("themeChanged", () => {
+      console.log("Тема изменилась");
+      applyTheme();
+    });
+    
+    // Ждём немного и инициализируем (themeParams может прийти с задержкой)
+    setTimeout(init, 100);
+  } else {
+    console.log("Telegram WebApp не найден, работаем в тестовом режиме");
+    // Инициализируем сразу
+    init();
+  }
 
-  // === ТЕСТ: Добавить тестовые кредиты (удали в продакшене) ===
-  // userCredits = { cases: { premium: 2, rich: 1 }, gifts: {} };
-  // renderCases();
+  // Fallback: инициализация при полной загрузке DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(init, 150);
+    });
+  } else {
+    setTimeout(init, 150);
+  }
 </script>
 </body>
 </html>
-
-
-
