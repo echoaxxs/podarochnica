@@ -774,14 +774,16 @@
   };
 
   const GIFTS = [
-    { id: "rose",  title: "Роза",     price: 25, gif_url: "/rose.gif" },
-    { id: "box",   title: "Подарок",  price: 25, gif_url: "/gift.gif" },
-    { id: "heart", title: "Сердце",   price: 15, gif_url: "/heart.gif" },
+    { id: "rocket", title: "Ракета",   price: 50, gif_url: "/rocket.gif"},
+    { id: "rose",   title: "Роза",     price: 25, gif_url: "/rose.gif" },
+    { id: "box",    title: "Подарок",  price: 25, gif_url: "/gift.gif" },
+    { id: "heart",  title: "Сердце",   price: 15, gif_url: "/heart.gif" },
+    { id: "bear",   title: "Мишка",    price: 15, gif_url: "/bear.gif"},
   ];
 
   const CASES = [
-    { id: "weekly", name: "Еженедельный", price: 0, priceText: "Бесплатно", type: "free", drops: ["rose", "box", "heart"] },
-    { id: "premium", name: "Премиум", price: 30, priceText: "30", type: "premium", drops: ["rose", "box", "heart"] },
+    { id: "weekly", name: "Еженедельный", price: 0, priceText: "Бесплатно", type: "free", drops: ["rose", "box", "heart", "bear"] },
+    { id: "premium", name: "Премиум", price: 30, priceText: "30", type: "premium", drops: ["rose", "box", "rocket"] },
     { id: "rich", name: "Богач", price: 100, priceText: "100", type: "rich", drops: ["rose", "box", "heart"] },
     { id: "ultra", name: "Ультра", price: 500, priceText: "500", type: "ultra", drops: ["rose", "box", "heart"] },
   ];
@@ -1050,3 +1052,4 @@
 </script>
 </body>
 </html>
+
