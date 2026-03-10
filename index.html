@@ -777,15 +777,29 @@
 
               <div id="senderOptions" class="senderOptions">
                 <div class="insetHeader" style="border-top: 1px solid var(--separator); padding-top: 14px;">Подписать от</div>
-
+              
                 <div id="optFree" class="selectRow">
-                  <div style="font-weight:600; font-size: 16px;">@echoaxxs</div>
+                  <div>
+                    <div style="font-weight:600; font-size: 16px;">@echoaxxs</div>
+                    <div class="muted">+2 ⭐</div>
+                  </div>
                   <div class="check on" id="checkFree"></div>
                 </div>
-
+              
                 <div id="optPaid" class="selectRow">
-                  <div style="font-weight:600; font-size: 16px;">@bogclm</div>
+                  <div>
+                    <div style="font-weight:600; font-size: 16px;">@bogclm</div>
+                    <div class="muted">+2 ⭐</div>
+                  </div>
                   <div class="check" id="checkPaid"></div>
+                </div>
+              
+                <div id="optBoth" class="selectRow">
+                  <div>
+                    <div style="font-weight:600; font-size: 16px;">@bogclm и @echoaxxs</div>
+                    <div class="muted">+5 ⭐</div>
+                  </div>
+                  <div class="check" id="checkBoth"></div>
                 </div>
               </div>
 
@@ -825,7 +839,13 @@
 
   const FREE_SENDER = "@echoaxxs";
   const PAID_SENDER = "@bogclm";
-  const SIGNATURE_COST = 2;
+  const BOTH_SENDER = "@bogclm и @echoaxxs";
+  
+  const SIGNATURE_COSTS = {
+    "@echoaxxs": 2,
+    "@bogclm": 2,
+    "@bogclm и @echoaxxs": 5,
+  };
 
   const ICONS = {
     star: `<svg class="star" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FFD60A" stroke="#FFB800" stroke-width="1"/></svg>`,
@@ -1624,7 +1644,9 @@
 
   function totalPrice() {
     if (!selectedGift) return 0;
-    return selectedGift.price + (addSignature ? SIGNATURE_COST : 0);
+    if (!addSignature) return selectedGift.price;
+    const cost = SIGNATURE_COSTS[sender] || 2;
+    return selectedGift.price + cost;
   }
 
   function updateTotalUI() {
@@ -1891,5 +1913,6 @@
 </script>
 </body>
 </html>
+
 
 
