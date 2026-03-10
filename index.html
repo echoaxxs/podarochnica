@@ -7,7 +7,6 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    /* Telegram theme vars (fallbacks) */
     :root{
       --bg: #0b0b0f;
       --card: #1c1c1e;
@@ -16,11 +15,11 @@
       --subtext: rgba(255,255,255,.65);
       --hint: rgba(255,255,255,.55);
       --separator: rgba(255,255,255,.08);
-      --accent: #8e83ff;             /* похожий на фиолетовый акцент */
+      --accent: #8e83ff;
       --accentText: #ffffff;
       --danger: #ff453a;
 
-      --radius: 18px;                 /* iOS большие скругления */
+      --radius: 18px;
       --radius2: 14px;
       --pad: 14px;
       --gap: 12px;
@@ -63,7 +62,6 @@
       overflow: hidden;
     }
 
-    /* Top bar (как “шапка” iOS) */
     .topbar {
       padding: 14px 14px 10px;
       display: flex;
@@ -98,7 +96,7 @@
       text-align: center;
     }
     .topbar .ghost {
-      width: 44px; /* баланс по ширине справа */
+      width: 44px;
       height: 1px;
     }
 
@@ -106,7 +104,6 @@
 
     .muted { color: var(--subtext); font-size: 13px; }
 
-    /* “Inset grouped” sections */
     .inset {
       background: color-mix(in oklab, var(--card) 92%, transparent);
       border: 1px solid var(--separator);
@@ -123,29 +120,6 @@
       text-transform: none;
     }
 
-    /* Segmented control */
-    .seg {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      padding: 8px 10px 12px;
-    }
-    .seg button {
-      border: 0;
-      border-radius: 12px;
-      padding: 10px 10px;
-      background: rgba(127,127,127,.14);
-      color: var(--text);
-      font-weight: 800;
-      font-size: 14px;
-    }
-    .seg button.active {
-      background: color-mix(in oklab, var(--accent) 65%, rgba(127,127,127,.14));
-      color: var(--accentText);
-    }
-    .seg button:active { transform: scale(.99); }
-
-    /* Gift grid */
     .grid {
       padding: 10px;
       display: grid;
@@ -163,6 +137,7 @@
       align-items: center;
       gap: 8px;
       user-select: none;
+      cursor: pointer;
     }
     .giftCard:active { transform: scale(.99); }
 
@@ -200,7 +175,6 @@
       filter: drop-shadow(0 2px 6px rgba(0,0,0,.25));
     }
 
-    /* Details */
     .preview {
       width: 100%;
       border-radius: 18px;
@@ -229,7 +203,6 @@
     .row:first-child { border-top: 0; }
     .row .right { color: var(--subtext); font-weight: 700; }
 
-    /* Radio-like selectors (iOS style) */
     .selectRow {
       display: flex;
       align-items: center;
@@ -260,7 +233,6 @@
       box-shadow: 0 6px 14px rgba(0,0,0,.28);
     }
 
-    /* Bottom buy bar */
     .buyBar {
       position: sticky;
       bottom: 0;
@@ -280,6 +252,7 @@
       font-size: 15px;
       background: var(--accent);
       color: var(--accentText);
+      cursor: pointer;
     }
     .buyBtn:active { transform: scale(.99); }
 
@@ -301,16 +274,10 @@
           </div>
 
           <div class="content">
-
-            <div style="height:12px"></div>
-
             <div class="inset">
               <div class="insetHeader">Подарки</div>
               <div id="giftGrid" class="grid"></div>
             </div>
-
-            <div style="height:12px"></div>
-            <div class="muted"></div>
           </div>
         </div>
 
@@ -335,7 +302,7 @@
               <div id="optFree" class="selectRow">
                 <div>
                   <div style="font-weight:800">@echoaxxs</div>
-                  <div class="muted">Без доплаты</div>
+                  <div class="muted">+1 ⭐ к стоимости</div>
                 </div>
                 <div class="check on" id="checkFree"></div>
               </div>
@@ -367,27 +334,21 @@
 <script>
   const tg = window.Telegram?.WebApp;
 
-  // Позже сюда поставишь URL твоего Worker API, например:
-  // const API_BASE = "https://gift-api.ricka97.workers.dev";
   const API_BASE = "";
 
   const FREE_SENDER = "@echoaxxs";
   const PAID_SENDER = "@bogclm";
-  const PAID_EXTRA = 1;
+  const SENDER_EXTRA = 1; // Оба варианта стоят +1 звезду
 
-  // Меняй пути на свои GIF в /assets/
   const GIFTS = [
     { id: "rose",  title: "Роза",     price: 25, gif_url: "/rose.gif" },
     { id: "box",   title: "Подарок",  price: 25, gif_url: "/gift.gif" },
     { id: "heart", title: "Сердце",   price: 15, gif_url: "/heart.gif" },
   ];
 
-  // state
-  let priceTier = 25;            // сегменты 25/50 (как в примере)
   let selectedGift = null;
   let sender = FREE_SENDER;
 
-  // Small inline star svg
   const starSvg = `
     <svg class="star" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M12 2.4l2.7 6.1 6.6.6-5 4.3 1.5 6.4L12 16.9 6.2 19.8l1.5-6.4-5-4.3 6.6-.6L12 2.4z"
@@ -401,7 +362,6 @@
     if (!tg) return;
     const p = tg.themeParams || {};
 
-    // Telegram gives colors like "#rrggbb"
     setVar("--bg", p.bg_color);
     setVar("--section", p.secondary_bg_color || p.section_bg_color);
     setVar("--card", p.section_bg_color || p.secondary_bg_color);
@@ -422,12 +382,7 @@
     const grid = document.getElementById("giftGrid");
     grid.innerHTML = "";
 
-    const filtered = GIFTS.map(g => ({
-      ...g,
-      price: (g.price === 25 || g.price === 50) ? priceTier : g.price
-    }));
-
-    filtered.forEach(g => {
+    GIFTS.forEach(g => {
       const el = document.createElement("div");
       el.className = "giftCard";
       el.innerHTML = `
@@ -465,9 +420,7 @@
 
   function totalPrice(){
     if(!selectedGift) return 0;
-    const base = (selectedGift.price === 25 || selectedGift.price === 50) ? priceTier : selectedGift.price;
-    const extra = (sender === PAID_SENDER) ? PAID_EXTRA : 0;
-    return base + extra;
+    return selectedGift.price + SENDER_EXTRA;
   }
 
   function updateTotalUI(){
@@ -476,21 +429,6 @@
     document.getElementById("btnBuy").textContent = `Купить за ${t} ⭐`;
   }
 
-  // Segmented buttons
-  document.getElementById("seg25").onclick = () => {
-    priceTier = 25;
-    document.getElementById("seg25").classList.add("active");
-    document.getElementById("seg50").classList.remove("active");
-    renderGrid();
-  };
-  document.getElementById("seg50").onclick = () => {
-    priceTier = 50;
-    document.getElementById("seg50").classList.add("active");
-    document.getElementById("seg25").classList.remove("active");
-    renderGrid();
-  };
-
-  // Sender options (mutually exclusive)
   document.getElementById("optFree").onclick = () => {
     sender = FREE_SENDER;
     syncSenderUI(); updateTotalUI();
@@ -502,11 +440,9 @@
 
   document.getElementById("btnBack").onclick = closeDetails;
 
-  // Buy
   document.getElementById("btnBuy").onclick = async () => {
     const t = totalPrice();
 
-    // Пока API не подключён — просто тест
     if (!tg || !API_BASE) {
       alert(`Тест: ${selectedGift.title}\nПодпись: от ${sender}\nИтого: ${t}⭐\n\nПодключи Worker API для оплаты.`);
       return;
@@ -532,7 +468,6 @@
     });
   };
 
-  // Telegram init
   if (tg) {
     tg.ready();
     tg.expand();
@@ -544,4 +479,3 @@
 </script>
 </body>
 </html>
-
