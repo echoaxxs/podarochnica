@@ -21,6 +21,7 @@
       --success: #30d158;
       --starColor: #FFD60A;
       --creditColor: #5AC8FA;
+      --jackpotColor: #FF6B35;
 
       --radius: 18px;
       --radius2: 14px;
@@ -28,19 +29,17 @@
     }
 
     html, body {
-    min-height: 100%;
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
-                 "SF Pro Rounded", system-ui, "Helvetica Neue", Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-feature-settings: "kern" 1;
-    text-rendering: optimizeLegibility;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
+      min-height: 100%;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+                   "SF Pro Rounded", system-ui, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
 
     * { -webkit-tap-highlight-color: transparent; }
 
@@ -72,6 +71,32 @@
     @keyframes pulse {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.05); }
+    }
+
+    @keyframes jackpotGlow {
+      0%, 100% { 
+        box-shadow: 0 0 30px rgba(255, 107, 53, 0.5), 0 0 60px rgba(255, 214, 10, 0.3);
+        transform: scale(1);
+      }
+      50% { 
+        box-shadow: 0 0 50px rgba(255, 107, 53, 0.8), 0 0 100px rgba(255, 214, 10, 0.5);
+        transform: scale(1.02);
+      }
+    }
+
+    @keyframes jackpotText {
+      0%, 100% { transform: scale(1); text-shadow: 0 0 20px rgba(255, 107, 53, 0.8); }
+      50% { transform: scale(1.1); text-shadow: 0 0 40px rgba(255, 214, 10, 1); }
+    }
+
+    @keyframes confetti {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
     .app {
@@ -560,6 +585,29 @@
       pointer-events: none;
     }
 
+    /* Jackpot Badge */
+    .jackpotBadge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(255, 107, 53, 0.25), rgba(255, 214, 10, 0.25));
+      border: 1px solid rgba(255, 107, 53, 0.4);
+      font-weight: 700;
+      font-size: 11px;
+      color: var(--jackpotColor);
+      position: relative;
+      z-index: 1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .jackpotBadge::before {
+      content: "🔥";
+      font-size: 10px;
+    }
+
     .rouletteOverlay {
       position: fixed;
       top: 0;
@@ -589,6 +637,12 @@
       border: 1px solid var(--separator);
       box-shadow: 0 32px 100px rgba(0,0,0,.6);
       animation: scaleIn 0.35s ease-out;
+      transition: all 0.5s ease;
+    }
+
+    .rouletteContainer.jackpot {
+      animation: jackpotGlow 1s infinite ease-in-out;
+      border-color: var(--jackpotColor);
     }
 
     .rouletteTitle {
@@ -641,6 +695,13 @@
       z-index: 3;
       pointer-events: none;
       box-shadow: 0 0 20px rgba(142, 131, 255, 0.25);
+      transition: all 0.3s ease;
+    }
+
+    .roulettePointer.jackpot {
+      border-color: var(--jackpotColor);
+      background: rgba(255, 107, 53, 0.2);
+      box-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
     }
 
     .rouletteStrip {
@@ -682,6 +743,68 @@
 
     .rouletteResult.win { color: var(--success); }
     .rouletteResult.lose { color: var(--subtext); }
+    .rouletteResult.jackpot { 
+      color: var(--jackpotColor); 
+      animation: jackpotText 0.5s infinite ease-in-out;
+    }
+
+    /* Multiplier display */
+    .multiplierDisplay {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(255, 214, 10, 0.15));
+      border-radius: 16px;
+      border: 1px solid rgba(255, 107, 53, 0.3);
+      animation: slideDown 0.5s ease-out;
+    }
+
+    .multiplierDisplay.show {
+      display: flex;
+    }
+
+    .multiplierTitle {
+      font-size: 14px;
+      color: var(--subtext);
+      font-weight: 600;
+    }
+
+    .multiplierGifts {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .multiplierGift {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px;
+      background: rgba(0,0,0,.2);
+      border-radius: 12px;
+      animation: scaleIn 0.3s ease-out backwards;
+    }
+
+    .multiplierGift:nth-child(1) { animation-delay: 0.1s; }
+    .multiplierGift:nth-child(2) { animation-delay: 0.2s; }
+    .multiplierGift:nth-child(3) { animation-delay: 0.3s; }
+
+    .multiplierGift img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+    }
+
+    .multiplierGift .count {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--jackpotColor);
+    }
 
     .rouletteClose {
       margin-top: 20px;
@@ -700,43 +823,11 @@
 
     .rouletteClose:active { transform: scale(0.98); opacity: 0.9; }
 
-    .testBtn {
-      padding: 10px 20px;
-      background: rgba(255,69,58,0.15);
-      color: var(--danger);
-      border: 1px solid rgba(255,69,58,0.3);
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s ease;
+    .rouletteClose.jackpot {
+      background: linear-gradient(135deg, var(--jackpotColor), #FFD93D);
     }
-    .testBtn:active { transform: scale(0.97); }
 
     .hidden { display: none; }
-
-    .loader {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      color: var(--subtext);
-      font-size: 14px;
-      gap: 8px;
-    }
-    
-    .spinner {
-      width: 18px;
-      height: 18px;
-      border: 2px solid var(--separator);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
   </style>
 </head>
 
@@ -842,19 +933,23 @@
   </div>
 
   <div id="rouletteOverlay" class="rouletteOverlay hidden">
-    <div class="rouletteContainer">
+    <div class="rouletteContainer" id="rouletteContainer">
       <div class="rouletteTitle" id="rouletteTitle">Открываем кейс...</div>
       <div class="rouletteWindow">
-        <div class="roulettePointer"></div>
+        <div class="roulettePointer" id="roulettePointer"></div>
         <div class="rouletteStrip" id="rouletteStrip"></div>
       </div>
       <div class="rouletteResult" id="rouletteResult"></div>
+      <div class="multiplierDisplay" id="multiplierDisplay">
+        <div class="multiplierTitle">Ты получаешь:</div>
+        <div class="multiplierGifts" id="multiplierGifts"></div>
+      </div>
       <button class="rouletteClose hidden" id="rouletteClose">Забрать</button>
     </div>
   </div>
 
 <script>
-    // === ИНИЦИАЛИЗАЦИЯ ===
+  // === ИНИЦИАЛИЗАЦИЯ ===
   const tg = window.Telegram?.WebApp;
   const API_BASE = "https://podarochnica-api.onrender.com";
 
@@ -881,11 +976,17 @@
   };
 
   const GIFTS = [
-    { id: "rocket", title: "Ракета",   price: 50, gif_url: "/rocket.gif"},
-    { id: "rose",   title: "Роза",     price: 25, gif_url: "/rose.gif" },
-    { id: "box",    title: "Подарок",  price: 25, gif_url: "/gift.gif" },
-    { id: "heart",  title: "Сердце",   price: 15, gif_url: "/heart.gif" },
-    { id: "bear",   title: "Мишка",    price: 15, gif_url: "/bear.gif"},
+    { id: "brilliant_ring", title: "Колечко", price: 100, gif_url: "/brilliant_ring.gif"},
+    { id: "heroic_cup", title: "Кубок", price: 100, gif_url: "/heroic_cup.gif"},
+    { id: "diamond", title: "Алмаз", price: 100, gif_url: "/diamond.gif"},
+    { id: "flowers_bouquet", title: "Букет цветов", price: 50, gif_url: "/bouquet_flowers.gif"},
+    { id: "cupcake", title: "Тортик", price: 50, gif_url: "/cupcake.gif"},
+    { id: "wine", title: "Вино", price: 50, gif_url: "/wine.gif"},
+    { id: "rocket", title: "Ракета", price: 50, gif_url: "/rocket.gif"},
+    { id: "rose", title: "Роза", price: 25, gif_url: "/rose.gif" },
+    { id: "box", title: "Подарок", price: 25, gif_url: "/gift.gif" },
+    { id: "heart", title: "Сердце", price: 15, gif_url: "/heart.gif" },
+    { id: "bear", title: "Мишка", price: 15, gif_url: "/bear.gif"},
   ];
 
   const CASES = [
@@ -897,7 +998,8 @@
       type: "free", 
       drops: ["rose", "box", "heart", "bear"],
       nothingChance: 1.0,
-      nothingOnStrip: 0.55
+      nothingOnStrip: 0.55,
+      multiplier: null
     },
     { 
       id: "premium", 
@@ -907,7 +1009,8 @@
       type: "premium", 
       drops: ["rose", "box", "rocket"],
       nothingChance: 0.3,
-      nothingOnStrip: 0.2
+      nothingOnStrip: 0.2,
+      multiplier: null
     },
     { 
       id: "rich", 
@@ -915,9 +1018,10 @@
       price: 100, 
       priceText: "100", 
       type: "rich", 
-      drops: ["rose", "box", "heart", "rocket"],
+      drops: ["rose", "box", "brilliant_ring", "rocket"],
       nothingChance: 0.15,
-      nothingOnStrip: 0.1
+      nothingOnStrip: 0.1,
+      multiplier: null
     },
     { 
       id: "ultra", 
@@ -925,9 +1029,18 @@
       price: 500, 
       priceText: "500", 
       type: "ultra", 
-      drops: ["rocket", "rose", "box"],
+      drops: ["brilliant_ring", "diamond", "heroic_cup"],
       nothingChance: 0.05,
-      nothingOnStrip: 0.03
+      nothingOnStrip: 0.03,
+      // Мультипликатор!
+      multiplier: {
+        enabled: true,
+        chances: [
+          { count: 1, chance: 0.70 },  // 70% - 1 подарок
+          { count: 2, chance: 0.22 },  // 22% - 2 подарка
+          { count: 3, chance: 0.08 },  // 8% - 3 подарка (ДЖЕКПОТ!)
+        ]
+      }
     },
   ];
 
@@ -1048,6 +1161,47 @@
     return days > 0 ? `${days}д ${hours}ч` : `${hours}ч`;
   }
 
+  // === МУЛЬТИПЛИКАТОР ===
+  function rollMultiplier(caseData) {
+    const multiplier = caseData.multiplier;
+    if (!multiplier || !multiplier.enabled) return 1;
+    
+    const roll = Math.random();
+    let cumulative = 0;
+    
+    for (const option of multiplier.chances) {
+      cumulative += option.chance;
+      if (roll < cumulative) {
+        return option.count;
+      }
+    }
+    
+    return 1;
+  }
+
+  function rollCaseGifts(caseData, count) {
+    const caseGifts = caseData.drops.map(id => GIFTS.find(g => g.id === id)).filter(Boolean);
+    const nothingChance = caseData.nothingChance || 0.5;
+    const results = [];
+    
+    for (let i = 0; i < count; i++) {
+      // При мультипликаторе > 1, уменьшаем шанс "ничего"
+      const adjustedNothingChance = count > 1 ? nothingChance * 0.3 : nothingChance;
+      
+      if (Math.random() < adjustedNothingChance && count === 1) {
+        results.push(null); // nothing
+      } else {
+        results.push(caseGifts[Math.floor(Math.random() * caseGifts.length)]);
+      }
+    }
+    
+    // Фильтруем null (nothing) если есть реальные подарки
+    const realGifts = results.filter(g => g !== null);
+    if (realGifts.length > 0) return realGifts;
+    
+    return [null]; // Всё равно ничего
+  }
+
   // === РЕНДЕР ===
   function initTabs() {
     document.getElementById("tabGifts").innerHTML = `${ICONS.gift}<span>Подарки</span>`;
@@ -1081,6 +1235,7 @@
       const cooldown = isWeekly ? getWeeklyCooldown() : null;
       const credits = getCaseCredits(c.id);
       const hasCredit = credits > 0;
+      const hasMultiplier = c.multiplier && c.multiplier.enabled;
       
       const el = document.createElement("div");
       el.className = `caseCard ${c.type}${!available && !hasCredit ? ' disabled' : ''}${hasCredit ? ' hasCredit' : ''}`;
@@ -1088,11 +1243,13 @@
       
       const priceContent = c.price === 0 ? c.priceText : `${ICONS.star}${c.priceText}`;
       const creditBadge = hasCredit ? `<div class="creditBadge">${ICONS.ticket} Доступно: ${credits}</div>` : '';
+      const jackpotBadge = hasMultiplier ? `<div class="jackpotBadge">до x3</div>` : '';
       
       el.innerHTML = `
         <div class="caseIcon">${CASE_ICONS[c.type]}</div>
         <div class="caseName">${c.name}</div>
         <div class="casePrice">${priceContent}</div>
+        ${jackpotBadge}
         ${creditBadge}
         ${cooldown && !hasCredit ? `<div class="cooldown">Через ${cooldown}</div>` : ''}
       `;
@@ -1182,17 +1339,40 @@
 
   function showRoulette(caseData, isWeekly) {
     const overlay = document.getElementById("rouletteOverlay");
+    const container = document.getElementById("rouletteContainer");
     const strip = document.getElementById("rouletteStrip");
     const title = document.getElementById("rouletteTitle");
     const result = document.getElementById("rouletteResult");
     const closeBtn = document.getElementById("rouletteClose");
+    const pointer = document.getElementById("roulettePointer");
+    const multiplierDisplay = document.getElementById("multiplierDisplay");
+    const multiplierGifts = document.getElementById("multiplierGifts");
 
+    // Reset
     overlay.classList.remove("hidden");
+    container.classList.remove("jackpot");
+    pointer.classList.remove("jackpot");
+    closeBtn.classList.remove("jackpot");
+    multiplierDisplay.classList.remove("show");
+    
     title.textContent = `${caseData.name} кейс`;
     result.textContent = "";
     result.className = "rouletteResult";
     closeBtn.classList.add("hidden");
 
+    // Определяем мультипликатор
+    const giftCount = rollMultiplier(caseData);
+    const isJackpot = giftCount > 1;
+    
+    console.log(`🎰 Мультипликатор: x${giftCount}`);
+
+    // Получаем выигранные подарки
+    const wonGifts = rollCaseGifts(caseData, giftCount);
+    const hasRealWin = wonGifts.some(g => g !== null);
+    
+    console.log(`🎁 Выигрыш:`, wonGifts);
+
+    // Строим ленту рулетки
     const nothingItem = { id: "nothing", title: "Ничего", isNothing: true };
     const items = [];
     const nothingOnStrip = caseData.nothingOnStrip || 0.25;
@@ -1208,25 +1388,18 @@
 
     const winIndex = isWeekly ? 38 : 35;
     
-    if (isWeekly) {
-      items[winIndex - 1] = GIFTS.find(g => g.id === "rocket") || GIFTS[0];
-      items[winIndex - 2] = nothingItem;
-      items[winIndex - 3] = GIFTS.find(g => g.id === "rose") || GIFTS[1];
-      items[winIndex] = nothingItem;
-      items[winIndex + 1] = GIFTS.find(g => g.id === "heart") || GIFTS[2];
-    }
+    // Показываем первый выигранный подарок на ленте
+    const displayItem = hasRealWin ? wonGifts.find(g => g !== null) : nothingItem;
+    items[winIndex] = displayItem.isNothing ? nothingItem : displayItem;
 
-    let winItem;
-    const nothingChance = caseData.nothingChance ?? 0.5;
-    
-    if (Math.random() < nothingChance) {
-      winItem = nothingItem;
-    } else {
-      const dropId = caseData.drops[Math.floor(Math.random() * caseData.drops.length)];
-      winItem = GIFTS.find(g => g.id === dropId) || GIFTS[0];
+    // Добавляем разнообразия вокруг
+    if (!isWeekly && hasRealWin) {
+      for (let offset of [-2, -1, 1, 2]) {
+        if (Math.random() > 0.5) {
+          items[winIndex + offset] = caseGifts[Math.floor(Math.random() * caseGifts.length)];
+        }
+      }
     }
-    
-    items[winIndex] = winItem;
 
     strip.innerHTML = items.map(item => {
       if (item.isNothing) return `<div class="rouletteItem">${ICONS.nothing}</div>`;
@@ -1248,10 +1421,43 @@
     });
 
     setTimeout(() => {
-      if (winItem.isNothing) {
+      if (!hasRealWin) {
         result.textContent = "Ничего не выпало...";
         result.classList.add("lose");
+      } else if (isJackpot) {
+        // ДЖЕКПОТ!
+        container.classList.add("jackpot");
+        pointer.classList.add("jackpot");
+        closeBtn.classList.add("jackpot");
+        
+        result.innerHTML = `🔥 ДЖЕКПОТ x${giftCount}! 🔥`;
+        result.classList.add("jackpot");
+        
+        // Показываем все подарки
+        multiplierGifts.innerHTML = "";
+        
+        // Группируем одинаковые подарки
+        const giftCounts = {};
+        wonGifts.filter(g => g).forEach(g => {
+          giftCounts[g.id] = (giftCounts[g.id] || 0) + 1;
+        });
+        
+        Object.entries(giftCounts).forEach(([giftId, count]) => {
+          const gift = GIFTS.find(g => g.id === giftId);
+          if (gift) {
+            const giftEl = document.createElement("div");
+            giftEl.className = "multiplierGift";
+            giftEl.innerHTML = `
+              <img src="${gift.gif_url}" alt="${gift.title}">
+              ${count > 1 ? `<div class="count">x${count}</div>` : ''}
+            `;
+            multiplierGifts.appendChild(giftEl);
+          }
+        });
+        
+        multiplierDisplay.classList.add("show");
       } else {
+        const winItem = wonGifts[0];
         result.textContent = `Выпало: ${winItem.title}!`;
         result.classList.add("win");
       }
@@ -1262,7 +1468,7 @@
       }
       
       closeBtn.classList.remove("hidden");
-      closeBtn.textContent = winItem.isNothing ? "Закрыть" : "Забрать";
+      closeBtn.textContent = !hasRealWin ? "Закрыть" : (isJackpot ? "🔥 Забрать всё!" : "Забрать");
     }, 5500);
   }
 
@@ -1320,6 +1526,8 @@
 
   document.getElementById("rouletteClose").onclick = () => {
     document.getElementById("rouletteOverlay").classList.add("hidden");
+    document.getElementById("rouletteContainer").classList.remove("jackpot");
+    document.getElementById("multiplierDisplay").classList.remove("show");
     renderCases();
   };
 
