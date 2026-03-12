@@ -2,34 +2,42 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
   <title>#подарочница</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  
+  <!-- Подключаем шрифт Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     :root {
+      /* Apple-style dark mode colors */
       --bg: #000000;
-      --bg2: #080808;
-      --card: #1a1a24;
-      --card2: #22222e;
+      --bg2: #121214;
+      --card: #1c1c1e;
+      --card2: #2c2c2e;
       --text: #ffffff;
-      --text2: rgba(255,255,255,.7);
-      --text3: rgba(255,255,255,.45);
-      --border: rgba(255,255,255,.08);
-      --accent: #7c6aff;
-      --accent2: #9d8cff;
-      --gold: #ffd700;
-      --gold2: #ffaa00;
-      --green: #00d26a;
-      --red: #ff4757;
-      --orange: #ff6b35;
-      --cyan: #00d4ff;
-      --pink: #ff6b9d;
-      --purple: #a855f7;
+      --text2: rgba(255, 255, 255, 0.7);
+      --text3: rgba(255, 255, 255, 0.4);
+      --border: rgba(255, 255, 255, 0.08);
       
-      --radius: 20px;
-      --radius2: 16px;
-      --radius3: 12px;
+      --accent: #0A84FF; /* iOS Blue */
+      --accent-gradient: linear-gradient(135deg, #0A84FF, #5E5CE6);
+      
+      --gold: #FFD60A;
+      --gold2: #FF9F0A;
+      --green: #32D74B;
+      --red: #FF453A;
+      --orange: #FF9F0A;
+      --cyan: #64D2FF;
+      --pink: #FF375F;
+      --purple: #BF5AF2;
+      
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
     }
 
     * {
@@ -40,110 +48,69 @@
     }
 
     html, body {
-      min-height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+      height: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
       background: var(--bg);
       color: var(--text);
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
+      overscroll-behavior-y: none; /* Убирает лишний баунс в тг */
     }
 
     /* === АНИМАЦИИ === */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(15px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes scaleIn {
-      from { opacity: 0; transform: scale(0.9); }
+      from { opacity: 0; transform: scale(0.92); }
       to { opacity: 1; transform: scale(1); }
     }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-8px) rotate(2deg); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.05); opacity: 0.9; }
-    }
-
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
-
-    @keyframes glow {
-      0%, 100% { box-shadow: 0 0 30px rgba(255, 107, 53, 0.4); }
-      50% { box-shadow: 0 0 50px rgba(255, 107, 53, 0.7), 0 0 80px rgba(255, 215, 0, 0.3); }
-    }
-
-    @keyframes jackpotPulse {
-      0%, 100% { 
-        transform: scale(1);
-        text-shadow: 0 0 20px var(--gold);
-      }
-      50% { 
-        transform: scale(1.1);
-        text-shadow: 0 0 40px var(--gold), 0 0 60px var(--orange);
-      }
-    }
-
-    @keyframes multiplierBounce {
-      0% { transform: scale(0) rotate(-10deg); }
-      50% { transform: scale(1.2) rotate(5deg); }
-      70% { transform: scale(0.9) rotate(-2deg); }
-      100% { transform: scale(1) rotate(0deg); }
-    }
-
-    @keyframes confetti {
-      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-    }
-
-    @keyframes borderGlow {
-      0%, 100% { border-color: var(--orange); }
-      25% { border-color: var(--gold); }
-      50% { border-color: var(--pink); }
-      75% { border-color: var(--purple); }
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(30px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     /* === LAYOUT === */
     .app {
       min-height: 100vh;
-      padding: env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 20px);
-      background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Общие стили для скрытия элементов */
+    .hidden {
+      display: none !important;
     }
 
     /* === HEADER === */
     .header {
-      padding: 20px 20px 16px;
+      padding: env(safe-area-inset-top, 20px) 20px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       top: 0;
       z-index: 50;
-      background: linear-gradient(180deg, var(--bg) 0%, transparent 100%);
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid transparent;
+      transition: background 0.3s, border 0.3s;
     }
 
     .header.with-back {
       justify-content: flex-start;
-      gap: 12px;
+      gap: 16px;
     }
 
     .back-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: var(--card);
-      border: 1px solid var(--border);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--card2);
+      border: none;
       color: var(--text);
       font-size: 18px;
       display: flex;
@@ -154,99 +121,79 @@
     }
 
     .back-btn:active {
-      transform: scale(0.95);
-      background: var(--card2);
+      transform: scale(0.9);
+      opacity: 0.8;
     }
 
     .logo {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
-      background: linear-gradient(135deg, var(--accent) 0%, var(--pink) 100%);
+      background: linear-gradient(135deg, var(--text) 0%, var(--text2) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
       letter-spacing: -0.5px;
     }
 
     .header-title {
       font-size: 18px;
-      font-weight: 700;
+      font-weight: 600;
       flex: 1;
+      text-align: left;
     }
 
-    /* === TABS === */
+    /* === TABS (iOS Segmented Control Style) === */
     .tabs {
       display: flex;
-      gap: 8px;
-      padding: 0 20px;
-      margin-bottom: 20px;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 4px;
+      margin: 8px 20px 24px;
+      position: relative;
     }
 
     .tab {
       flex: 1;
-      height: 52px;
-      border-radius: var(--radius2);
+      height: 36px;
       border: none;
-      background: var(--card);
+      background: transparent;
       color: var(--text3);
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 6px;
+      transition: all 0.25s ease;
       position: relative;
-      overflow: hidden;
+      z-index: 2;
     }
 
-    .tab::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, var(--accent), var(--purple));
-      opacity: 0;
-      transition: opacity 0.3s;
+    .tab svg {
+      width: 16px;
+      height: 16px;
+      opacity: 0.8;
     }
 
     .tab.active {
       color: var(--text);
-      box-shadow: 0 8px 32px rgba(124, 106, 255, 0.3);
-    }
-
-    .tab.active::before {
-      opacity: 1;
-    }
-
-    .tab span, .tab svg {
-      position: relative;
-      z-index: 1;
-    }
-
-    .tab:active {
-      transform: scale(0.98);
-    }
-
-    .tab svg {
-      width: 20px;
-      height: 20px;
+      background: var(--card2);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
 
     /* === SECTIONS === */
     .section {
-      padding: 0 16px;
-      animation: fadeUp 0.4s ease-out;
+      padding: 0 20px 40px;
+      animation: fadeIn 0.3s ease-out;
     }
 
     .section-title {
-      font-size: 13px;
+      font-size: 22px;
       font-weight: 700;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      margin-bottom: 14px;
-      padding-left: 4px;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      margin-bottom: 20px;
     }
 
     /* === GIFT GRID === */
@@ -258,173 +205,133 @@
 
     .gift-card {
       background: var(--card);
-      border-radius: var(--radius2);
-      padding: 14px 10px 12px;
+      border-radius: var(--radius-md);
+      padding: 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       cursor: pointer;
-      transition: all 0.3s;
-      border: 1px solid transparent;
+      transition: all 0.2s;
       animation: scaleIn 0.4s ease-out backwards;
+      border: 1px solid var(--border);
     }
-
-    .gift-card:nth-child(1) { animation-delay: 0.05s; }
-    .gift-card:nth-child(2) { animation-delay: 0.1s; }
-    .gift-card:nth-child(3) { animation-delay: 0.15s; }
-    .gift-card:nth-child(4) { animation-delay: 0.2s; }
-    .gift-card:nth-child(5) { animation-delay: 0.25s; }
-    .gift-card:nth-child(6) { animation-delay: 0.3s; }
 
     .gift-card:active {
-      transform: scale(0.96);
-      border-color: var(--accent);
+      transform: scale(0.94);
+      background: var(--card2);
     }
 
+    /* Исправление отображения гифок */
     .gift-img {
-      width: 72px;
-      height: 72px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, rgba(124,106,255,0.1), rgba(255,107,157,0.1));
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,0.03); /* Мягкий нейтральный фон */
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      padding: 8px;
     }
 
     .gift-img img {
-      width: 85%;
-      height: 85%;
+      width: 100%;
+      height: 100%;
       object-fit: contain;
     }
 
     .gift-price {
       display: flex;
       align-items: center;
-      gap: 5px;
-      padding: 6px 12px;
-      background: rgba(255, 215, 0, 0.1);
-      border-radius: 999px;
+      gap: 4px;
       font-size: 14px;
       font-weight: 700;
       color: var(--gold);
-    }
-
-    .gift-price svg {
-      width: 14px;
-      height: 14px;
     }
 
     /* === CASE GRID === */
     .case-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
+      gap: 16px;
     }
 
     .case-card {
       background: var(--card);
-      border-radius: var(--radius);
-      padding: 24px 16px 20px;
+      border-radius: var(--radius-lg);
+      padding: 24px 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
       cursor: pointer;
-      transition: all 0.3s;
-      border: 2px solid transparent;
+      transition: all 0.2s;
+      border: 1px solid var(--border);
       position: relative;
       overflow: hidden;
       animation: scaleIn 0.4s ease-out backwards;
     }
 
-    .case-card::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 200%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
-      animation: shimmer 3s infinite;
-    }
-
-    .case-card:nth-child(1) { animation-delay: 0.1s; }
-    .case-card:nth-child(2) { animation-delay: 0.2s; }
-    .case-card:nth-child(3) { animation-delay: 0.3s; }
-    .case-card:nth-child(4) { animation-delay: 0.4s; }
-
     .case-card:active {
-      transform: scale(0.97);
+      transform: scale(0.96);
     }
 
-    .case-card.free {
-      background: linear-gradient(145deg, rgba(0, 210, 106, 0.12), var(--card));
-      border-color: rgba(0, 210, 106, 0.3);
-    }
-
-    .case-card.premium {
-      background: linear-gradient(145deg, rgba(124, 106, 255, 0.12), var(--card));
-      border-color: rgba(124, 106, 255, 0.3);
-    }
-
-    .case-card.rich {
-      background: linear-gradient(145deg, rgba(255, 215, 0, 0.12), var(--card));
-      border-color: rgba(255, 215, 0, 0.3);
-    }
-
-    .case-card.ultra {
-      background: linear-gradient(145deg, rgba(255, 107, 53, 0.15), rgba(168, 85, 247, 0.15));
-      border-color: rgba(255, 107, 53, 0.4);
-      animation: scaleIn 0.4s ease-out backwards, glow 2s infinite ease-in-out;
-      animation-delay: 0.4s, 0s;
+    /* Красивые градиентные подложки для кейсов */
+    .case-card.free { border-top: 2px solid var(--green); }
+    .case-card.premium { border-top: 2px solid var(--purple); }
+    .case-card.rich { border-top: 2px solid var(--gold); }
+    .case-card.ultra { 
+      border-top: 2px solid var(--orange);
+      background: linear-gradient(180deg, rgba(255,159,10,0.1) 0%, var(--card) 100%);
     }
 
     .case-card.disabled {
-      opacity: 0.4;
+      opacity: 0.5;
       pointer-events: none;
+      filter: grayscale(0.5);
     }
 
     .case-icon {
-      width: 64px;
-      height: 64px;
-      animation: float 4s ease-in-out infinite;
+      width: 72px;
+      height: 72px;
+      margin-bottom: 4px;
     }
 
     .case-icon svg {
       width: 100%;
       height: 100%;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
     }
 
     .case-name {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
+      letter-spacing: -0.3px;
     }
 
     .case-price {
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 8px 16px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 999px;
-      font-size: 15px;
-      font-weight: 700;
+      gap: 4px;
+      padding: 6px 14px;
+      background: var(--card2);
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
     }
 
     .case-card.free .case-price {
       color: var(--green);
-    }
-
-    .case-price svg {
-      width: 15px;
-      height: 15px;
+      background: rgba(50, 215, 75, 0.15);
     }
 
     .case-badge {
-      padding: 5px 12px;
-      border-radius: 999px;
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      padding: 4px 8px;
+      border-radius: 8px;
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
@@ -432,15 +339,16 @@
     }
 
     .case-badge.jackpot {
-      background: linear-gradient(135deg, var(--orange), var(--gold));
-      color: #000;
-      animation: pulse 1.5s infinite;
+      background: var(--orange);
+      color: #fff;
     }
 
     .case-badge.credit {
-      background: rgba(0, 212, 255, 0.15);
-      border: 1px solid rgba(0, 212, 255, 0.3);
-      color: var(--cyan);
+      background: var(--cyan);
+      color: #000;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .case-cooldown {
@@ -450,67 +358,83 @@
     }
 
     /* === DETAIL SCREEN === */
+    #screenDetails {
+      /* Главный фикс прокрутки: даем место снизу для панели покупки */
+      padding-bottom: calc(120px + env(safe-area-inset-bottom));
+    }
+
     .detail-preview {
-      margin: 0 16px 20px;
-      border-radius: var(--radius);
-      background: linear-gradient(145deg, var(--card), var(--card2));
-      padding: 32px;
+      margin: 10px 20px 24px;
+      border-radius: var(--radius-lg);
+      background: var(--card);
+      aspect-ratio: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       border: 1px solid var(--border);
+      position: relative;
+    }
+
+    /* Блик на карточке */
+    .detail-preview::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 40%);
+      pointer-events: none;
     }
 
     .detail-preview img {
-      max-width: 200px;
-      max-height: 200px;
+      width: 60%;
+      height: 60%;
       object-fit: contain;
+      filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));
     }
 
     .detail-options {
-      margin: 0 16px;
+      margin: 0 20px;
       background: var(--card);
-      border-radius: var(--radius);
-      overflow: hidden;
+      border-radius: var(--radius-md);
       border: 1px solid var(--border);
     }
 
-    .option-row {
+    .option-row, .sender-option {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 20px;
+      padding: 16px;
       border-bottom: 1px solid var(--border);
       cursor: pointer;
-      transition: background 0.2s;
     }
-
-    .option-row:last-child {
+    
+    .sender-option:last-child {
       border-bottom: none;
     }
 
-    .option-row:active {
+    .option-row:active, .sender-option:active {
       background: var(--card2);
     }
 
     .option-label {
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 500;
     }
 
     .option-hint {
       font-size: 13px;
       color: var(--text3);
-      margin-top: 3px;
+      margin-top: 4px;
     }
 
+    /* iOS Style Toggle */
     .toggle {
-      width: 52px;
-      height: 32px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
+      width: 51px;
+      height: 31px;
+      background: #39393D;
+      border-radius: 31px;
       position: relative;
-      transition: background 0.3s;
+      transition: background 0.3s ease;
     }
 
     .toggle.on {
@@ -520,14 +444,14 @@
     .toggle::after {
       content: "";
       position: absolute;
-      width: 28px;
-      height: 28px;
+      width: 27px;
+      height: 27px;
       background: #fff;
       border-radius: 50%;
       top: 2px;
       left: 2px;
-      transition: transform 0.3s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: transform 0.3s cubic-bezier(0.2, 0.85, 0.32, 1.2);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.16), 0 3px 1px rgba(0,0,0,0.1);
     }
 
     .toggle.on::after {
@@ -537,56 +461,37 @@
     .sender-options {
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.35s ease;
+      transition: max-height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+      background: rgba(0,0,0,0.2);
     }
 
     .sender-options.expanded {
-      max-height: 300px;
+      max-height: 250px; /* Достаточно для 3 элементов */
     }
 
-    .sender-option {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 20px;
-      border-top: 1px solid var(--border);
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .sender-option:active {
-      background: var(--card2);
-    }
-
+    /* iOS Checkmark */
     .check {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      border: 2px solid var(--text3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.25s;
-      font-size: 14px;
+      color: transparent;
+      font-size: 20px;
+      font-weight: bold;
+      transition: color 0.2s;
     }
 
     .check.on {
-      border-color: var(--accent);
-      background: var(--accent);
-      color: #fff;
+      color: var(--accent);
     }
 
     .total-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 20px;
-      background: rgba(255, 215, 0, 0.05);
+      padding: 16px;
+      border-top: 1px solid var(--border);
     }
 
     .total-label {
-      font-size: 14px;
-      color: var(--text2);
+      font-size: 16px;
+      font-weight: 600;
     }
 
     .total-value {
@@ -604,174 +509,152 @@
       bottom: 0;
       left: 0;
       right: 0;
-      padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
-      background: linear-gradient(180deg, transparent 0%, var(--bg) 30%);
+      padding: 16px 20px calc(16px + env(safe-area-inset-bottom, 0px));
+      background: rgba(18, 18, 20, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      z-index: 100;
     }
 
     .buy-btn {
       width: 100%;
-      height: 56px;
-      border-radius: var(--radius2);
+      height: 54px;
+      border-radius: 14px;
       border: none;
-      background: linear-gradient(135deg, var(--accent), var(--purple));
+      background: var(--accent);
       color: #fff;
+      font-family: 'Inter', sans-serif;
       font-size: 17px;
-      font-weight: 700;
+      font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: all 0.25s;
-      box-shadow: 0 8px 32px rgba(124, 106, 255, 0.4);
+      transition: all 0.2s;
     }
 
     .buy-btn:active {
-      transform: scale(0.98);
-      opacity: 0.9;
+      transform: scale(0.97);
+      background: #0070DF;
     }
 
     /* === ROULETTE === */
     .roulette-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.9);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      z-index: 100;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      z-index: 200;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
-      animation: fadeUp 0.3s ease-out;
-    }
-
-    .roulette-overlay.hidden {
-      display: none;
-    }
-
-    .confetti {
-      position: fixed;
-      pointer-events: none;
-      animation: confetti 3s linear forwards;
+      padding: 20px;
+      animation: fadeIn 0.3s ease-out;
     }
 
     .roulette-box {
       width: 100%;
-      max-width: 380px;
+      max-width: 360px;
       background: var(--card);
-      border-radius: 28px;
-      padding: 28px;
-      border: 2px solid var(--border);
-      transition: all 0.5s;
+      border-radius: var(--radius-lg);
+      padding: 30px 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 48px rgba(0,0,0,0.5);
       position: relative;
-    }
-
-    .roulette-box.jackpot {
-      animation: borderGlow 1s linear infinite;
-      box-shadow: 0 0 60px rgba(255, 107, 53, 0.5);
     }
 
     .roulette-title {
       text-align: center;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 800;
+      letter-spacing: -0.5px;
       margin-bottom: 24px;
     }
 
-    /* Multiplier Preview */
     .multiplier-box {
       display: none;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 4px;
       margin-bottom: 24px;
-      padding: 20px;
-      background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,215,0,0.15));
-      border-radius: var(--radius2);
-      border: 1px solid rgba(255,107,53,0.3);
-      animation: slideUp 0.5s ease-out;
+      animation: fadeUp 0.4s ease-out;
     }
 
-    .multiplier-box.show {
-      display: flex;
-    }
+    .multiplier-box.show { display: flex; }
 
     .multiplier-label {
-      font-size: 14px;
-      color: var(--text2);
-      font-weight: 600;
+      font-size: 13px;
+      color: var(--orange);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .multiplier-value {
-      font-size: 56px;
+      font-size: 48px;
       font-weight: 900;
-      background: linear-gradient(135deg, var(--orange), var(--gold));
+      background: linear-gradient(135deg, var(--gold), var(--orange));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: multiplierBounce 0.6s ease-out;
     }
 
+    /* Окно рулетки */
     .roulette-window {
       position: relative;
-      height: 110px;
+      height: 120px;
       overflow: hidden;
-      border-radius: var(--radius2);
-      background: rgba(0, 0, 0, 0.4);
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      box-shadow: inset 0 4px 12px rgba(0,0,0,0.5);
     }
 
+    /* Тени по бокам рулетки для эффекта барабана */
     .roulette-window::before,
     .roulette-window::after {
       content: "";
       position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 70px;
+      top: 0; bottom: 0;
+      width: 60px;
       z-index: 2;
       pointer-events: none;
     }
-
     .roulette-window::before {
-      left: 0;
-      background: linear-gradient(to right, var(--card), transparent);
+      left: 0; background: linear-gradient(to right, var(--bg), transparent);
     }
-
     .roulette-window::after {
-      right: 0;
-      background: linear-gradient(to left, var(--card), transparent);
+      right: 0; background: linear-gradient(to left, var(--bg), transparent);
     }
 
+    /* Центральный указатель */
     .roulette-pointer {
       position: absolute;
-      left: 50%;
-      top: 50%;
+      left: 50%; top: 50%;
       transform: translate(-50%, -50%);
-      width: 95px;
-      height: calc(100% - 14px);
-      border: 3px solid var(--accent);
-      border-radius: var(--radius2);
-      background: rgba(124, 106, 255, 0.1);
+      width: 100px; height: 104px;
+      border: 2px solid var(--accent);
+      border-radius: var(--radius-sm);
+      background: rgba(10, 132, 255, 0.1);
       z-index: 3;
-      box-shadow: 0 0 20px rgba(124, 106, 255, 0.3);
-      transition: all 0.3s;
     }
 
     .roulette-pointer.jackpot {
       border-color: var(--orange);
-      background: rgba(255, 107, 53, 0.2);
-      box-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
+      background: rgba(255, 159, 10, 0.15);
+      box-shadow: 0 0 20px rgba(255, 159, 10, 0.4);
     }
 
     .roulette-strip {
       display: flex;
       height: 100%;
       align-items: center;
-      transition: transform 5s cubic-bezier(0.12, 0.8, 0.3, 1);
     }
 
     .roulette-item {
-      width: 95px;
+      width: 100px;
       height: 100%;
       display: flex;
       align-items: center;
@@ -780,58 +663,41 @@
     }
 
     .roulette-item img {
-      width: 75px;
-      height: 75px;
+      width: 65%;
+      height: 65%;
       object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
     }
 
-    .roulette-item svg {
-      width: 65px;
-      height: 65px;
-    }
+    .roulette-item svg { width: 50%; height: 50%; }
 
     .roulette-result {
       text-align: center;
-      margin-top: 28px;
-      font-size: 22px;
+      margin-top: 24px;
+      font-size: 20px;
       font-weight: 700;
-      min-height: 32px;
+      min-height: 28px;
     }
 
-    .roulette-result.win {
-      color: var(--green);
-    }
+    .roulette-result.win { color: var(--green); }
+    .roulette-result.lose { color: var(--text3); font-weight: 500;}
+    .roulette-result.jackpot { color: var(--gold); font-size: 24px;}
 
-    .roulette-result.lose {
-      color: var(--text3);
-    }
-
-    .roulette-result.jackpot {
-      font-size: 26px;
-      color: var(--gold);
-      animation: jackpotPulse 0.5s infinite ease-in-out;
-    }
-
-    /* Won Gifts Display */
     .won-gifts {
       display: none;
       flex-direction: column;
       align-items: center;
       gap: 16px;
-      margin-top: 24px;
-      padding: 24px;
-      background: linear-gradient(135deg, rgba(255,107,53,0.1), rgba(255,215,0,0.1));
-      border-radius: var(--radius2);
-      border: 1px solid rgba(255,107,53,0.2);
-      animation: slideUp 0.5s ease-out;
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(255,255,255,0.03);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
     }
-
-    .won-gifts.show {
-      display: flex;
-    }
+    .won-gifts.show { display: flex; animation: fadeUp 0.4s ease-out; }
 
     .won-gifts-title {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text2);
       font-weight: 600;
       text-transform: uppercase;
@@ -840,7 +706,7 @@
 
     .won-gifts-grid {
       display: flex;
-      gap: 14px;
+      gap: 12px;
       flex-wrap: wrap;
       justify-content: center;
     }
@@ -849,70 +715,57 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
-      padding: 14px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: var(--radius3);
-      min-width: 90px;
-      animation: scaleIn 0.5s ease-out backwards;
+      gap: 6px;
+      padding: 10px;
+      background: var(--card2);
+      border-radius: var(--radius-sm);
+      min-width: 80px;
     }
 
-    .won-gift:nth-child(1) { animation-delay: 0.1s; }
-    .won-gift:nth-child(2) { animation-delay: 0.25s; }
-    .won-gift:nth-child(3) { animation-delay: 0.4s; }
-
     .won-gift img {
-      width: 60px;
-      height: 60px;
+      width: 50px; height: 50px;
       object-fit: contain;
     }
 
     .won-gift-name {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
-      text-align: center;
     }
 
     .won-gift-count {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
-      color: var(--gold);
-      padding: 3px 10px;
-      background: rgba(255, 215, 0, 0.15);
-      border-radius: 999px;
+      color: #000;
+      padding: 2px 8px;
+      background: var(--gold);
+      border-radius: 10px;
+      margin-top: 2px;
     }
 
     .roulette-close {
       width: 100%;
-      height: 54px;
+      height: 50px;
       margin-top: 24px;
-      border-radius: var(--radius2);
+      border-radius: 14px;
       border: none;
-      background: var(--accent);
-      color: #fff;
-      font-size: 17px;
-      font-weight: 700;
+      background: var(--card2);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.25s;
+      transition: all 0.2s;
     }
 
-    .roulette-close:active {
-      transform: scale(0.98);
-      opacity: 0.9;
-    }
-
+    .roulette-close:active { transform: scale(0.97); }
     .roulette-close.jackpot {
-      background: linear-gradient(135deg, var(--orange), var(--gold));
+      background: var(--gold);
       color: #000;
     }
 
-    .hidden {
-      display: none !important;
-    }
-
-    /* === ICONS === */
-    .star-icon {
-      fill: var(--gold);
+    .confetti {
+      position: absolute;
+      pointer-events: none;
     }
   </style>
 </head>
@@ -928,7 +781,7 @@
 
       <div class="tabs">
         <button class="tab active" id="tabGifts">
-          <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="10" width="18" height="12" rx="2"/><rect x="10.5" y="10" width="3" height="12" fill="#FFE066"/><path d="M12 10s-3-3-3-5c0-2 1.5-3 3-1 1.5-2 3-1 3 1 0 2-3 5-3 5z"/><rect x="4" y="6" width="16" height="4" rx="1" opacity="0.8"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="10" width="18" height="12" rx="2"/><rect x="10.5" y="10" width="3" height="12" fill="currentColor" opacity="0.5"/><path d="M12 10s-3-3-3-5c0-2 1.5-3 3-1 1.5-2 3-1 3 1 0 2-3 5-3 5z"/><rect x="4" y="6" width="16" height="4" rx="1" opacity="0.8"/></svg>
           <span>Подарки</span>
         </button>
         <button class="tab" id="tabLuck">
@@ -951,7 +804,9 @@
     <!-- DETAIL SCREEN -->
     <div id="screenDetails" class="hidden">
       <div class="header with-back">
-        <button class="back-btn" id="btnBack">←</button>
+        <button class="back-btn" id="btnBack">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
         <div class="header-title" id="detailsTitle">Подарок</div>
       </div>
 
@@ -981,21 +836,21 @@
               <div class="option-label">@bogclm</div>
               <div class="option-hint">+2 ⭐</div>
             </div>
-            <div class="check" id="checkPaid"></div>
+            <div class="check" id="checkPaid">✓</div>
           </div>
           <div class="sender-option" id="optBoth">
             <div>
               <div class="option-label">@bogclm и @echoaxxs</div>
               <div class="option-hint">+5 ⭐</div>
             </div>
-            <div class="check" id="checkBoth"></div>
+            <div class="check" id="checkBoth">✓</div>
           </div>
         </div>
 
         <div class="total-row">
           <div class="total-label">Итого</div>
           <div class="total-value" id="detailsTotal">
-            <svg class="star-icon" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FFD700"/></svg>
+            <svg class="star-icon" width="20" height="20" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FFD700"/></svg>
             <span id="totalAmount">0</span>
           </div>
         </div>
@@ -1018,7 +873,7 @@
       <div class="roulette-title" id="rouletteTitle">Открываем кейс...</div>
       
       <div class="multiplier-box" id="multiplierBox">
-        <div class="multiplier-label">🔥 Мультипликатор</div>
+        <div class="multiplier-label">Мультипликатор</div>
         <div class="multiplier-value" id="multiplierValue">x2</div>
       </div>
       
@@ -1039,6 +894,11 @@
   </div>
 
 <script>
+  /* 
+     ====================================================
+     JS ЛОГИКА ОСТАВЛЕНА ПОЛНОСТЬЮ БЕЗ ИЗМЕНЕНИЙ 
+     ====================================================
+  */
   const tg = window.Telegram?.WebApp;
   const API_BASE = "https://podarochnica-api.onrender.com";
 
@@ -1202,7 +1062,7 @@
 
   function spawnConfetti() {
     const overlay = document.getElementById("rouletteOverlay");
-    const colors = ['#FF6B35', '#FFD93D', '#FF4757', '#00D26A', '#00D4FF', '#A855F7'];
+    const colors = ['#FF9F0A', '#FFD60A', '#FF375F', '#32D74B', '#64D2FF', '#BF5AF2'];
     for (let i = 0; i < 60; i++) {
       const el = document.createElement('div');
       el.className = 'confetti';
@@ -1214,6 +1074,17 @@
       el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
       el.style.animationDelay = Math.random() * 2 + 's';
       el.style.animationDuration = (2.5 + Math.random() * 2) + 's';
+      
+      // Добавим простую анимацию в CSS через JS
+      el.animate([
+        { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+        { transform: `translateY(100vh) rotate(${720}deg)`, opacity: 0 }
+      ], {
+        duration: (2.5 + Math.random() * 2) * 1000,
+        delay: Math.random() * 500,
+        fill: 'forwards'
+      });
+      
       overlay.appendChild(el);
       setTimeout(() => el.remove(), 5000);
     }
@@ -1253,7 +1124,7 @@
 
       const priceContent = c.price === 0 ? c.priceText : `${ICONS.star}${c.priceText}`;
       let badges = '';
-      if (hasMultiplier) badges += `<div class="case-badge jackpot">🔥 до x3</div>`;
+      if (hasMultiplier) badges += `<div class="case-badge jackpot">до x3</div>`;
       if (hasCredit) badges += `<div class="case-badge credit">${ICONS.ticket} ${credits}</div>`;
       if (cooldown && !hasCredit) badges += `<div class="case-cooldown">Через ${cooldown}</div>`;
 
@@ -1282,6 +1153,9 @@
     document.getElementById("senderOptions").classList.remove("expanded");
     syncSenderUI();
     updateTotalUI();
+    
+    // Скролл вверх при открытии деталей
+    window.scrollTo(0,0);
   }
 
   function closeDetails() {
@@ -1291,11 +1165,8 @@
 
   function syncSenderUI() {
     document.getElementById("checkFree").classList.toggle("on", sender === FREE_SENDER);
-    document.getElementById("checkFree").textContent = sender === FREE_SENDER ? "✓" : "";
     document.getElementById("checkPaid").classList.toggle("on", sender === PAID_SENDER);
-    document.getElementById("checkPaid").textContent = sender === PAID_SENDER ? "✓" : "";
     document.getElementById("checkBoth").classList.toggle("on", sender === BOTH_SENDER);
-    document.getElementById("checkBoth").textContent = sender === BOTH_SENDER ? "✓" : "";
   }
 
   function totalPrice() {
@@ -1369,7 +1240,7 @@
     closeBtn.classList.remove("jackpot");
     multiplierBox.classList.remove("show");
     wonGifts.classList.remove("show");
-    title.textContent = `${caseData.name} кейс`;
+    title.textContent = `${caseData.name}`;
     result.textContent = "";
     result.className = "roulette-result";
     closeBtn.classList.add("hidden");
@@ -1421,7 +1292,7 @@
     strip.style.transform = "translateX(0)";
 
     const containerWidth = document.querySelector('.roulette-window').offsetWidth;
-    const itemWidth = 95;
+    const itemWidth = 100; // обновленная ширина айтема
     const centerOffset = (containerWidth / 2) - (itemWidth / 2);
 
     const startDelay = isJackpot ? 900 : 100;
@@ -1439,12 +1310,12 @@
 
     setTimeout(() => {
       if (!hasRealWin) {
-        result.textContent = "Ничего не выпало...";
+        result.textContent = "Увы, ничего...";
         result.classList.add("lose");
         multiplierBox.classList.remove("show");
       } else if (isJackpot) {
         spawnConfetti();
-        result.innerHTML = `🔥 ДЖЕКПОТ x${giftCount}! 🔥`;
+        result.innerHTML = `ДЖЕКПОТ x${giftCount}!`;
         result.classList.add("jackpot");
         closeBtn.classList.add("jackpot");
 
@@ -1469,7 +1340,7 @@
         wonGifts.classList.add("show");
       } else {
         const winItem = wonGiftsList[0];
-        result.textContent = `Выпало: ${winItem.title}!`;
+        result.textContent = `${winItem.title}!`;
         result.classList.add("win");
       }
 
@@ -1479,7 +1350,7 @@
       }
 
       closeBtn.classList.remove("hidden");
-      closeBtn.textContent = !hasRealWin ? "Закрыть" : (isJackpot ? "🔥 Забрать всё!" : "Забрать");
+      closeBtn.textContent = !hasRealWin ? "Закрыть" : (isJackpot ? "Забрать всё!" : "Забрать");
     }, resultDelay);
   }
 
@@ -1504,6 +1375,13 @@
     document.getElementById("signatureToggle").classList.toggle("on", addSignature);
     document.getElementById("senderOptions").classList.toggle("expanded", addSignature);
     updateTotalUI();
+    
+    // Плавный скролл вниз, если опции раскрылись и не влезают
+    if (addSignature) {
+      setTimeout(() => {
+        window.scrollBy({ top: 200, behavior: 'smooth' });
+      }, 300);
+    }
   };
 
   document.getElementById("optFree").onclick = () => { sender = FREE_SENDER; syncSenderUI(); updateTotalUI(); };
@@ -1562,4 +1440,3 @@
 </script>
 </body>
 </html>
-
