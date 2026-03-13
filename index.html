@@ -498,6 +498,7 @@ document.getElementById("choiceBalance").onclick = async () => {
 };
 
 // РУЛЕТКА ДЛЯ ОБЫЧНЫХ КЕЙСОВ
+// РУЛЕТКА ДЛЯ ОБЫЧНЫХ КЕЙСОВ
 function showRoulette(c, isWeekly, preRolledData = null) {
   const overlay = document.getElementById("rouletteOverlay"), strip = document.getElementById("rouletteStrip"), titleText = document.getElementById("rouletteTitleText"), titleIcon = document.getElementById("rouletteTitleIcon"), result = document.getElementById("rouletteResult"), closeBtn = document.getElementById("rouletteClose"), pointer = document.getElementById("roulettePointer"), multBox = document.getElementById("multiplierBox"), multVal = document.getElementById("multiplierValue"), wonGifts = document.getElementById("wonGifts");
   overlay.classList.remove("hidden"); pointer.className = "roulette-pointer"; closeBtn.className = "roulette-close hidden"; multBox.classList.remove("show"); wonGifts.classList.remove("show");
@@ -523,16 +524,31 @@ function showRoulette(c, isWeekly, preRolledData = null) {
   
   const isJackpot = giftCount > 1;
   if (isJackpot) { multVal.textContent = `x${giftCount}`; multBox.classList.add("show"); pointer.classList.add("jackpot"); }
-  const hasWin = wonList.some(g => g !== null), caseGifts = c.drops.map(id => GIFTS.find(g => g.id === id)).filter(Boolean), nothingItem = { isNothing: true, title: "Ничего", price: 0 }, items = [];
-  for (let i = 0; i < 50; i++) { if (!caseGifts.length || Math.random() < 0.4) items.push(nothingItem); else items.push(caseGifts[Math.floor(Math.random()*caseGifts.length)]); }
+  
+  const hasWin = wonList.some(g => g !== null);
+  
+  let visualGifts = c.drops.map(id => GIFTS.find(g => g.id === id)).filter(Boolean);
+  if (visualGifts.length === 0) {
+    // В пустых кейсах крутим только мелочь (до 25 звёзд)
+    visualGifts = GIFTS.filter(g => g.price <= 25);
+  }
+  
+  const nothingItem = { isNothing: true, title: "Ничего", price: 0 }, items = [];
+  for (let i = 0; i < 50; i++) { if (Math.random() < 0.3) items.push(nothingItem); else items.push(visualGifts[Math.floor(Math.random()*visualGifts.length)]); }
+  
   const winIndex = 35; items[winIndex] = hasWin ? (wonList.find(g => g) || nothingItem) : nothingItem;
   
-  // КАРТОЧКА КАК НА ФОТО
+  if (!hasWin) {
+    // Ставим приманки прямо вокруг проигрыша
+    items[winIndex - 1] = visualGifts[Math.floor(Math.random()*visualGifts.length)];
+    items[winIndex + 1] = visualGifts[Math.floor(Math.random()*visualGifts.length)];
+  }
+  
   strip.innerHTML = items.map(it => `
     <div class="r-item">
       <div class="r-img-wrap">${it.isNothing ? ICONS.nothing : `<img src="${it.gif_url}">`}</div>
       <div class="r-title">${it.title}</div>
-      <div class="r-price">${ICONS.star} ${it.price}</div>
+      <div class="r-price">${it.isNothing ? '' : ICONS.star} ${it.isNothing ? '---' : it.price}</div>
     </div>
   `).join("");
   
@@ -540,7 +556,11 @@ function showRoulette(c, isWeekly, preRolledData = null) {
   const containerWidth = document.querySelector('.roulette-window').offsetWidth;
   const itemWidth = 100, gap = 6; const advance = itemWidth + gap;
   const itemCenter = 3 + (winIndex * advance) + (itemWidth / 2);
-  const targetX = (containerWidth / 2) - itemCenter;
+  
+  // ЭФФЕКТ СМЕЩЕНИЯ (Останавливается не по центру, а чуть с краю)
+  // Рандом от -42 до +42 пикселей (при ширине карточки 100 это прям почти на границе)
+  const randomOffset = (Math.random() * 84) - 42;
+  const targetX = (containerWidth / 2) - itemCenter + randomOffset;
   
   const delay = isJackpot ? 800 : 100;
   setTimeout(() => { strip.style.transition = "transform 5s cubic-bezier(0.12,0.8,0.3,1)"; strip.style.transform = `translateX(${targetX}px)`; }, delay);
@@ -568,7 +588,6 @@ function showStarRoulette(c, preRolledStars = null) {
   for (let i = 0; i < 55; i++) { if (i < 30 && Math.random() < 0.6 && fake.length) items.push({ stars: fake[Math.floor(Math.random()*fake.length)].stars }); else items.push({ stars: all[Math.floor(Math.random()*all.length)].stars }); }
   const winIndex = 38; if (fake.length) items[winIndex-1] = { stars: fake[Math.floor(Math.random()*fake.length)].stars }; items[winIndex] = { stars: won };
   
-  // КАРТОЧКА STAR КАК НА ФОТО
   strip.innerHTML = items.map(it => `
     <div class="r-item star-theme">
       <div class="r-img-wrap"><svg viewBox="0 0 24 24" fill="#000"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg></div>
@@ -581,13 +600,16 @@ function showStarRoulette(c, preRolledStars = null) {
   const containerWidth = document.querySelector('.roulette-window').offsetWidth;
   const itemWidth = 100, gap = 6; const advance = itemWidth + gap;
   const itemCenter = 3 + (winIndex * advance) + (itemWidth / 2);
-  const targetX = (containerWidth / 2) - itemCenter;
+  
+  // ЭФФЕКТ СМЕЩЕНИЯ ДЛЯ STAR КЕЙСА
+  const randomOffset = (Math.random() * 84) - 42;
+  const targetX = (containerWidth / 2) - itemCenter + randomOffset;
   
   setTimeout(() => { strip.style.transition = "transform 6s cubic-bezier(0.1,0.9,0.2,1)"; strip.style.transform = `translateX(${targetX}px)`; }, 100);
   
   setTimeout(() => {
     result.innerHTML = `${ICONS.star}<span>+${won} Stars</span>`; result.classList.add("stars"); closeBtn.classList.add("stars"); closeBtn.classList.remove("hidden"); closeBtn.querySelector('span').textContent = "Забрать!";
-    if (!preRolledStars) { starBalance += won; updateBalanceUI(); } // Обновляем только если тестовый режим
+    if (!preRolledStars) { starBalance += won; updateBalanceUI(); } 
   }, 6200);
 }
 
