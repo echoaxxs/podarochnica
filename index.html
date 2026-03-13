@@ -47,19 +47,9 @@
     .balance-widget svg { width: 16px; height: 16px; color: var(--gold); }
     .balance-widget span { font-size: 14px; font-weight: 700; color: var(--gold); }
 
-    /* === PITY БАР === */
-    .pity-bar { margin: calc(60px + env(safe-area-inset-top)) 16px 12px; padding: 12px 14px; background: var(--card); border-radius: var(--radius-md); border: 1px solid var(--border); }
-    .pity-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .pity-label { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; }
-    .pity-value { font-size: 12px; font-weight: 700; color: var(--green); }
-    .pity-track { height: 6px; background: var(--card2); border-radius: 3px; overflow: hidden; }
-    .pity-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--cyan)); border-radius: 3px; transition: width 0.5s ease; }
-
     /* === СЕКЦИИ === */
     .section { width: 100%; padding: 16px; animation: fadeIn 0.3s ease-out; }
-    .section.with-pity { padding-top: 8px; }
     .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-top: calc(44px + env(safe-area-inset-top)); }
-    .section.with-pity .section-header { padding-top: 0; }
     .section-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
 
     /* === НОВОСТИ === */
@@ -109,7 +99,6 @@
     .case-price-row { display: flex; align-items: center; gap: 4px; font-size: 15px; font-weight: 700; color: var(--gold); }
     .case-badge { position: absolute; top: 8px; right: 8px; padding: 4px 6px; border-radius: 6px; font-size: 9px; font-weight: 700; }
     .case-badge.jackpot { background: var(--gold2); color: #000; }
-    .case-badge.pity { background: var(--green); color: #000; }
 
     /* === ПОДАРКИ === */
     .gift-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; width: 100%; }
@@ -167,20 +156,30 @@
     .gift-buy-btn.balance { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #000; }
     .gift-buy-btn.disabled { opacity: 0.4; pointer-events: none; }
 
-    /* === СТРОГАЯ РУЛЕТКА === */
+    /* === СТАРЫЙ ДИЗАЙН РУЛЕТКИ (V6) === */
     .roulette-wrapper { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.98); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; overscroll-behavior: none; }
     .roulette-box { width: 100%; max-width: 380px; position: relative; }
-    .roulette-window { position: relative; height: 140px; width: 100%; overflow: hidden; border-radius: 14px; background: var(--bg2); border: 2px solid var(--border); box-shadow: inset 0 0 40px rgba(0,0,0,0.7); }
-    .roulette-strip { display: flex; height: 100%; align-items: center; gap: 8px; padding: 0 4px; }
-    .r-item { width: 90px; height: 120px; background: var(--card); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 4px; flex-shrink: 0; border: 2px solid var(--border); }
-    .r-item.star { background: linear-gradient(135deg, var(--gold), var(--gold2)); border: none; color: #000; }
-    .r-img { width: 44px; height: 44px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }
-    .r-img img { width: 100%; height: 100%; object-fit: contain; }
-    .r-label { font-size: 11px; font-weight: 700; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .r-value { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 4px; color: var(--gold); }
-    .r-item.star .r-value { color: #000; }
-    .roulette-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: #fff; transform: translateX(-50%); z-index: 10; box-shadow: 0 0 15px rgba(255,255,255,0.9); }
+    .roulette-window { position: relative; height: 150px; width: 100%; overflow: hidden; border-radius: 12px; background: var(--bg2); border: 1px solid var(--border); box-shadow: inset 0 0 30px rgba(0,0,0,0.6); }
     
+    .roulette-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #fff; transform: translateX(-50%); z-index: 10; box-shadow: 0 0 10px rgba(255,255,255,0.8); }
+    .roulette-pointer::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 12px solid #fff; }
+    .roulette-pointer::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 12px solid #fff; }
+    
+    .roulette-strip { display: flex; height: 100%; align-items: center; gap: 6px; padding: 0 3px; }
+    
+    .r-item { width: 100px; height: 130px; background: var(--card); border-radius: 12px; display: flex; flex-direction: column; align-items: center; padding: 10px 6px; flex-shrink: 0; border: 2px solid var(--border); box-sizing: border-box; }
+    .r-item.star-theme { background: linear-gradient(135deg, #FFD60A, #FF9F0A); border: none; color: #000; }
+    
+    .r-img-wrap { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+    .r-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
+    .r-img-wrap svg { width: 44px; height: 44px; }
+    
+    .r-title { font-size: 11px; font-weight: 800; text-align: center; line-height: 1.2; margin-bottom: 6px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .r-price { background: #111; color: #fff; border-radius: 10px; padding: 3px 8px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 4px; margin-top: auto; }
+    .r-item.star-theme .r-price { background: rgba(0,0,0,0.15); color: #000; }
+    .r-price svg { width: 12px; height: 12px; }
+
     /* === ОЖИДАНИЕ (LOADING) === */
     .loading-container { display: flex; flex-direction: column; align-items: center; gap: 16px; animation: pulse 1.5s ease-in-out infinite; text-align: center; }
     .loading-icon { font-size: 48px; }
@@ -202,18 +201,9 @@
     <span id="balanceValue">0</span>
   </div>
 
-  <!-- PITY -->
-  <div class="pity-bar hidden" id="pityBar">
-    <div class="pity-header">
-      <span class="pity-label">До гарантированного подарка</span>
-      <span class="pity-value" id="pityValue">20⭐</span>
-    </div>
-    <div class="pity-track"><div class="pity-fill" id="pityFill" style="width: 0%"></div></div>
-  </div>
-
   <!-- СЕКЦИИ -->
   <div class="section" id="sectionHome"></div>
-  <div class="section with-pity hidden" id="sectionCases"></div>
+  <div class="section hidden" id="sectionCases"></div>
   <div class="section hidden" id="sectionGifts"></div>
   <div class="section hidden" id="sectionDonate"></div>
   <div class="section hidden" id="sectionAdmin"></div>
@@ -292,7 +282,12 @@
   <!-- Сама рулетка -->
   <div class="roulette-box hidden" id="rouletteMain">
     <div id="rouletteTitle" style="text-align:center;font-size:20px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:8px;"></div>
-    <div class="roulette-window"><div class="roulette-pointer"></div><div class="roulette-strip" id="rouletteStrip"></div></div>
+    
+    <div class="roulette-window">
+      <div class="roulette-pointer"></div>
+      <div class="roulette-strip" id="rouletteStrip"></div>
+    </div>
+    
     <div id="rouletteResult" style="text-align:center;margin-top:20px;font-size:18px;font-weight:700;min-height:28px;"></div>
     <button class="choice-btn cancel hidden" id="rouletteClose" style="margin-top:20px;">Закрыть</button>
   </div>
@@ -314,7 +309,7 @@ const DONATE_AMOUNTS = [10, 25, 50, 100, 250, 500];
 
 const ICONS = {
   star: `<svg viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>`,
-  nothing: `<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="16" stroke="#666" stroke-width="3" fill="none"/><line x1="14" y1="14" x2="34" y2="34" stroke="#666" stroke-width="3"/></svg>`,
+  nothing: `<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" stroke="#555" stroke-width="3" fill="none"/><line x1="14" y1="14" x2="34" y2="34" stroke="#555" stroke-width="3"/></svg>`,
   box: `<svg viewBox="0 0 48 48"><path d="M6 18L24 8L42 18V34L24 44L6 34V18Z" fill="#4ECDC4"/><path d="M24 8L42 18L24 28L6 18L24 8Z" fill="#7DE8E1"/><path d="M24 28V44L6 34V18L24 28Z" fill="#3DB9B1"/></svg>`,
   diamond: `<svg viewBox="0 0 48 48"><path d="M24 4L42 18L24 44L6 18L24 4Z" fill="#A78BFA"/><path d="M24 4L6 18H42L24 4Z" fill="#C4B5FD"/><path d="M6 18L24 44V28L6 18Z" fill="#8B5CF6"/></svg>`,
   starCase: `<svg viewBox="0 0 48 48"><path d="M24 4L30 16L44 18L34 28L36 42L24 36L12 42L14 28L4 18L18 16L24 4Z" fill="#FFD60A"/><path d="M24 4L30 16L44 18L34 28L36 42L24 36" fill="#E5C000"/></svg>`,
@@ -362,11 +357,6 @@ async function loadApp() {
 
 function updateUI() {
   document.getElementById("balanceValue").textContent = state.balance.toLocaleString();
-  const bar = document.getElementById("pityBar"), rem = state.pityThreshold - state.pitySpent;
-  if (state.pitySpent > 0 && rem > 0 && document.getElementById("tabCases").classList.contains("active")) {
-    bar.classList.remove("hidden"); document.getElementById("pityValue").textContent = `${rem}⭐`;
-    document.getElementById("pityFill").style.width = `${(state.pitySpent / state.pityThreshold) * 100}%`;
-  } else bar.classList.add("hidden");
 }
 
 function showSubscribeOverlay() {
@@ -483,7 +473,7 @@ async function loadPromos() {
   try {
     const r = await api("/api/admin/get-promocodes");
     const list = document.getElementById("admList");
-    if(list) list.innerHTML = r.promocodes.map(p=>`<div class="admin-promo-item"><div><b>${p.code}</b><br><span style="font-size:12px;color:#888">${p.rewardType}:${p.rewardId} (${p.uses}/${p.maxUses})</span></div><button class="admin-promo-del" onclick="delPromo('${p.code}')">${ICONS.close}</button></div>`).join("");
+    if(list) list.innerHTML = r.promocodes.map(p=>`<div class="admin-promo-item"><div><b style="font-family:monospace">${p.code}</b><br><span style="font-size:12px;color:#888">${p.rewardType}:${p.rewardId} (${p.uses}/${p.maxUses})</span></div><button class="admin-promo-del" onclick="delPromo('${p.code}')">${ICONS.close}</button></div>`).join("");
   } catch(e){}
 }
 async function delPromo(c) { if(confirm('Удалить?')){ await api("/api/admin/delete-promocode",{code:c}); loadPromos(); } }
@@ -507,7 +497,7 @@ function renderCaseGrid() {
       <div class="case-icon">${c.type==='stars'?ICONS.starCase:(c.category==='cheap'?ICONS.box:ICONS.diamond)}</div>
       <div class="case-name">${c.title}</div>
       <div class="case-price-row">${ICONS.star}${c.price}</div>
-      ${c.has_multiplier?'<div class="case-badge jackpot">x3</div>':''}${c.pity_enabled?'<div class="case-badge pity">ГАРАНТ</div>':''}
+      ${c.has_multiplier?'<div class="case-badge jackpot">x3</div>':''}
     </div>
   `).join("");
 }
@@ -610,36 +600,54 @@ function startRouletteSpin(c, r) {
   document.getElementById("rouletteTitle").innerHTML = `${c.type==='stars'?ICONS.starCase:ICONS.box}<span>${c.title}</span>`;
   
   let items = [];
+  const winIndex = 35; // Оригинальный индекс версии 6.0
+  
   if(c.type==='stars') {
     const d = r.allDrops || c.possible_drops || []; const w = r.starsWon || 0;
-    for(let i=0;i<50;i++) items.push({t:"star", s:d[Math.floor(Math.random()*d.length)]?.stars||10}); items[38] = {t:"star", s:w};
+    for(let i=0;i<50;i++) items.push({type: "star", val: d[Math.floor(Math.random()*d.length)]?.stars||50});
+    items[winIndex] = {type: "star", val: w};
   } else {
-    const g = (c.possible_drops||[]).map(x=>state.gifts.find(y=>y.id===x.gift_id)).filter(Boolean);
-    for(let i=0;i<50;i++) items.push(Math.random()<0.3||!g.length ? {t:"none"} : {t:"gift", g:g[Math.floor(Math.random()*g.length)]});
-    if(r.type==="nothing") items[38] = {t:"none"};
-    else if(r.pityTriggered) items[38] = {t:"gift", g:state.gifts.find(x=>x.id==="heart")||state.gifts[0]};
-    else if(r.won?.length) items[38] = {t:"gift", g:state.gifts.find(x=>x.title===r.won[0].title)};
+    // Делаем визуальное разнообразие из всех подарков для приманки, как в 6.0
+    let visualGifts = state.gifts;
+    if(c.category === "cheap") visualGifts = state.gifts.filter(g => g.price <= 25);
+    
+    for(let i=0;i<50;i++) {
+      if(Math.random() < 0.3) items.push({type: "nothing"});
+      else items.push({type: "gift", val: visualGifts[Math.floor(Math.random()*visualGifts.length)]});
+    }
+    
+    if(r.type==="nothing") {
+        items[winIndex] = {type: "nothing"};
+        items[winIndex-1] = {type: "gift", val: visualGifts[Math.floor(Math.random()*visualGifts.length)]};
+        items[winIndex+1] = {type: "gift", val: visualGifts[Math.floor(Math.random()*visualGifts.length)]};
+    }
+    else if(r.pityTriggered) items[winIndex] = {type: "gift", val: state.gifts.find(x=>x.id==="heart")||state.gifts[0]};
+    else if(r.won?.length) items[winIndex] = {type: "gift", val: state.gifts.find(x=>x.title===r.won[0].title)};
   }
   
   strip.innerHTML = items.map(i => {
-    if(i.t==="star") return `<div class="r-item star"><div class="r-img">${ICONS.star}</div><div class="r-label">Stars</div><div class="r-value">${ICONS.star}${i.s}</div></div>`;
-    if(i.t==="none") return `<div class="r-item" style="background:var(--card2)"><div class="r-img">${ICONS.nothing}</div><div class="r-label" style="color:var(--text3)">Пусто</div><div class="r-value" style="color:var(--text3)">---</div></div>`;
-    return `<div class="r-item"><div class="r-img"><img src="${i.g.gif_url}"></div><div class="r-label">${i.g.title}</div><div class="r-value">${ICONS.star}${i.g.price}</div></div>`;
+    if(i.type==="star") return `<div class="r-item star-theme"><div class="r-img-wrap"><svg viewBox="0 0 24 24" fill="#000"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg></div><div class="r-title">Stars</div><div class="r-price">${ICONS.star} ${i.val}</div></div>`;
+    if(i.type==="nothing") return `<div class="r-item"><div class="r-img-wrap">${ICONS.nothing}</div><div class="r-title" style="color:var(--text2)">Пусто</div><div class="r-price" style="color:var(--text3)">---</div></div>`;
+    return `<div class="r-item"><div class="r-img-wrap"><img src="${i.val.gif_url}"></div><div class="r-title">${i.val.title}</div><div class="r-price">${ICONS.star} ${i.val.price}</div></div>`;
   }).join("");
   
   strip.style.transition = "none"; strip.style.transform = "translateX(0)";
   setTimeout(() => {
     const cw = document.querySelector('.roulette-window').offsetWidth;
-    const itemW = 100, gap = 8, adv = itemW+gap, target = (cw/2) - (4 + 38*adv + itemW/2) + (Math.random()*80-40);
-    strip.style.transition = "transform 5s cubic-bezier(0.1, 0.9, 0.2, 1)";
-    strip.style.transform = `translateX(${target}px)`;
+    const itemW = 100, gap = 6, adv = itemW + gap;
+    const itemCenter = 3 + (winIndex * adv) + (itemW / 2);
+    const randomOffset = (Math.random() * 84) - 42; // Случайное смещение
+    const targetX = (cw / 2) - itemCenter + randomOffset;
+    
+    strip.style.transition = "transform 5s cubic-bezier(0.12, 0.8, 0.3, 1)";
+    strip.style.transform = `translateX(${targetX}px)`;
   }, 100);
   
   setTimeout(() => {
     if(c.type==='stars') { res.innerHTML = `${ICONS.star}<span>+${r.starsWon} Stars!</span>`; res.style.color="var(--gold)"; res.style.fontSize="24px"; btn.className="choice-btn stars"; btn.textContent="Забрать!"; }
     else if(r.type==="nothing") { res.innerHTML = `${ICONS.close}<span>Ничего...</span>`; res.style.color="var(--text3)"; btn.textContent="Закрыть"; }
-    else if(r.pityTriggered) { res.innerHTML = `🎁<span>Гарантированный подарок!</span>`; res.style.color="var(--green)"; btn.className="choice-btn"; btn.style.background="var(--green)"; btn.textContent="Круто!"; }
-    else { res.innerHTML = `${ICONS.check}<span>${r.won[0].title}!</span>`; res.style.color="var(--green)"; btn.className="choice-btn"; btn.style.background="var(--green)"; btn.textContent="Забрать!"; }
+    else if(r.pityTriggered) { res.innerHTML = `🎁<span>Гарант! ${items[winIndex].val.title}</span>`; res.style.color="var(--green)"; btn.className="choice-btn"; btn.style.background="var(--green)"; btn.textContent="Круто!"; }
+    else { res.innerHTML = `${ICONS.check}<span>${items[winIndex].val.title}!</span>`; res.style.color="var(--green)"; btn.className="choice-btn"; btn.style.background="var(--green)"; btn.textContent="Забрать!"; }
     btn.classList.remove("hidden");
   }, 5200);
 }
