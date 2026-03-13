@@ -26,6 +26,7 @@
       --red: #FF453A;
       --purple: #BF5AF2;
       --cyan: #64D2FF;
+      --pink: #FF375F;
       --radius-lg: 20px;
       --radius-md: 14px;
       --radius-sm: 10px;
@@ -39,7 +40,7 @@
     
     @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes glow { 0%, 100% { box-shadow: 0 0 15px rgba(255,214,10,0.3); } 50% { box-shadow: 0 0 25px rgba(255,214,10,0.5); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.95); } }
 
     /* === БАЛАНС === */
     .balance-widget { position: fixed; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); z-index: 100; display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: linear-gradient(135deg, rgba(255,214,10,0.2), rgba(255,159,10,0.15)); border: 1px solid rgba(255,214,10,0.3); border-radius: 20px; backdrop-filter: blur(10px); }
@@ -84,13 +85,12 @@
     .promo-result.error { background: rgba(255,69,58,0.15); color: var(--red); }
 
     /* === АДМИН ПАНЕЛЬ === */
-    .admin-section { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border); width: 100%; }
     .admin-form { background: var(--card); border-radius: var(--radius-lg); padding: 16px; border: 1px solid var(--border); }
     .admin-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; width: 100%; }
     .admin-input, .admin-select { flex: 1; min-width: 100px; height: 46px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 12px; color: var(--text); font-size: 14px; }
     .admin-btn { height: 46px; padding: 0 20px; background: var(--accent); border: none; border-radius: var(--radius-sm); color: #fff; font-weight: 600; }
     .admin-promo-item { display: flex; align-items: center; justify-content: space-between; padding: 14px; background: var(--card); border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 8px; word-break: break-all; }
-    .admin-promo-del { width: 36px; height: 36px; flex-shrink: 0; background: rgba(255,69,58,0.2); border: none; border-radius: 10px; color: var(--red); display: flex; align-items: center; justify-content: center; }
+    .admin-promo-del { width: 36px; height: 36px; flex-shrink: 0; background: rgba(255,69,58,0.2); border: none; border-radius: 10px; color: var(--red); display: flex; align-items: center; justify-content: center; cursor:pointer;}
 
     /* === КЕЙСЫ === */
     .case-categories { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
@@ -119,16 +119,27 @@
     .gift-img img { width: 100%; height: 100%; object-fit: contain; }
     .gift-price { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; color: var(--gold); }
 
+    /* === ДОНАТ === */
+    .donate-card { background: var(--card); border-radius: var(--radius-lg); padding: 24px 20px; border: 1px solid var(--border); }
+    .donate-icon { font-size: 48px; margin-bottom: 16px; text-align: center; }
+    .donate-text { text-align: center; font-size: 14px; color: var(--text2); margin-bottom: 24px; }
+    .donate-amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+    .donate-btn { height: 50px; background: var(--card2); border: 2px solid var(--border); border-radius: 12px; color: var(--text); font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; transition: 0.2s; }
+    .donate-btn svg { width: 16px; height: 16px; color: var(--gold); }
+    .donate-btn.selected { border-color: var(--pink); background: rgba(255,55,95,0.15); }
+    .donate-custom { display: flex; align-items: center; background: var(--bg); border-radius: 12px; padding: 6px; border: 1px solid var(--border); margin-bottom: 20px; }
+    .donate-custom input { flex: 1; height: 46px; background: transparent; border: none; padding: 0 16px; font-size: 18px; font-weight: 700; color: var(--text); }
+    .donate-custom input:focus { outline: none; }
+    .donate-custom span { padding-right: 16px; color: var(--text3); font-weight: 600; }
+    .donate-send { width: 100%; height: 54px; background: linear-gradient(135deg, var(--pink), #FF6B6B); border: none; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; }
+
     /* === МОДАЛЬНЫЕ ОКНА === */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeIn 0.2s; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeIn 0.2s; overscroll-behavior: none; }
     .modal-box { background: var(--card); border-radius: var(--radius-lg); padding: 24px 20px; width: 100%; max-width: 360px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border); position: relative; }
-    
-    /* КНОПКА ЗАКРЫТЬ (КРЕСТИК) */
     .modal-close-btn { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; background: var(--card2); border: none; border-radius: 50%; color: var(--text2); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; transition: 0.2s; }
     .modal-close-btn:active { background: var(--card3); color: #fff; transform: scale(0.9); }
     .modal-close-btn svg { width: 18px; height: 18px; }
 
-    /* КНОПКИ ПОКУПКИ В МОДАЛКАХ */
     .choice-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; height: 50px; border-radius: var(--radius-md); border: none; font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 8px; cursor: pointer; }
     .choice-btn:active { transform: scale(0.97); }
     .choice-btn.stars { background: var(--accent); }
@@ -136,22 +147,19 @@
     .choice-btn.cancel { background: var(--card2); margin-top: 12px; }
     .choice-btn.balance.disabled { opacity: 0.4; pointer-events: none; }
 
-    /* GIFT DETAIL ИСПРАВЛЕНИЯ */
-    .gift-detail-preview { width: 150px; height: 150px; margin: 0 auto 16px; background: var(--bg2); border-radius: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
-    .gift-detail-preview img { width: 65%; height: 65%; object-fit: contain; }
+    /* ДЕТАЛИ ПОДАРКА */
+    .gift-detail-preview { width: 130px; height: 130px; margin: 0 auto 16px; background: var(--bg2); border-radius: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
+    .gift-detail-preview img { width: 70%; height: 70%; object-fit: contain; }
     .gift-detail-title { text-align: center; font-size: 20px; font-weight: 700; margin-bottom: 16px; }
-    
-    .signature-toggle { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--card2); border-radius: var(--radius-md); margin-bottom: 12px; }
+    .signature-toggle { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card2); border-radius: var(--radius-md); margin-bottom: 12px; }
     .toggle-switch { width: 46px; height: 28px; background: #39393D; border-radius: 30px; position: relative; flex-shrink: 0; transition: 0.3s; }
     .toggle-switch.on { background: var(--green); }
     .toggle-switch::after { content: ""; position: absolute; width: 24px; height: 24px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
     .toggle-switch.on::after { transform: translateX(18px); }
-    
     .sender-options { display: none; flex-direction: column; gap: 6px; margin-bottom: 14px; }
     .sender-options.show { display: flex; }
-    .sender-option { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--card2); border-radius: var(--radius-sm); border: 2px solid transparent; }
+    .sender-option { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--card2); border-radius: var(--radius-sm); border: 2px solid transparent; cursor: pointer;}
     .sender-option.selected { border-color: var(--accent); background: rgba(10,132,255,0.1); }
-    
     .gift-total { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: rgba(255,214,10,0.1); border-radius: var(--radius-md); margin-bottom: 16px; }
     .gift-buy-btns { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
     .gift-buy-btn { flex: 1; min-width: 130px; height: 50px; border-radius: var(--radius-md); border: none; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; }
@@ -159,8 +167,9 @@
     .gift-buy-btn.balance { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #000; }
     .gift-buy-btn.disabled { opacity: 0.4; pointer-events: none; }
 
-    /* === РУЛЕТКА === */
-    .roulette-box { width: 100%; max-width: 400px; margin: 0 auto; position: relative; }
+    /* === СТРОГАЯ РУЛЕТКА === */
+    .roulette-wrapper { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.98); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; overscroll-behavior: none; }
+    .roulette-box { width: 100%; max-width: 380px; position: relative; }
     .roulette-window { position: relative; height: 140px; width: 100%; overflow: hidden; border-radius: 14px; background: var(--bg2); border: 2px solid var(--border); box-shadow: inset 0 0 40px rgba(0,0,0,0.7); }
     .roulette-strip { display: flex; height: 100%; align-items: center; gap: 8px; padding: 0 4px; }
     .r-item { width: 90px; height: 120px; background: var(--card); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 4px; flex-shrink: 0; border: 2px solid var(--border); }
@@ -172,6 +181,11 @@
     .r-item.star .r-value { color: #000; }
     .roulette-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: #fff; transform: translateX(-50%); z-index: 10; box-shadow: 0 0 15px rgba(255,255,255,0.9); }
     
+    /* === ОЖИДАНИЕ (LOADING) === */
+    .loading-container { display: flex; flex-direction: column; align-items: center; gap: 16px; animation: pulse 1.5s ease-in-out infinite; text-align: center; }
+    .loading-icon { font-size: 48px; }
+    .loading-text { font-size: 18px; font-weight: 700; color: var(--text); }
+
     /* === НИЖНИЕ ТАБЫ === */
     .bottom-tabs { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: rgba(18,18,20,0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border); padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); z-index: 50; width: 100%; }
     .bottom-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; color: var(--text3); font-size: 10px; font-weight: 600; cursor: pointer; }
@@ -201,17 +215,21 @@
   <div class="section" id="sectionHome"></div>
   <div class="section with-pity hidden" id="sectionCases"></div>
   <div class="section hidden" id="sectionGifts"></div>
+  <div class="section hidden" id="sectionDonate"></div>
+  <div class="section hidden" id="sectionAdmin"></div>
 
   <!-- ТАБЫ -->
   <nav class="bottom-tabs">
     <button class="bottom-tab active" id="tabHome"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Главная</span></button>
     <button class="bottom-tab" id="tabCases"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg><span>Кейсы</span></button>
     <button class="bottom-tab" id="tabGifts"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2z"/></svg><span>Подарки</span></button>
+    <button class="bottom-tab" id="tabDonate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span>Донат</span></button>
+    <button class="bottom-tab hidden" id="tabAdmin"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg><span>Админ</span></button>
   </nav>
 </div>
 
 <!-- ПОДПИСКА -->
-<div class="subscribe-overlay hidden" id="subscribeOverlay">
+<div class="modal-overlay hidden" id="subscribeOverlay">
   <div class="modal-box">
     <div style="font-size: 48px; margin-bottom: 12px; text-align:center;">🔔</div>
     <h2 style="margin-bottom:8px; text-align:center;">Подпишись на каналы</h2>
@@ -263,9 +281,16 @@
   </div>
 </div>
 
-<!-- РУЛЕТКА -->
-<div class="roulette-overlay hidden" id="rouletteOverlay">
-  <div class="roulette-box">
+<!-- ЦЕНТРАЛЬНАЯ РУЛЕТКА -->
+<div class="roulette-wrapper hidden" id="rouletteOverlay">
+  <!-- Ожидание -->
+  <div class="loading-container hidden" id="rouletteLoading">
+    <div class="loading-icon">⏳</div>
+    <div class="loading-text">Пожалуйста, подождите...</div>
+  </div>
+  
+  <!-- Сама рулетка -->
+  <div class="roulette-box hidden" id="rouletteMain">
     <div id="rouletteTitle" style="text-align:center;font-size:20px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:8px;"></div>
     <div class="roulette-window"><div class="roulette-pointer"></div><div class="roulette-strip" id="rouletteStrip"></div></div>
     <div id="rouletteResult" style="text-align:center;margin-top:20px;font-size:18px;font-weight:700;min-height:28px;"></div>
@@ -284,6 +309,8 @@ const state = {
 };
 
 const SENDERS = [{ key: "@echoaxxs", label: "@echoaxxs", cost: 2 }, { key: "@bogclm", label: "@bogclm", cost: 2 }, { key: "@bogclm и @echoaxxs", label: "@bogclm и @echoaxxs", cost: 5 }];
+
+const DONATE_AMOUNTS = [10, 25, 50, 100, 250, 500];
 
 const ICONS = {
   star: `<svg viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>`,
@@ -325,7 +352,12 @@ async function loadApp() {
     state.balance = u.starBalance || 0; state.pitySpent = u.pitySpent || 0; state.pityThreshold = u.pityThreshold || 20; state.isAdmin = u.isAdmin || false;
     state.news = n.news || []; state.gifts = g.gifts || []; state.cases = c.categories || {};
   } catch(e) {}
-  renderHome(); renderCases(); renderGifts(); setupTabs(); updateUI();
+  
+  if (state.isAdmin) {
+    document.getElementById("tabAdmin").classList.remove("hidden");
+  }
+  
+  renderHome(); renderCases(); renderGifts(); renderDonate(); renderAdmin(); setupTabs(); updateUI();
 }
 
 function updateUI() {
@@ -355,14 +387,14 @@ document.getElementById("subscribeCheck").onclick = async function() {
 };
 
 function setupTabs() {
-  const tabs = { Home: "sectionHome", Cases: "sectionCases", Gifts: "sectionGifts" };
+  const tabs = { Home: "sectionHome", Cases: "sectionCases", Gifts: "sectionGifts", Donate: "sectionDonate", Admin: "sectionAdmin" };
   Object.keys(tabs).forEach(name => {
     document.getElementById(`tab${name}`).onclick = () => {
       Object.keys(tabs).forEach(n => {
-        document.getElementById(`tab${n}`).classList.toggle("active", n === name);
-        document.getElementById(tabs[n]).classList.toggle("hidden", n !== name);
+        document.getElementById(`tab${n}`)?.classList.toggle("active", n === name);
+        document.getElementById(tabs[n])?.classList.toggle("hidden", n !== name);
       });
-      updateUI(); // Обновит видимость pity bar
+      updateUI();
     };
   });
 }
@@ -373,17 +405,10 @@ function renderHome() {
     <div class="news-card"><div class="news-img">${n.image ? `<img src="${n.image}">` : '📰'}</div>
     <div class="news-content"><div class="news-date">${n.date}</div><div class="news-title">${n.title}</div><div class="news-text">${n.text}</div></div></div>
   `).join("") : `<div class="news-card"><div class="news-content" style="text-align:center;color:var(--text3)">Пока нет новостей</div></div>`;
-  
-  let admin = state.isAdmin ? `
-    <div class="admin-section"><div style="color:var(--red);font-weight:700;margin-bottom:10px">Админка (Промо)</div>
-    <div class="admin-form"><div class="admin-row"><input class="admin-input" id="admC" placeholder="Код"><select class="admin-select" id="admT"><option value="stars">Stars</option><option value="gift">Gift</option><option value="case">Case</option></select></div>
-    <div class="admin-row"><input class="admin-input" id="admR" placeholder="ID/Кол-во"><button class="admin-btn" onclick="createPromo()">Создать</button></div></div>
-    <div id="admList"></div></div>` : '';
     
   s.innerHTML = `<div class="section-header"><div class="section-title">🏠 Главная</div></div>
     <div class="news-list">${newsHtml}</div>
-    <div class="promo-card"><div class="promo-title">🎟 Промокод</div><div class="promo-input-row"><input id="promoInput" class="promo-input" placeholder="Код..."><button id="promoBtn" class="promo-btn">➜</button></div><div id="promoResult" class="promo-result hidden"></div></div>
-    ${admin}`;
+    <div class="promo-card"><div class="promo-title">🎟 Промокод</div><div class="promo-input-row"><input id="promoInput" class="promo-input" placeholder="Код..."><button id="promoBtn" class="promo-btn">➜</button></div><div id="promoResult" class="promo-result hidden"></div></div>`;
     
   document.getElementById("promoBtn").onclick = async () => {
     const val = document.getElementById("promoInput").value.trim(), res = document.getElementById("promoResult");
@@ -392,7 +417,63 @@ function renderHome() {
     catch(e) { res.innerHTML=`❌ ${e.message}`; res.className="promo-result error"; }
     res.classList.remove("hidden");
   };
-  if(state.isAdmin) loadPromos();
+}
+
+function renderDonate() {
+  const s = document.getElementById("sectionDonate");
+  s.innerHTML = `
+    <div class="section-header"><div class="section-title">💝 Донат</div></div>
+    <div class="donate-card">
+      <div class="donate-icon">☕</div>
+      <div class="donate-text">Поддержите проект, чтобы мы могли делать его лучше!</div>
+      <div class="donate-amounts" id="donateAmounts">
+        ${DONATE_AMOUNTS.map(a => `<button class="donate-btn" data-amount="${a}">${ICONS.star}${a}</button>`).join('')}
+      </div>
+      <div class="donate-custom">
+        <input type="number" id="donateCustom" placeholder="Своя сумма" min="1" max="10000">
+        <span>Stars</span>
+      </div>
+      <button class="donate-send" id="donateSend">Отправить</button>
+    </div>
+  `;
+  
+  let sel = null;
+  s.querySelectorAll('.donate-btn').forEach(b => {
+    b.onclick = () => {
+      s.querySelectorAll('.donate-btn').forEach(x => x.classList.remove('selected'));
+      b.classList.add('selected');
+      sel = parseInt(b.dataset.amount);
+      document.getElementById("donateCustom").value = '';
+    };
+  });
+  
+  document.getElementById("donateCustom").oninput = () => {
+    s.querySelectorAll('.donate-btn').forEach(x => x.classList.remove('selected'));
+    sel = null;
+  };
+  
+  document.getElementById("donateSend").onclick = async () => {
+    const custom = document.getElementById("donateCustom").value;
+    const amount = custom ? parseInt(custom) : sel;
+    if (!amount || amount < 1 || amount > 10000) { alert("Введите сумму от 1 до 10000 Stars"); return; }
+    
+    try {
+      const r = await api("/api/create-donate", { amount });
+      if (r.link && tg) tg.openInvoice(r.link, s => { if (s === "paid") tg.showAlert("Спасибо за поддержку! 💝"); });
+    } catch(e) { alert("Ошибка: " + e.message); }
+  };
+}
+
+function renderAdmin() {
+  if (!state.isAdmin) return;
+  const s = document.getElementById("sectionAdmin");
+  s.innerHTML = `
+    <div class="section-header"><div class="section-title" style="color:var(--red)">🛡 Админ Панель</div></div>
+    <div class="admin-form"><div class="admin-row"><input class="admin-input" id="admC" placeholder="Код"><select class="admin-select" id="admT"><option value="stars">Stars</option><option value="gift">Gift</option><option value="case">Case</option></select></div>
+    <div class="admin-row"><input class="admin-input" id="admR" placeholder="ID/Кол-во"><button class="admin-btn" onclick="createPromo()">Создать</button></div></div>
+    <div id="admList"></div>
+  `;
+  loadPromos();
 }
 
 async function createPromo() {
@@ -401,7 +482,8 @@ async function createPromo() {
 async function loadPromos() {
   try {
     const r = await api("/api/admin/get-promocodes");
-    document.getElementById("admList").innerHTML = r.promocodes.map(p=>`<div class="admin-promo-item"><div><b>${p.code}</b><br><span style="font-size:12px;color:#888">${p.rewardType}:${p.rewardId} (${p.uses}/${p.maxUses})</span></div><button class="admin-promo-del" onclick="delPromo('${p.code}')">✕</button></div>`).join("");
+    const list = document.getElementById("admList");
+    if(list) list.innerHTML = r.promocodes.map(p=>`<div class="admin-promo-item"><div><b>${p.code}</b><br><span style="font-size:12px;color:#888">${p.rewardType}:${p.rewardId} (${p.uses}/${p.maxUses})</span></div><button class="admin-promo-del" onclick="delPromo('${p.code}')">${ICONS.close}</button></div>`).join("");
   } catch(e){}
 }
 async function delPromo(c) { if(confirm('Удалить?')){ await api("/api/admin/delete-promocode",{code:c}); loadPromos(); } }
@@ -442,10 +524,11 @@ window.openCase = (id) => {
   document.getElementById("caseChoiceModal").classList.remove("hidden");
 };
 
-// Закрытие по клику вне модалки
-document.querySelectorAll('.modal-overlay').forEach(el => {
-  el.onclick = (e) => { if(e.target === el) el.classList.add('hidden'); }
-});
+function showRouletteLoading(caseData) {
+  document.getElementById("rouletteOverlay").classList.remove("hidden");
+  document.getElementById("rouletteLoading").classList.remove("hidden");
+  document.getElementById("rouletteMain").classList.add("hidden");
+}
 
 document.getElementById("choiceStars").onclick = async () => {
   document.getElementById("caseChoiceModal").classList.add("hidden");
@@ -453,17 +536,27 @@ document.getElementById("choiceStars").onclick = async () => {
     const r = await api("/api/create-invoice", {caseId:state.selectedCase.id});
     if(r.link && tg) tg.openInvoice(r.link, async (s) => {
       if(s==='paid') {
+        showRouletteLoading(state.selectedCase); 
         setTimeout(async()=>{
-          try { const res = await api("/api/get-case-result",{paymentId:r.paymentId}); state.balance=res.newBalance; state.pitySpent=res.pitySpent||0; updateUI(); showRoulette(state.selectedCase, res); }
-          catch(e){ alert("Результат в боте!"); loadApp(); }
-        }, 500);
+          try { const res = await api("/api/get-case-result",{paymentId:r.paymentId}); state.balance=res.newBalance; state.pitySpent=res.pitySpent||0; updateUI(); startRouletteSpin(state.selectedCase, res); }
+          catch(e){ document.getElementById("rouletteOverlay").classList.add("hidden"); alert("Результат в боте!"); loadApp(); }
+        }, 800);
       }
     });
   } catch(e){alert(e.message);}
 };
+
 document.getElementById("choiceBalance").onclick = async () => {
   document.getElementById("caseChoiceModal").classList.add("hidden");
-  try { const r = await api("/api/buy-with-balance", {caseId:state.selectedCase.id}); state.balance=r.newBalance; state.pitySpent=r.pitySpent||0; updateUI(); showRoulette(state.selectedCase, r); } catch(e){alert(e.message);}
+  showRouletteLoading(state.selectedCase);
+  try { 
+    const r = await api("/api/buy-with-balance", {caseId:state.selectedCase.id}); 
+    state.balance=r.newBalance; state.pitySpent=r.pitySpent||0; updateUI(); 
+    startRouletteSpin(state.selectedCase, r); 
+  } catch(e){ 
+    document.getElementById("rouletteOverlay").classList.add("hidden");
+    alert(e.message); 
+  }
 };
 
 function renderGifts() {
@@ -508,9 +601,12 @@ document.getElementById("giftBuyBalance").onclick = async () => {
   } catch(e){alert(e.message);}
 };
 
-function showRoulette(c, r) {
-  const over = document.getElementById("rouletteOverlay"), strip = document.getElementById("rouletteStrip"), res = document.getElementById("rouletteResult"), btn = document.getElementById("rouletteClose");
-  over.classList.remove("hidden"); res.textContent = ""; res.className = ""; btn.classList.add("hidden"); btn.className="choice-btn cancel hidden";
+function startRouletteSpin(c, r) {
+  document.getElementById("rouletteLoading").classList.add("hidden");
+  document.getElementById("rouletteMain").classList.remove("hidden");
+  
+  const strip = document.getElementById("rouletteStrip"), res = document.getElementById("rouletteResult"), btn = document.getElementById("rouletteClose");
+  res.textContent = ""; res.className = ""; btn.classList.add("hidden"); btn.className="choice-btn cancel hidden";
   document.getElementById("rouletteTitle").innerHTML = `${c.type==='stars'?ICONS.starCase:ICONS.box}<span>${c.title}</span>`;
   
   let items = [];
@@ -547,6 +643,7 @@ function showRoulette(c, r) {
     btn.classList.remove("hidden");
   }, 5200);
 }
+
 document.getElementById("rouletteClose").onclick = () => { document.getElementById("rouletteOverlay").classList.add("hidden"); renderCases(); };
 
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
