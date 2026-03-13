@@ -120,7 +120,7 @@
     .promo-result.success { background: rgba(50,215,75,0.15); color: var(--green); }
     .promo-result.error { background: rgba(255,69,58,0.15); color: var(--red); }
 
-    /* === DONATE SECTION === */
+      /* === DONATE SECTION === */
     .donate-card { background: var(--card); border-radius: var(--radius-lg); padding: 24px 20px; border: 1px solid var(--border); }
     .donate-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
     .donate-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--pink), #FF6B6B); border-radius: 14px; display: flex; align-items: center; justify-content: center; }
@@ -131,14 +131,21 @@
     .donate-btn { height: 56px; background: var(--card2); border: 2px solid var(--border); border-radius: 14px; color: var(--text); font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
     .donate-btn svg { width: 16px; height: 16px; color: var(--gold); }
     .donate-btn.selected { border-color: var(--pink); background: rgba(255,55,95,0.15); }
+    
     .donate-custom { display: flex; align-items: center; background: var(--bg); border-radius: 14px; padding: 6px; border: 1px solid var(--border); margin-bottom: 16px; }
-    .donate-custom-icon { width: 46px; height: 46px; background: var(--card2); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .donate-custom-icon { width: 46px; height: 46px; background: var(--card2); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .donate-custom-icon svg { width: 20px; height: 20px; color: var(--gold); }
-    .donate-custom input { flex: 1; height: 46px; background: transparent; border: none; padding: 0 16px; font-size: 20px; font-family: inherit; color: var(--text); font-weight: 700; }
+    
+    /* Исправил текстовое поле (выравнивание) */
+    .donate-custom input { flex: 1; width: 100%; height: 46px; background: transparent; border: none; padding: 0 12px; font-size: 20px; font-family: inherit; color: var(--text); font-weight: 700; text-align: left; }
     .donate-custom input::placeholder { color: var(--text3); font-weight: 400; font-size: 16px; }
     .donate-custom input:focus { outline: none; }
-    .donate-custom-label { padding-right: 16px; font-size: 16px; color: var(--text3); font-weight: 600; }
+    .donate-custom-label { padding-right: 16px; font-size: 16px; color: var(--text3); font-weight: 600; flex-shrink: 0; }
+    
     .donate-send { width: 100%; height: 56px; background: linear-gradient(135deg, var(--pink), #FF6B6B); border: none; border-radius: 14px; color: #fff; font-size: 17px; font-weight: 600; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    
+    /* ВОТ ЭТА СТРОКА УСМИРЯЕТ ГИГАНТСКОЕ СЕРДЦЕ */
+    .donate-send svg { width: 22px; height: 22px; flex-shrink: 0; }
 
     /* === DETAIL SCREEN === */
     #screenDetails { padding-bottom: calc(140px + env(safe-area-inset-bottom)); }
@@ -670,4 +677,5 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 </script>
 </body>
 </html>
+
 
