@@ -5,15 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
   <title>#подарочница</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  
-  <!-- Подключаем шрифт Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      /* Apple-style dark mode colors */
       --bg: #000000;
       --bg2: #121214;
       --card: #1c1c1e;
@@ -22,10 +19,7 @@
       --text2: rgba(255, 255, 255, 0.7);
       --text3: rgba(255, 255, 255, 0.4);
       --border: rgba(255, 255, 255, 0.08);
-      
-      --accent: #0A84FF; /* iOS Blue */
-      --accent-gradient: linear-gradient(135deg, #0A84FF, #5E5CE6);
-      
+      --accent: #0A84FF;
       --gold: #FFD60A;
       --gold2: #FF9F0A;
       --green: #32D74B;
@@ -34,1410 +28,503 @@
       --cyan: #64D2FF;
       --pink: #FF375F;
       --purple: #BF5AF2;
-      
       --radius-lg: 24px;
       --radius-md: 16px;
       --radius-sm: 12px;
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html, body {
-      height: 100%;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-      overscroll-behavior-y: none; /* Убирает лишний баунс в тг */
-    }
-
-    /* === АНИМАЦИИ === */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes scaleIn {
-      from { opacity: 0; transform: scale(0.92); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    /* === LAYOUT === */
-    .app {
-      min-height: 100vh;
-      background: var(--bg);
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Общие стили для скрытия элементов */
-    .hidden {
-      display: none !important;
-    }
-
-    /* === HEADER === */
-    .header {
-      padding: env(safe-area-inset-top, 20px) 20px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid transparent;
-      transition: background 0.3s, border 0.3s;
-    }
-
-    .header.with-back {
-      justify-content: flex-start;
-      gap: 16px;
-    }
-
-    .back-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--card2);
-      border: none;
-      color: var(--text);
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .back-btn:active {
-      transform: scale(0.9);
-      opacity: 0.8;
-    }
-
-    .logo {
-      font-size: 20px;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--text) 0%, var(--text2) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -0.5px;
-    }
-
-    .header-title {
-      font-size: 18px;
-      font-weight: 600;
-      flex: 1;
-      text-align: left;
-    }
-
-    /* === TABS (iOS Segmented Control Style) === */
-    .tabs {
-      display: flex;
-      background: var(--card);
-      border-radius: 12px;
-      padding: 4px;
-      margin: 8px 20px 24px;
-      position: relative;
-    }
-
-    .tab {
-      flex: 1;
-      height: 36px;
-      border: none;
-      background: transparent;
-      color: var(--text3);
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.25s ease;
-      position: relative;
-      z-index: 2;
-    }
-
-    .tab svg {
-      width: 16px;
-      height: 16px;
-      opacity: 0.8;
-    }
-
-    .tab.active {
-      color: var(--text);
-      background: var(--card2);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-
-    /* === SECTIONS === */
-    .section {
-      padding: 0 20px 40px;
-      animation: fadeIn 0.3s ease-out;
-    }
-
-    .section-title {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.5px;
-      margin-bottom: 20px;
-    }
-
-    /* === GIFT GRID === */
-    .gift-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .gift-card {
-      background: var(--card);
-      border-radius: var(--radius-md);
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-      animation: scaleIn 0.4s ease-out backwards;
-      border: 1px solid var(--border);
-    }
-
-    .gift-card:active {
-      transform: scale(0.94);
-      background: var(--card2);
-    }
-
-    /* Исправление отображения гифок */
-    .gift-img {
-      width: 100%;
-      aspect-ratio: 1;
-      border-radius: var(--radius-sm);
-      background: rgba(255,255,255,0.03); /* Мягкий нейтральный фон */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      padding: 8px;
-    }
-
-    .gift-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-
-    .gift-price {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--gold);
-    }
-
-    /* === CASE GRID === */
-    .case-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-    }
-
-    .case-card {
-      background: var(--card);
-      border-radius: var(--radius-lg);
-      padding: 24px 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-      border: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
-      animation: scaleIn 0.4s ease-out backwards;
-    }
-
-    .case-card:active {
-      transform: scale(0.96);
-    }
-
-    /* Красивые градиентные подложки для кейсов */
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .app { min-height: 100vh; background: var(--bg); display: flex; flex-direction: column; }
+    .hidden { display: none !important; }
+    
+    .balance-bar { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 20px; background: linear-gradient(135deg, rgba(255,214,10,0.15), rgba(255,159,10,0.1)); border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 600; }
+    .balance-bar.empty { display: none; }
+    
+    .tabs { display: flex; background: var(--card); border-radius: 12px; padding: 4px; margin: 12px 16px 20px; gap: 2px; }
+    .tab { flex: 1; height: 36px; border: none; background: transparent; color: var(--text3); font-size: 11px; font-weight: 600; cursor: pointer; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 3px; transition: all 0.25s ease; }
+    .tab svg { width: 14px; height: 14px; }
+    .tab.active { color: var(--text); background: var(--card2); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    
+    .section { padding: 0 16px 100px; animation: fadeIn 0.3s ease-out; }
+    .section-title { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 16px; }
+    
+    .gift-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .gift-card { background: var(--card); border-radius: var(--radius-md); padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; border: 1px solid var(--border); }
+    .gift-card:active { transform: scale(0.94); background: var(--card2); }
+    .gift-img { width: 100%; aspect-ratio: 1; border-radius: var(--radius-sm); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 6px; }
+    .gift-img img { width: 100%; height: 100%; object-fit: contain; }
+    .gift-price { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; color: var(--gold); }
+    
+    .case-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .case-card { background: var(--card); border-radius: var(--radius-lg); padding: 20px 12px; display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; border: 1px solid var(--border); position: relative; overflow: hidden; }
+    .case-card:active { transform: scale(0.96); }
+    .case-card.mini { border-top: 2px solid var(--text3); }
     .case-card.free { border-top: 2px solid var(--green); }
     .case-card.premium { border-top: 2px solid var(--purple); }
     .case-card.rich { border-top: 2px solid var(--gold); }
-    .case-card.ultra { 
-      border-top: 2px solid var(--orange);
-      background: linear-gradient(180deg, rgba(255,159,10,0.1) 0%, var(--card) 100%);
-    }
-
-    .case-card.disabled {
-      opacity: 0.5;
-      pointer-events: none;
-      filter: grayscale(0.5);
-    }
-
-    .case-icon {
-      width: 72px;
-      height: 72px;
-      margin-bottom: 4px;
-    }
-
-    .case-icon svg {
-      width: 100%;
-      height: 100%;
-      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
-    }
-
-    .case-name {
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-
-    .case-price {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 6px 14px;
-      background: var(--card2);
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .case-card.free .case-price {
-      color: var(--green);
-      background: rgba(50, 215, 75, 0.15);
-    }
-
-    .case-badge {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      padding: 4px 8px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .case-badge.jackpot {
-      background: var(--orange);
-      color: #fff;
-    }
-
-    .case-badge.credit {
-      background: var(--cyan);
-      color: #000;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .case-cooldown {
-      font-size: 12px;
-      color: var(--text3);
-      font-weight: 500;
-    }
-
-    /* === DETAIL SCREEN === */
-    #screenDetails {
-      /* Главный фикс прокрутки: даем место снизу для панели покупки */
-      padding-bottom: calc(120px + env(safe-area-inset-bottom));
-    }
-
-    .detail-preview {
-      margin: 10px 20px 24px;
-      border-radius: var(--radius-lg);
-      background: var(--card);
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--border);
-      position: relative;
-    }
-
-    /* Блик на карточке */
-    .detail-preview::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      border-radius: var(--radius-lg);
-      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 40%);
-      pointer-events: none;
-    }
-
-    .detail-preview img {
-      width: 60%;
-      height: 60%;
-      object-fit: contain;
-      filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));
-    }
-
-    .detail-options {
-      margin: 0 20px;
-      background: var(--card);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-    }
-
-    .option-row, .sender-option {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-    }
+    .case-card.ultra { border-top: 2px solid var(--orange); background: linear-gradient(180deg, rgba(255,159,10,0.1) 0%, var(--card) 100%); }
+    .case-card.star { border-top: 2px solid var(--gold); background: linear-gradient(180deg, rgba(255,214,10,0.15) 0%, var(--card) 100%); }
+    .case-card.disabled { opacity: 0.5; pointer-events: none; }
+    .case-icon { width: 60px; height: 60px; }
+    .case-icon svg { width: 100%; height: 100%; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.3)); }
+    .case-name { font-size: 14px; font-weight: 700; text-align: center; }
+    .case-price { display: flex; align-items: center; gap: 4px; padding: 5px 12px; background: var(--card2); border-radius: 20px; font-size: 13px; font-weight: 600; }
+    .case-card.free .case-price { color: var(--green); background: rgba(50,215,75,0.15); }
+    .case-badge { position: absolute; top: 10px; right: 10px; padding: 3px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .case-badge.jackpot { background: var(--orange); color: #fff; }
+    .case-badge.stars { background: var(--gold); color: #000; }
+    .case-cooldown { font-size: 11px; color: var(--text3); font-weight: 500; }
     
-    .sender-option:last-child {
-      border-bottom: none;
-    }
-
-    .option-row:active, .sender-option:active {
-      background: var(--card2);
-    }
-
-    .option-label {
-      font-size: 16px;
-      font-weight: 500;
-    }
-
-    .option-hint {
-      font-size: 13px;
-      color: var(--text3);
-      margin-top: 4px;
-    }
-
-    /* iOS Style Toggle */
-    .toggle {
-      width: 51px;
-      height: 31px;
-      background: #39393D;
-      border-radius: 31px;
-      position: relative;
-      transition: background 0.3s ease;
-    }
-
-    .toggle.on {
-      background: var(--green);
-    }
-
-    .toggle::after {
-      content: "";
-      position: absolute;
-      width: 27px;
-      height: 27px;
-      background: #fff;
-      border-radius: 50%;
-      top: 2px;
-      left: 2px;
-      transition: transform 0.3s cubic-bezier(0.2, 0.85, 0.32, 1.2);
-      box-shadow: 0 3px 8px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.16), 0 3px 1px rgba(0,0,0,0.1);
-    }
-
-    .toggle.on::after {
-      transform: translateX(20px);
-    }
-
-    .sender-options {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-      background: rgba(0,0,0,0.2);
-    }
-
-    .sender-options.expanded {
-      max-height: 250px; /* Достаточно для 3 элементов */
-    }
-
-    /* iOS Checkmark */
-    .check {
-      color: transparent;
-      font-size: 20px;
-      font-weight: bold;
-      transition: color 0.2s;
-    }
-
-    .check.on {
-      color: var(--accent);
-    }
-
-    .total-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px;
-      border-top: 1px solid var(--border);
-    }
-
-    .total-label {
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    .total-value {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--gold);
-    }
-
-    /* === BUY BUTTON === */
-    .buy-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 16px 20px calc(16px + env(safe-area-inset-bottom, 0px));
-      background: rgba(18, 18, 20, 0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid var(--border);
-      z-index: 100;
-    }
-
-    .buy-btn {
-      width: 100%;
-      height: 54px;
-      border-radius: 14px;
-      border: none;
-      background: var(--accent);
-      color: #fff;
-      font-family: 'Inter', sans-serif;
-      font-size: 17px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all 0.2s;
-    }
-
-    .buy-btn:active {
-      transform: scale(0.97);
-      background: #0070DF;
-    }
-
-    /* === ROULETTE === */
-    .roulette-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      z-index: 200;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      animation: fadeIn 0.3s ease-out;
-    }
-
-    .roulette-box {
-      width: 100%;
-      max-width: 360px;
-      background: var(--card);
-      border-radius: var(--radius-lg);
-      padding: 30px 20px;
-      border: 1px solid var(--border);
-      box-shadow: 0 24px 48px rgba(0,0,0,0.5);
-      position: relative;
-    }
-
-    .roulette-title {
-      text-align: center;
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      margin-bottom: 24px;
-    }
-
-    .multiplier-box {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      margin-bottom: 24px;
-      animation: fadeUp 0.4s ease-out;
-    }
-
+    .promo-input-wrap { display: flex; gap: 10px; margin-bottom: 20px; }
+    .promo-input { flex: 1; height: 50px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 0 16px; font-size: 16px; font-family: inherit; color: var(--text); text-transform: uppercase; }
+    .promo-input::placeholder { color: var(--text3); text-transform: none; }
+    .promo-btn { height: 50px; padding: 0 20px; background: var(--accent); border: none; border-radius: 12px; color: #fff; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; }
+    .promo-btn:active { transform: scale(0.95); }
+    .promo-result { padding: 16px; border-radius: 12px; text-align: center; font-weight: 600; animation: fadeUp 0.3s ease-out; }
+    .promo-result.success { background: rgba(50,215,75,0.15); color: var(--green); }
+    .promo-result.error { background: rgba(255,69,58,0.15); color: var(--red); }
+    
+    .donate-amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+    .donate-btn { height: 60px; background: var(--card); border: 2px solid var(--border); border-radius: 14px; color: var(--text); font-size: 18px; font-weight: 700; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.2s; }
+    .donate-btn:active { transform: scale(0.95); }
+    .donate-btn.selected { border-color: var(--pink); background: rgba(255,55,95,0.1); }
+    .donate-custom { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .donate-custom input { flex: 1; height: 50px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 0 16px; font-size: 18px; font-family: inherit; color: var(--text); text-align: center; }
+    .donate-send { width: 100%; height: 54px; background: linear-gradient(135deg, var(--pink), #FF6B6B); border: none; border-radius: 14px; color: #fff; font-size: 17px; font-weight: 600; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .donate-send:active { transform: scale(0.97); }
+    
+    #screenDetails { padding-bottom: calc(140px + env(safe-area-inset-bottom)); }
+    .header { padding: 16px 20px; display: flex; align-items: center; gap: 16px; background: rgba(0,0,0,0.75); backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 50; }
+    .back-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--card2); border: none; color: var(--text); font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .back-btn:active { transform: scale(0.9); }
+    .header-title { font-size: 18px; font-weight: 600; }
+    .detail-preview { margin: 10px 20px 24px; border-radius: var(--radius-lg); background: var(--card); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
+    .detail-preview img { width: 60%; height: 60%; object-fit: contain; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5)); }
+    .detail-options { margin: 0 20px; background: var(--card); border-radius: var(--radius-md); border: 1px solid var(--border); }
+    .option-row, .sender-option { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid var(--border); cursor: pointer; }
+    .sender-option:last-child { border-bottom: none; }
+    .option-row:active, .sender-option:active { background: var(--card2); }
+    .option-label { font-size: 16px; font-weight: 500; }
+    .option-hint { font-size: 13px; color: var(--text3); margin-top: 4px; }
+    .toggle { width: 51px; height: 31px; background: #39393D; border-radius: 31px; position: relative; transition: background 0.3s; }
+    .toggle.on { background: var(--green); }
+    .toggle::after { content: ""; position: absolute; width: 27px; height: 27px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: transform 0.3s cubic-bezier(0.2, 0.85, 0.32, 1.2); box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+    .toggle.on::after { transform: translateX(20px); }
+    .sender-options { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: rgba(0,0,0,0.2); }
+    .sender-options.expanded { max-height: 250px; }
+    .check { color: transparent; font-size: 20px; font-weight: bold; transition: color 0.2s; }
+    .check.on { color: var(--accent); }
+    .total-row { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-top: 1px solid var(--border); }
+    .total-label { font-size: 16px; font-weight: 600; }
+    .total-value { display: flex; align-items: center; gap: 6px; font-size: 20px; font-weight: 700; color: var(--gold); }
+    
+    .buy-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px)); background: rgba(18,18,20,0.9); backdrop-filter: blur(20px); border-top: 1px solid var(--border); z-index: 100; }
+    .buy-buttons { display: flex; gap: 10px; }
+    .buy-btn { flex: 1; height: 52px; border-radius: 14px; border: none; background: var(--accent); color: #fff; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .buy-btn:active { transform: scale(0.97); }
+    .buy-btn.balance { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #000; }
+    .buy-btn.balance.disabled { opacity: 0.4; pointer-events: none; }
+    
+    .roulette-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(25px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.3s; }
+    .roulette-box { width: 100%; max-width: 360px; background: var(--card); border-radius: var(--radius-lg); padding: 24px 16px; border: 1px solid var(--border); box-shadow: 0 24px 48px rgba(0,0,0,0.5); }
+    .roulette-title { text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 20px; }
+    .multiplier-box { display: none; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 20px; animation: fadeUp 0.4s; }
     .multiplier-box.show { display: flex; }
-
-    .multiplier-label {
-      font-size: 13px;
-      color: var(--orange);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .multiplier-value {
-      font-size: 48px;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--gold), var(--orange));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    /* Окно рулетки */
-    .roulette-window {
-      position: relative;
-      height: 120px;
-      overflow: hidden;
-      border-radius: var(--radius-md);
-      background: var(--bg);
-      border: 1px solid var(--border);
-      box-shadow: inset 0 4px 12px rgba(0,0,0,0.5);
-    }
-
-    /* Тени по бокам рулетки для эффекта барабана */
-    .roulette-window::before,
-    .roulette-window::after {
-      content: "";
-      position: absolute;
-      top: 0; bottom: 0;
-      width: 60px;
-      z-index: 2;
-      pointer-events: none;
-    }
-    .roulette-window::before {
-      left: 0; background: linear-gradient(to right, var(--bg), transparent);
-    }
-    .roulette-window::after {
-      right: 0; background: linear-gradient(to left, var(--bg), transparent);
-    }
-
-    /* Центральный указатель */
-    .roulette-pointer {
-      position: absolute;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      width: 100px; height: 104px;
-      border: 2px solid var(--accent);
-      border-radius: var(--radius-sm);
-      background: rgba(10, 132, 255, 0.1);
-      z-index: 3;
-    }
-
-    .roulette-pointer.jackpot {
-      border-color: var(--orange);
-      background: rgba(255, 159, 10, 0.15);
-      box-shadow: 0 0 20px rgba(255, 159, 10, 0.4);
-    }
-
-    .roulette-strip {
-      display: flex;
-      height: 100%;
-      align-items: center;
-    }
-
-    .roulette-item {
-      width: 100px;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .roulette-item img {
-      width: 65%;
-      height: 65%;
-      object-fit: contain;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-    }
-
-    .roulette-item svg { width: 50%; height: 50%; }
-
-    .roulette-result {
-      text-align: center;
-      margin-top: 24px;
-      font-size: 20px;
-      font-weight: 700;
-      min-height: 28px;
-    }
-
+    .multiplier-label { font-size: 12px; color: var(--orange); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .multiplier-value { font-size: 42px; font-weight: 900; background: linear-gradient(135deg, var(--gold), var(--orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .roulette-window { position: relative; height: 100px; overflow: hidden; border-radius: var(--radius-md); background: var(--bg); border: 1px solid var(--border); }
+    .roulette-window::before, .roulette-window::after { content: ""; position: absolute; top: 0; bottom: 0; width: 50px; z-index: 2; pointer-events: none; }
+    .roulette-window::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); }
+    .roulette-window::after { right: 0; background: linear-gradient(to left, var(--bg), transparent); }
+    .roulette-pointer { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 90px; height: 94px; border: 2px solid var(--accent); border-radius: var(--radius-sm); background: rgba(10,132,255,0.1); z-index: 3; }
+    .roulette-pointer.jackpot { border-color: var(--orange); background: rgba(255,159,10,0.15); }
+    .roulette-pointer.stars { border-color: var(--gold); background: rgba(255,214,10,0.15); }
+    .roulette-strip { display: flex; height: 100%; align-items: center; }
+    .roulette-item { width: 90px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; gap: 4px; }
+    .roulette-item img { width: 55%; height: 55%; object-fit: contain; }
+    .roulette-item svg { width: 40%; height: 40%; }
+    .roulette-item .star-amount { font-size: 16px; font-weight: 800; color: var(--gold); }
+    .roulette-result { text-align: center; margin-top: 20px; font-size: 18px; font-weight: 700; min-height: 24px; }
     .roulette-result.win { color: var(--green); }
-    .roulette-result.lose { color: var(--text3); font-weight: 500;}
-    .roulette-result.jackpot { color: var(--gold); font-size: 24px;}
-
-    .won-gifts {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      margin-top: 20px;
-      padding: 20px;
-      background: rgba(255,255,255,0.03);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-    }
-    .won-gifts.show { display: flex; animation: fadeUp 0.4s ease-out; }
-
-    .won-gifts-title {
-      font-size: 12px;
-      color: var(--text2);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .won-gifts-grid {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .won-gift {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      padding: 10px;
-      background: var(--card2);
-      border-radius: var(--radius-sm);
-      min-width: 80px;
-    }
-
-    .won-gift img {
-      width: 50px; height: 50px;
-      object-fit: contain;
-    }
-
-    .won-gift-name {
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .won-gift-count {
-      font-size: 11px;
-      font-weight: 700;
-      color: #000;
-      padding: 2px 8px;
-      background: var(--gold);
-      border-radius: 10px;
-      margin-top: 2px;
-    }
-
-    .roulette-close {
-      width: 100%;
-      height: 50px;
-      margin-top: 24px;
-      border-radius: 14px;
-      border: none;
-      background: var(--card2);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
+    .roulette-result.lose { color: var(--text3); font-weight: 500; }
+    .roulette-result.jackpot { color: var(--gold); font-size: 22px; }
+    .roulette-result.stars { color: var(--gold); font-size: 24px; }
+    .won-gifts { display: none; flex-direction: column; align-items: center; gap: 12px; margin-top: 16px; padding: 16px; background: rgba(255,255,255,0.03); border-radius: var(--radius-md); }
+    .won-gifts.show { display: flex; animation: fadeUp 0.4s; }
+    .won-gifts-title { font-size: 11px; color: var(--text2); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .won-gifts-grid { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .won-gift { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; background: var(--card2); border-radius: var(--radius-sm); min-width: 70px; }
+    .won-gift img { width: 40px; height: 40px; object-fit: contain; }
+    .won-gift-name { font-size: 11px; font-weight: 600; }
+    .won-gift-count { font-size: 10px; font-weight: 700; color: #000; padding: 2px 6px; background: var(--gold); border-radius: 8px; }
+    .roulette-close { width: 100%; height: 48px; margin-top: 20px; border-radius: 14px; border: none; background: var(--card2); color: var(--text); font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
     .roulette-close:active { transform: scale(0.97); }
-    .roulette-close.jackpot {
-      background: var(--gold);
-      color: #000;
-    }
+    .roulette-close.jackpot, .roulette-close.stars { background: var(--gold); color: #000; }
+    
+    .result-box { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; text-align: center; padding: 20px; }
+    .result-box svg { width: 60px; height: 60px; margin-bottom: 12px; }
+    .result-box .big { font-size: 32px; font-weight: 900; color: var(--gold); }
 
-    .confetti {
-      position: absolute;
-      pointer-events: none;
-    }
+    .case-choice { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 150; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .case-choice-box { background: var(--card); border-radius: var(--radius-lg); padding: 24px; width: 100%; max-width: 320px; text-align: center; }
+    .case-choice-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .case-choice-price { font-size: 24px; font-weight: 800; color: var(--gold); margin-bottom: 20px; }
+    .case-choice-btns { display: flex; flex-direction: column; gap: 10px; }
+    .case-choice-btn { height: 50px; border-radius: 12px; border: none; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .case-choice-btn.stars { background: var(--accent); color: #fff; }
+    .case-choice-btn.balance { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #000; }
+    .case-choice-btn.balance.disabled { opacity: 0.4; pointer-events: none; }
+    .case-choice-btn.cancel { background: var(--card2); color: var(--text); }
   </style>
 </head>
 
 <body>
-  <div class="app">
-    
-    <!-- CATALOG SCREEN -->
-    <div id="screenCatalog">
-      <!--<div class="header">
-        <div class="logo">#подарочница</div>
-      </div>-->
-
-      <div class="tabs">
-        <button class="tab active" id="tabGifts">
-          <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="10" width="18" height="12" rx="2"/><rect x="10.5" y="10" width="3" height="12" fill="currentColor" opacity="0.5"/><path d="M12 10s-3-3-3-5c0-2 1.5-3 3-1 1.5-2 3-1 3 1 0 2-3 5-3 5z"/><rect x="4" y="6" width="16" height="4" rx="1" opacity="0.8"/></svg>
-          <span>Подарки</span>
-        </button>
-        <button class="tab" id="tabLuck">
-          <svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="7" cy="7" r="2" fill="var(--bg)"/><circle cx="12" cy="12" r="2" fill="var(--bg)"/><circle cx="17" cy="17" r="2" fill="var(--bg)"/><circle cx="17" cy="7" r="2" fill="var(--bg)"/><circle cx="7" cy="17" r="2" fill="var(--bg)"/></svg>
-          <span>Удача</span>
-        </button>
-      </div>
-
-      <div class="section" id="sectionGifts">
-        <div class="section-title">Выбери подарок</div>
-        <div class="gift-grid" id="giftGrid"></div>
-      </div>
-
-      <div class="section hidden" id="sectionLuck">
-        <div class="section-title">Испытай удачу</div>
-        <div class="case-grid" id="caseGrid"></div>
-      </div>
-    </div>
-
-    <!-- DETAIL SCREEN -->
-    <div id="screenDetails" class="hidden">
-      <div class="header with-back">
-        <button class="back-btn" id="btnBack">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
-        <div class="header-title" id="detailsTitle">Подарок</div>
-      </div>
-
-      <div class="detail-preview">
-        <img id="detailsGif" alt="gift" />
-      </div>
-
-      <div class="detail-options">
-        <div class="option-row" id="toggleSignature">
-          <div>
-            <div class="option-label">Добавить подпись</div>
-            <div class="option-hint">от +2 ⭐ к стоимости</div>
-          </div>
-          <div class="toggle" id="signatureToggle"></div>
-        </div>
-
-        <div class="sender-options" id="senderOptions">
-          <div class="sender-option" id="optFree">
-            <div>
-              <div class="option-label">@echoaxxs</div>
-              <div class="option-hint">+2 ⭐</div>
-            </div>
-            <div class="check on" id="checkFree">✓</div>
-          </div>
-          <div class="sender-option" id="optPaid">
-            <div>
-              <div class="option-label">@bogclm</div>
-              <div class="option-hint">+2 ⭐</div>
-            </div>
-            <div class="check" id="checkPaid">✓</div>
-          </div>
-          <div class="sender-option" id="optBoth">
-            <div>
-              <div class="option-label">@bogclm и @echoaxxs</div>
-              <div class="option-hint">+5 ⭐</div>
-            </div>
-            <div class="check" id="checkBoth">✓</div>
-          </div>
-        </div>
-
-        <div class="total-row">
-          <div class="total-label">Итого</div>
-          <div class="total-value" id="detailsTotal">
-            <svg class="star-icon" width="20" height="20" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FFD700"/></svg>
-            <span id="totalAmount">0</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="buy-bar">
-        <button class="buy-btn" id="btnBuy">
-          Купить за
-          <svg class="star-icon" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FFD700"/></svg>
-          <span id="buyAmount">0</span>
-        </button>
-      </div>
-    </div>
-
+<div class="app">
+  <div class="balance-bar empty" id="balanceBar">
+    <svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FFD700"/></svg>
+    <span>Баланс: <span id="balanceAmount">0</span>⭐</span>
   </div>
 
-  <!-- ROULETTE -->
-  <div id="rouletteOverlay" class="roulette-overlay hidden">
-    <div class="roulette-box" id="rouletteBox">
-      <div class="roulette-title" id="rouletteTitle">Открываем кейс...</div>
-      
-      <div class="multiplier-box" id="multiplierBox">
-        <div class="multiplier-label">Мультипликатор</div>
-        <div class="multiplier-value" id="multiplierValue">x2</div>
+  <div id="screenCatalog">
+    <div class="tabs">
+      <button class="tab active" id="tabGifts"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M12 10s-3-3-3-5c0-2 1.5-3 3-1 1.5-2 3-1 3 1 0 2-3 5-3 5z"/></svg>Подарки</button>
+      <button class="tab" id="tabLuck"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="7" cy="7" r="2" fill="var(--bg)"/><circle cx="12" cy="12" r="2" fill="var(--bg)"/><circle cx="17" cy="17" r="2" fill="var(--bg)"/></svg>Кейсы</button>
+      <button class="tab" id="tabPromo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 9V6a2 2 0 012-2h16a2 2 0 012 2v3M2 15v3a2 2 0 002 2h16a2 2 0 002-2v-3"/></svg>Промо</button>
+      <button class="tab" id="tabDonate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>Донат</button>
+    </div>
+
+    <div class="section" id="sectionGifts"><div class="section-title">Выбери подарок</div><div class="gift-grid" id="giftGrid"></div></div>
+    <div class="section hidden" id="sectionLuck"><div class="section-title">Испытай удачу</div><div class="case-grid" id="caseGrid"></div></div>
+    <div class="section hidden" id="sectionPromo"><div class="section-title">Промокод</div><div class="promo-input-wrap"><input type="text" class="promo-input" id="promoInput" placeholder="Введи код..." maxlength="20"><button class="promo-btn" id="promoBtn">→</button></div><div class="promo-result hidden" id="promoResult"></div></div>
+    <div class="section hidden" id="sectionDonate"><div class="section-title">Поддержать 💝</div><div class="donate-amounts" id="donateAmounts"></div><div class="donate-custom"><input type="number" id="donateCustom" placeholder="Другая сумма" min="1" max="10000"><span style="color:var(--gold);">⭐</span></div><button class="donate-send" id="donateSend">Отправить 💝</button></div>
+  </div>
+
+  <div id="screenDetails" class="hidden">
+    <div class="header"><button class="back-btn" id="btnBack"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button><div class="header-title" id="detailsTitle">Подарок</div></div>
+    <div class="detail-preview"><img id="detailsGif" /></div>
+    <div class="detail-options">
+      <div class="option-row" id="toggleSignature"><div><div class="option-label">Добавить подпись</div><div class="option-hint">от +2⭐</div></div><div class="toggle" id="signatureToggle"></div></div>
+      <div class="sender-options" id="senderOptions">
+        <div class="sender-option" data-sender="@echoaxxs"><div><div class="option-label">@echoaxxs</div><div class="option-hint">+2⭐</div></div><div class="check on">✓</div></div>
+        <div class="sender-option" data-sender="@bogclm"><div><div class="option-label">@bogclm</div><div class="option-hint">+2⭐</div></div><div class="check">✓</div></div>
+        <div class="sender-option" data-sender="@bogclm и @echoaxxs"><div><div class="option-label">@bogclm и @echoaxxs</div><div class="option-hint">+5⭐</div></div><div class="check">✓</div></div>
       </div>
-      
-      <div class="roulette-window">
-        <div class="roulette-pointer" id="roulettePointer"></div>
-        <div class="roulette-strip" id="rouletteStrip"></div>
-      </div>
-      
-      <div class="roulette-result" id="rouletteResult"></div>
-      
-      <div class="won-gifts" id="wonGifts">
-        <div class="won-gifts-title">Ты выиграл</div>
-        <div class="won-gifts-grid" id="wonGiftsGrid"></div>
-      </div>
-      
-      <button class="roulette-close hidden" id="rouletteClose">Забрать</button>
+      <div class="total-row"><div class="total-label">Итого</div><div class="total-value"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FFD700"/></svg><span id="totalAmount">0</span></div></div>
+    </div>
+    <div class="buy-bar"><div class="buy-buttons"><button class="buy-btn" id="btnBuy"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FFD700"/></svg><span id="buyAmount">0</span> Stars</button><button class="buy-btn balance hidden" id="btnBuyBalance">Баланс <span id="buyBalanceAmount">0</span>⭐</button></div></div>
+  </div>
+</div>
+
+<div id="caseChoice" class="case-choice hidden">
+  <div class="case-choice-box">
+    <div class="case-choice-title" id="choiceTitle">Открыть кейс</div>
+    <div class="case-choice-price" id="choicePrice">100⭐</div>
+    <div class="case-choice-btns">
+      <button class="case-choice-btn stars" id="choiceStars">Оплатить Stars</button>
+      <button class="case-choice-btn balance" id="choiceBalance">Использовать баланс</button>
+      <button class="case-choice-btn cancel" id="choiceCancel">Отмена</button>
     </div>
   </div>
+</div>
+
+<div id="rouletteOverlay" class="roulette-overlay hidden">
+  <div class="roulette-box">
+    <div class="roulette-title" id="rouletteTitle">Открываем...</div>
+    <div class="multiplier-box" id="multiplierBox"><div class="multiplier-label">Мультипликатор</div><div class="multiplier-value" id="multiplierValue">x2</div></div>
+    <div class="roulette-window"><div class="roulette-pointer" id="roulettePointer"></div><div class="roulette-strip" id="rouletteStrip"></div></div>
+    <div class="roulette-result" id="rouletteResult"></div>
+    <div class="won-gifts" id="wonGifts"><div class="won-gifts-title">Ты выиграл</div><div class="won-gifts-grid" id="wonGiftsGrid"></div></div>
+    <button class="roulette-close hidden" id="rouletteClose">Забрать</button>
+  </div>
+</div>
 
 <script>
-  /* 
-     ====================================================
-     JS ЛОГИКА ОСТАВЛЕНА ПОЛНОСТЬЮ БЕЗ ИЗМЕНЕНИЙ 
-     ====================================================
-  */
-  const tg = window.Telegram?.WebApp;
-  const API_BASE = "https://podarochnica-api.onrender.com";
+const tg = window.Telegram?.WebApp;
+const API_BASE = "https://podarochnica-api.onrender.com";
+const SIGNATURE_COSTS = { "@echoaxxs": 2, "@bogclm": 2, "@bogclm и @echoaxxs": 5 };
+const ICONS = {
+  star: `<svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FFD700"/></svg>`,
+  nothing: `<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" stroke="#555" stroke-width="3" fill="none"/><line x1="12" y1="12" x2="36" y2="36" stroke="#555" stroke-width="3"/></svg>`,
+  box: `<svg viewBox="0 0 48 48"><path d="M4 16L24 6L44 16V36L24 46L4 36V16Z" fill="#4ECDC4"/><path d="M24 6L44 16L24 26L4 16Z" fill="#7DE8E1"/></svg>`,
+  diamond: `<svg viewBox="0 0 48 48"><path d="M24 4L42 18L24 44L6 18Z" fill="#A78BFA"/><path d="M24 4L6 18H42Z" fill="#C4B5FD"/></svg>`,
+  money: `<svg viewBox="0 0 48 48"><ellipse cx="24" cy="24" rx="18" ry="14" fill="#34D399"/><ellipse cx="24" cy="20" rx="18" ry="14" fill="#6EE7B7"/><text x="24" y="25" text-anchor="middle" fill="white" font-size="16" font-weight="bold">$</text></svg>`,
+  fire: `<svg viewBox="0 0 48 48"><path d="M24 4C24 4 12 16 12 28C12 36 17 44 24 44C31 44 36 36 36 28C36 16 24 4 24 4Z" fill="#FF6B35"/><path d="M24 16C24 16 18 22 18 30C18 36 21 40 24 40C27 40 30 36 30 30C30 22 24 16 24 16Z" fill="#FFD93D"/></svg>`,
+  starCase: `<svg viewBox="0 0 48 48"><path d="M24 4L30 16L44 18L34 28L36 42L24 36L12 42L14 28L4 18L18 16Z" fill="#FFD60A"/></svg>`,
+  mini: `<svg viewBox="0 0 48 48"><rect x="8" y="16" width="32" height="24" rx="4" fill="#666"/><path d="M24 16s-4-4-4-7c0-2 2-4 4-2 2-2 4 0 4 2 0 3-4 7-4 7z" fill="#888"/></svg>`
+};
 
-  const FREE_SENDER = "@echoaxxs";
-  const PAID_SENDER = "@bogclm";
-  const BOTH_SENDER = "@bogclm и @echoaxxs";
-  
-  const SIGNATURE_COSTS = {
-    "@echoaxxs": 2,
-    "@bogclm": 2,
-    "@bogclm и @echoaxxs": 5,
-  };
+const GIFTS = [
+  { id: "brilliant_ring", title: "Колечко", price: 100, gif_url: "/brilliant_ring.gif" },
+  { id: "heroic_cup", title: "Кубок", price: 100, gif_url: "/heroic_cup.gif" },
+  { id: "diamond", title: "Алмаз", price: 100, gif_url: "/diamond.gif" },
+  { id: "flowers_bouquet", title: "Букет", price: 50, gif_url: "/bouquet_flowers.gif" },
+  { id: "cupcake", title: "Тортик", price: 50, gif_url: "/cupcake.gif" },
+  { id: "wine", title: "Вино", price: 50, gif_url: "/wine.gif" },
+  { id: "rocket", title: "Ракета", price: 50, gif_url: "/rocket.gif" },
+  { id: "rose", title: "Роза", price: 25, gif_url: "/rose.gif" },
+  { id: "box", title: "Подарок", price: 25, gif_url: "/gift.gif" },
+  { id: "heart", title: "Сердце", price: 15, gif_url: "/heart.gif" },
+  { id: "bear", title: "Мишка", price: 15, gif_url: "/bear.gif" },
+];
 
-  const ICONS = {
-    star: `<svg class="star-icon" width="14" height="14" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FFD700"/></svg>`,
-    nothing: `<svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="18" stroke="#555" stroke-width="3" fill="none"/><line x1="12" y1="12" x2="36" y2="36" stroke="#555" stroke-width="3"/></svg>`,
-    box: `<svg viewBox="0 0 48 48"><path d="M4 16L24 6L44 16V36L24 46L4 36V16Z" fill="#4ECDC4"/><path d="M24 6L44 16L24 26L4 16L24 6Z" fill="#7DE8E1"/><path d="M24 26V46L4 36V16L24 26Z" fill="#3DB9B1"/><path d="M24 26V46L44 36V16L24 26Z" fill="#44C4BC"/></svg>`,
-    diamond: `<svg viewBox="0 0 48 48"><path d="M24 4L42 18L24 44L6 18L24 4Z" fill="#A78BFA"/><path d="M24 4L6 18H42L24 4Z" fill="#C4B5FD"/><path d="M6 18L24 44V18H6Z" fill="#8B5CF6"/><path d="M42 18L24 44V18H42Z" fill="#9F7AEA"/></svg>`,
-    money: `<svg viewBox="0 0 48 48"><ellipse cx="24" cy="26" rx="18" ry="14" fill="#34D399"/><ellipse cx="24" cy="22" rx="18" ry="14" fill="#6EE7B7"/><ellipse cx="24" cy="22" rx="14" ry="10" fill="#34D399"/><text x="24" y="27" text-anchor="middle" fill="white" font-size="16" font-weight="bold">$</text></svg>`,
-    fire: `<svg viewBox="0 0 48 48"><path d="M24 4C24 4 12 16 12 28C12 36 17 44 24 44C31 44 36 36 36 28C36 16 24 4 24 4Z" fill="#FF6B35"/><path d="M24 16C24 16 18 22 18 30C18 36 21 40 24 40C27 40 30 36 30 30C30 22 24 16 24 16Z" fill="#FFD93D"/><path d="M24 26C24 26 21 30 21 34C21 37 22.5 39 24 39C25.5 39 27 37 27 34C27 30 24 26 24 26Z" fill="#FFF"/></svg>`,
-    ticket: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 9V6a2 2 0 012-2h16a2 2 0 012 2v3M2 15v3a2 2 0 002 2h16a2 2 0 002-2v-3M22 9a3 3 0 00-3 3 3 3 0 003 3M2 9a3 3 0 013 3 3 3 0 01-3 3"/></svg>`
-  };
+const CASES = [
+  { id: "mini", name: "Мини", price: 1, type: "mini", drops: [], nothingChance: 1.0 },
+  { id: "weekly", name: "Еженедельный", price: 0, type: "free", drops: [], nothingChance: 1.0 },
+  { id: "premium", name: "Премиум", price: 30, type: "premium", drops: ["rose", "box", "rocket"], nothingChance: 0.3 },
+  { id: "rich", name: "Богач", price: 100, type: "rich", drops: ["rose", "box", "brilliant_ring", "rocket"], nothingChance: 0.15 },
+  { id: "ultra", name: "Ультра", price: 500, type: "ultra", drops: ["brilliant_ring", "diamond", "heroic_cup"], nothingChance: 0.05, multiplier: { enabled: true, chances: [{ count: 1, chance: 0.50 }, { count: 2, chance: 0.35 }, { count: 3, chance: 0.15 }] } },
+  { id: "star", name: "Star", price: 1000, type: "star", starDrops: [
+    { stars: 500, chance: 0.40, canWin: true }, { stars: 800, chance: 0.30, canWin: true }, { stars: 900, chance: 0.15, canWin: true },
+    { stars: 999, chance: 0.05, canWin: true }, { stars: 1000, chance: 0.05, canWin: true },
+    { stars: 1200, chance: 0.02, canWin: false }, { stars: 1500, chance: 0.015, canWin: false }, { stars: 3000, chance: 0.01, canWin: false },
+    { stars: 5000, chance: 0.004, canWin: false }, { stars: 10000, chance: 0.001, canWin: false },
+  ]},
+];
 
-  const CASE_ICONS = {
-    free: ICONS.box,
-    premium: ICONS.diamond,
-    rich: ICONS.money,
-    ultra: ICONS.fire
-  };
+const DONATE_AMOUNTS = [10, 25, 50, 100, 250, 500];
 
-  const GIFTS = [
-    { id: "brilliant_ring", title: "Колечко", price: 100, gif_url: "/brilliant_ring.gif"},
-    { id: "heroic_cup", title: "Кубок", price: 100, gif_url: "/heroic_cup.gif"},
-    { id: "diamond", title: "Алмаз", price: 100, gif_url: "/diamond.gif"},
-    { id: "flowers_bouquet", title: "Букет", price: 50, gif_url: "/bouquet_flowers.gif"},
-    { id: "cupcake", title: "Тортик", price: 50, gif_url: "/cupcake.gif"},
-    { id: "wine", title: "Вино", price: 50, gif_url: "/wine.gif"},
-    { id: "rocket", title: "Ракета", price: 50, gif_url: "/rocket.gif"},
-    { id: "rose", title: "Роза", price: 25, gif_url: "/rose.gif" },
-    { id: "box", title: "Подарок", price: 25, gif_url: "/gift.gif" },
-    { id: "heart", title: "Сердце", price: 15, gif_url: "/heart.gif" },
-    { id: "bear", title: "Мишка", price: 15, gif_url: "/bear.gif"},
-  ];
+let selectedGift = null, sender = "@echoaxxs", addSignature = false, starBalance = 0, pendingCase = null;
+let weeklyUsed = localStorage.getItem('weeklyUsed');
 
-  const CASES = [
-    { id: "weekly", name: "Еженедельный", price: 0, priceText: "Бесплатно", type: "free", drops: ["rose", "box", "heart", "bear"], nothingChance: 1.0, nothingOnStrip: 0.55 },
-    { id: "premium", name: "Премиум", price: 30, priceText: "30", type: "premium", drops: ["rose", "box", "rocket"], nothingChance: 0.3, nothingOnStrip: 0.2 },
-    { id: "rich", name: "Богач", price: 100, priceText: "100", type: "rich", drops: ["rose", "box", "brilliant_ring", "rocket"], nothingChance: 0.15, nothingOnStrip: 0.1 },
-    { id: "ultra", name: "Ультра", price: 500, priceText: "500", type: "ultra", drops: ["brilliant_ring", "diamond", "heroic_cup"], nothingChance: 0.05, nothingOnStrip: 0.03,
-      multiplier: { enabled: true, chances: [{ count: 1, chance: 0.70 }, { count: 2, chance: 0.22 }, { count: 3, chance: 0.08 }] }
-    },
-  ];
+async function safeFetch(url, opts = {}) {
+  const r = await fetch(url, opts);
+  if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.detail || `HTTP ${r.status}`); }
+  return r;
+}
 
-  let selectedGift = null;
-  let sender = FREE_SENDER;
-  let addSignature = false;
-  let weeklyUsed = localStorage.getItem('weeklyUsed') || null;
-  let userCredits = { cases: {}, gifts: {} };
+async function loadData() {
+  if (!tg?.initData) return;
+  try {
+    const r = await safeFetch(`${API_BASE}/api/get-credits`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ initData: tg.initData }) });
+    const d = await r.json();
+    starBalance = d.starBalance || 0;
+    updateBalanceUI();
+  } catch (e) { console.error(e); }
+}
 
-  // === API ===
-  async function safeFetch(url, options = {}) {
-    const maxRetries = 2;
-    let lastError;
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      try {
-        const response = await fetch(url, options);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return response;
-      } catch (error) {
-        lastError = error;
-        if (attempt < maxRetries) await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
-      }
-    }
-    throw lastError;
-  }
+function updateBalanceUI() {
+  const bar = document.getElementById("balanceBar"), amt = document.getElementById("balanceAmount");
+  if (starBalance > 0) { bar.classList.remove("empty"); amt.textContent = starBalance; } else { bar.classList.add("empty"); }
+}
 
-  async function loadCredits() {
-    if (!tg?.initData || !API_BASE) return;
+function isWeeklyAvailable() { return !weeklyUsed || (new Date() - new Date(weeklyUsed)) >= 7*24*60*60*1000; }
+function getWeeklyCooldown() { if (isWeeklyAvailable()) return null; const d = new Date(new Date(weeklyUsed).getTime() + 7*24*60*60*1000) - new Date(); const days = Math.floor(d/(24*60*60*1000)), hrs = Math.floor((d%(24*60*60*1000))/(60*60*1000)); return days > 0 ? `${days}д ${hrs}ч` : `${hrs}ч`; }
+
+function renderGifts() {
+  document.getElementById("giftGrid").innerHTML = GIFTS.map(g => `<div class="gift-card" data-id="${g.id}"><div class="gift-img"><img src="${g.gif_url}" loading="lazy"></div><div class="gift-price">${ICONS.star}${g.price}</div></div>`).join("");
+  document.querySelectorAll('.gift-card').forEach(el => { el.onclick = () => openDetails(GIFTS.find(g => g.id === el.dataset.id)); });
+}
+
+function renderCases() {
+  document.getElementById("caseGrid").innerHTML = CASES.map(c => {
+    const isWeekly = c.id === "weekly", available = !isWeekly || isWeeklyAvailable(), cooldown = isWeekly ? getWeeklyCooldown() : null;
+    let badges = '';
+    if (c.multiplier?.enabled) badges += `<div class="case-badge jackpot">x3</div>`;
+    if (c.type === "star") badges += `<div class="case-badge stars">⭐</div>`;
+    if (cooldown) badges = `<div class="case-cooldown">Через ${cooldown}</div>`;
+    const price = c.price === 0 ? "Бесплатно" : `${ICONS.star}${c.price}`;
+    const icon = c.type === "star" ? ICONS.starCase : (ICONS[c.type] || ICONS.box);
+    return `<div class="case-card ${c.type}${!available ? ' disabled' : ''}" data-id="${c.id}"><div class="case-icon">${icon}</div><div class="case-name">${c.name}</div><div class="case-price">${price}</div>${badges}</div>`;
+  }).join("");
+  document.querySelectorAll('.case-card:not(.disabled)').forEach(el => { el.onclick = () => openCase(CASES.find(c => c.id === el.dataset.id)); });
+}
+
+function renderDonate() {
+  document.getElementById("donateAmounts").innerHTML = DONATE_AMOUNTS.map(a => `<button class="donate-btn" data-amount="${a}">${ICONS.star}${a}</button>`).join("");
+  let sel = null;
+  document.querySelectorAll('.donate-btn').forEach(b => { b.onclick = () => { document.querySelectorAll('.donate-btn').forEach(x => x.classList.remove('selected')); b.classList.add('selected'); sel = +b.dataset.amount; document.getElementById("donateCustom").value = ''; }; });
+  document.getElementById("donateCustom").oninput = () => { document.querySelectorAll('.donate-btn').forEach(x => x.classList.remove('selected')); sel = null; };
+  document.getElementById("donateSend").onclick = async () => {
+    const custom = document.getElementById("donateCustom").value, amount = custom ? +custom : sel;
+    if (!amount || amount < 1 || amount > 10000) { alert("Сумма 1-10000"); return; }
+    if (!tg?.initData) { alert(`Тест: ${amount}⭐`); return; }
     try {
-      const resp = await safeFetch(`${API_BASE}/api/get-credits`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ initData: tg.initData })
-      });
-      userCredits = await resp.json() || { cases: {}, gifts: {} };
-      if (!document.getElementById("sectionLuck").classList.contains("hidden")) renderCases();
-    } catch (e) {
-      userCredits = { cases: {}, gifts: {} };
-    }
-  }
-
-  async function useCreditAPI(itemType, itemId) {
-    if (!tg?.initData || !API_BASE) {
-      if (userCredits[itemType === "case" ? "cases" : "gifts"]?.[itemId] > 0) {
-        userCredits[itemType === "case" ? "cases" : "gifts"][itemId]--;
-        return true;
-      }
-      return false;
-    }
-    try {
-      const resp = await safeFetch(`${API_BASE}/api/use-credit`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ initData: tg.initData, itemType, itemId })
-      });
-      const result = await resp.json();
-      if (result.success) {
-        const cat = itemType === "case" ? "cases" : "gifts";
-        if (userCredits[cat]?.[itemId]) userCredits[cat][itemId]--;
-        return true;
-      }
-      return false;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function getCaseCredits(id) { return userCredits.cases?.[id] || 0; }
-
-  function isWeeklyAvailable() {
-    if (!weeklyUsed) return true;
-    return (new Date() - new Date(weeklyUsed)) >= 7 * 24 * 60 * 60 * 1000;
-  }
-
-  function getWeeklyCooldown() {
-    if (!weeklyUsed || isWeeklyAvailable()) return null;
-    const diff = new Date(new Date(weeklyUsed).getTime() + 7 * 24 * 60 * 60 * 1000) - new Date();
-    const days = Math.floor(diff / (24 * 60 * 60 * 1000));
-    const hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-    return days > 0 ? `${days}д ${hours}ч` : `${hours}ч`;
-  }
-
-  // === MULTIPLIER ===
-  function rollMultiplier(caseData) {
-    const m = caseData.multiplier;
-    if (!m || !m.enabled) return 1;
-    const roll = Math.random();
-    let cum = 0;
-    for (const opt of m.chances) {
-      cum += opt.chance;
-      if (roll < cum) return opt.count;
-    }
-    return 1;
-  }
-
-  function rollCaseGifts(caseData, count) {
-    const caseGifts = caseData.drops.map(id => GIFTS.find(g => g.id === id)).filter(Boolean);
-    const nothingChance = caseData.nothingChance || 0.5;
-    const results = [];
-    for (let i = 0; i < count; i++) {
-      const adj = count > 1 ? nothingChance * 0.3 : nothingChance;
-      if (Math.random() < adj && count === 1) {
-        results.push(null);
-      } else {
-        results.push(caseGifts[Math.floor(Math.random() * caseGifts.length)]);
-      }
-    }
-    const real = results.filter(g => g !== null);
-    return real.length > 0 ? real : [null];
-  }
-
-  function spawnConfetti() {
-    const overlay = document.getElementById("rouletteOverlay");
-    const colors = ['#FF9F0A', '#FFD60A', '#FF375F', '#32D74B', '#64D2FF', '#BF5AF2'];
-    for (let i = 0; i < 60; i++) {
-      const el = document.createElement('div');
-      el.className = 'confetti';
-      el.style.left = Math.random() * 100 + '%';
-      el.style.top = '-10px';
-      el.style.width = (6 + Math.random() * 10) + 'px';
-      el.style.height = (6 + Math.random() * 10) + 'px';
-      el.style.background = colors[Math.floor(Math.random() * colors.length)];
-      el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-      el.style.animationDelay = Math.random() * 2 + 's';
-      el.style.animationDuration = (2.5 + Math.random() * 2) + 's';
-      
-      // Добавим простую анимацию в CSS через JS
-      el.animate([
-        { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
-        { transform: `translateY(100vh) rotate(${720}deg)`, opacity: 0 }
-      ], {
-        duration: (2.5 + Math.random() * 2) * 1000,
-        delay: Math.random() * 500,
-        fill: 'forwards'
-      });
-      
-      overlay.appendChild(el);
-      setTimeout(() => el.remove(), 5000);
-    }
-  }
-
-  // === RENDER ===
-  function renderGifts() {
-    const grid = document.getElementById("giftGrid");
-    grid.innerHTML = "";
-    GIFTS.forEach((g, i) => {
-      const el = document.createElement("div");
-      el.className = "gift-card";
-      el.style.animationDelay = `${i * 0.05}s`;
-      el.innerHTML = `
-        <div class="gift-img"><img src="${g.gif_url}" alt="${g.title}" loading="lazy"></div>
-        <div class="gift-price">${ICONS.star}${g.price}</div>
-      `;
-      el.onclick = () => openDetails(g);
-      grid.appendChild(el);
-    });
-  }
-
-  function renderCases() {
-    const grid = document.getElementById("caseGrid");
-    grid.innerHTML = "";
-    CASES.forEach((c, i) => {
-      const isWeekly = c.id === "weekly";
-      const available = !isWeekly || isWeeklyAvailable();
-      const cooldown = isWeekly ? getWeeklyCooldown() : null;
-      const credits = getCaseCredits(c.id);
-      const hasCredit = credits > 0;
-      const hasMultiplier = c.multiplier?.enabled;
-
-      const el = document.createElement("div");
-      el.className = `case-card ${c.type}${!available && !hasCredit ? ' disabled' : ''}`;
-      el.style.animationDelay = `${i * 0.1}s`;
-
-      const priceContent = c.price === 0 ? c.priceText : `${ICONS.star}${c.priceText}`;
-      let badges = '';
-      if (hasMultiplier) badges += `<div class="case-badge jackpot">до x3</div>`;
-      if (hasCredit) badges += `<div class="case-badge credit">${ICONS.ticket} ${credits}</div>`;
-      if (cooldown && !hasCredit) badges += `<div class="case-cooldown">Через ${cooldown}</div>`;
-
-      el.innerHTML = `
-        <div class="case-icon">${CASE_ICONS[c.type]}</div>
-        <div class="case-name">${c.name}</div>
-        <div class="case-price">${priceContent}</div>
-        ${badges}
-      `;
-
-      if (available || hasCredit) el.onclick = () => openCase(c, hasCredit);
-      grid.appendChild(el);
-    });
-  }
-
-  // === DETAILS ===
-  function openDetails(g) {
-    selectedGift = g;
-    sender = FREE_SENDER;
-    addSignature = false;
-    document.getElementById("screenCatalog").classList.add("hidden");
-    document.getElementById("screenDetails").classList.remove("hidden");
-    document.getElementById("detailsTitle").textContent = g.title;
-    document.getElementById("detailsGif").src = g.gif_url;
-    document.getElementById("signatureToggle").classList.remove("on");
-    document.getElementById("senderOptions").classList.remove("expanded");
-    syncSenderUI();
-    updateTotalUI();
-    
-    // Скролл вверх при открытии деталей
-    window.scrollTo(0,0);
-  }
-
-  function closeDetails() {
-    document.getElementById("screenDetails").classList.add("hidden");
-    document.getElementById("screenCatalog").classList.remove("hidden");
-  }
-
-  function syncSenderUI() {
-    document.getElementById("checkFree").classList.toggle("on", sender === FREE_SENDER);
-    document.getElementById("checkPaid").classList.toggle("on", sender === PAID_SENDER);
-    document.getElementById("checkBoth").classList.toggle("on", sender === BOTH_SENDER);
-  }
-
-  function totalPrice() {
-    if (!selectedGift) return 0;
-    return addSignature ? selectedGift.price + (SIGNATURE_COSTS[sender] || 2) : selectedGift.price;
-  }
-
-  function updateTotalUI() {
-    const t = totalPrice();
-    document.getElementById("totalAmount").textContent = t;
-    document.getElementById("buyAmount").textContent = t;
-  }
-
-  // === CASE ===
-  async function openCase(caseData, useCredit = false) {
-    const isWeekly = caseData.id === "weekly";
-    const isPaid = caseData.price > 0 && !useCredit;
-
-    if (isPaid) {
-      if (!tg?.initData || !API_BASE) {
-        alert(`Тест: ${caseData.name} за ${caseData.price}⭐`);
-        showRoulette(caseData, false);
-        return;
-      }
-      try {
-        const resp = await safeFetch(`${API_BASE}/api/create-invoice`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ initData: tg.initData, caseId: caseData.id })
-        });
-        const data = await resp.json();
-        if (data.link) {
-          tg.openInvoice(data.link, (status) => {
-            if (status === "paid") showRoulette(caseData, false);
-          });
-        } else {
-          alert("Не удалось создать счёт");
-        }
-        return;
-      } catch (e) {
-        alert("Ошибка: " + e.message);
-        return;
-      }
-    }
-
-    if (useCredit) {
-      const ok = await useCreditAPI("case", caseData.id);
-      if (!ok) { alert("Не удалось использовать кредит"); return; }
-    }
-
-    showRoulette(caseData, isWeekly);
-  }
-
-  function showRoulette(caseData, isWeekly) {
-    const overlay = document.getElementById("rouletteOverlay");
-    const box = document.getElementById("rouletteBox");
-    const strip = document.getElementById("rouletteStrip");
-    const title = document.getElementById("rouletteTitle");
-    const result = document.getElementById("rouletteResult");
-    const closeBtn = document.getElementById("rouletteClose");
-    const pointer = document.getElementById("roulettePointer");
-    const multiplierBox = document.getElementById("multiplierBox");
-    const multiplierValue = document.getElementById("multiplierValue");
-    const wonGifts = document.getElementById("wonGifts");
-    const wonGiftsGrid = document.getElementById("wonGiftsGrid");
-
-    // Reset
-    overlay.classList.remove("hidden");
-    box.classList.remove("jackpot");
-    pointer.classList.remove("jackpot");
-    closeBtn.classList.remove("jackpot");
-    multiplierBox.classList.remove("show");
-    wonGifts.classList.remove("show");
-    title.textContent = `${caseData.name}`;
-    result.textContent = "";
-    result.className = "roulette-result";
-    closeBtn.classList.add("hidden");
-
-    // Multiplier
-    const giftCount = rollMultiplier(caseData);
-    const isJackpot = giftCount > 1;
-
-    if (isJackpot) {
-      multiplierValue.textContent = `x${giftCount}`;
-      multiplierBox.classList.add("show");
-      setTimeout(() => {
-        box.classList.add("jackpot");
-        pointer.classList.add("jackpot");
-      }, 600);
-    }
-
-    // Roll gifts
-    const wonGiftsList = rollCaseGifts(caseData, giftCount);
-    const hasRealWin = wonGiftsList.some(g => g !== null);
-
-    // Build strip
-    const nothingItem = { id: "nothing", title: "Ничего", isNothing: true };
-    const items = [];
-    const nothingOnStrip = caseData.nothingOnStrip || 0.25;
-    const caseGifts = caseData.drops.map(id => GIFTS.find(g => g.id === id)).filter(Boolean);
-
-    for (let i = 0; i < 50; i++) {
-      if (Math.random() < nothingOnStrip) items.push(nothingItem);
-      else items.push(caseGifts[Math.floor(Math.random() * caseGifts.length)]);
-    }
-
-    const winIndex = isWeekly ? 38 : 35;
-    const displayItem = hasRealWin ? wonGiftsList.find(g => g !== null) : nothingItem;
-    items[winIndex] = displayItem.isNothing ? nothingItem : displayItem;
-
-    if (!isWeekly && hasRealWin) {
-      for (let off of [-2, -1, 1, 2]) {
-        if (Math.random() > 0.5) items[winIndex + off] = caseGifts[Math.floor(Math.random() * caseGifts.length)];
-      }
-    }
-
-    strip.innerHTML = items.map(item => {
-      if (item.isNothing) return `<div class="roulette-item">${ICONS.nothing}</div>`;
-      return `<div class="roulette-item"><img src="${item.gif_url}" alt="${item.title}"></div>`;
-    }).join("");
-
-    strip.style.transition = "none";
-    strip.style.transform = "translateX(0)";
-
-    const containerWidth = document.querySelector('.roulette-window').offsetWidth;
-    const itemWidth = 100; // обновленная ширина айтема
-    const centerOffset = (containerWidth / 2) - (itemWidth / 2);
-
-    const startDelay = isJackpot ? 900 : 100;
-
-    setTimeout(() => {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          strip.style.transition = "transform 5s cubic-bezier(0.12, 0.8, 0.3, 1)";
-          strip.style.transform = `translateX(-${(winIndex * itemWidth) - centerOffset}px)`;
-        });
-      });
-    }, startDelay);
-
-    const resultDelay = 5500 + startDelay;
-
-    setTimeout(() => {
-      if (!hasRealWin) {
-        result.textContent = "Увы, ничего...";
-        result.classList.add("lose");
-        multiplierBox.classList.remove("show");
-      } else if (isJackpot) {
-        spawnConfetti();
-        result.innerHTML = `ДЖЕКПОТ x${giftCount}!`;
-        result.classList.add("jackpot");
-        closeBtn.classList.add("jackpot");
-
-        wonGiftsGrid.innerHTML = "";
-        const counts = {};
-        wonGiftsList.filter(g => g).forEach(g => counts[g.id] = (counts[g.id] || 0) + 1);
-
-        Object.entries(counts).forEach(([giftId, count]) => {
-          const gift = GIFTS.find(g => g.id === giftId);
-          if (gift) {
-            const el = document.createElement("div");
-            el.className = "won-gift";
-            el.innerHTML = `
-              <img src="${gift.gif_url}" alt="${gift.title}">
-              <div class="won-gift-name">${gift.title}</div>
-              ${count > 1 ? `<div class="won-gift-count">x${count}</div>` : ''}
-            `;
-            wonGiftsGrid.appendChild(el);
-          }
-        });
-
-        wonGifts.classList.add("show");
-      } else {
-        const winItem = wonGiftsList[0];
-        result.textContent = `${winItem.title}!`;
-        result.classList.add("win");
-      }
-
-      if (isWeekly) {
-        weeklyUsed = new Date().toISOString();
-        localStorage.setItem('weeklyUsed', weeklyUsed);
-      }
-
-      closeBtn.classList.remove("hidden");
-      closeBtn.textContent = !hasRealWin ? "Закрыть" : (isJackpot ? "Забрать всё!" : "Забрать");
-    }, resultDelay);
-  }
-
-  // === EVENTS ===
-  document.getElementById("tabGifts").onclick = () => {
-    document.getElementById("tabGifts").classList.add("active");
-    document.getElementById("tabLuck").classList.remove("active");
-    document.getElementById("sectionGifts").classList.remove("hidden");
-    document.getElementById("sectionLuck").classList.add("hidden");
+      const r = await safeFetch(`${API_BASE}/api/create-donate`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ initData: tg.initData, amount }) });
+      const d = await r.json();
+      if (d.link) tg.openInvoice(d.link, s => { if (s === "paid") alert("💝 Спасибо!"); });
+    } catch (e) { alert("Ошибка: " + e.message); }
   };
+}
 
-  document.getElementById("tabLuck").onclick = () => {
-    document.getElementById("tabLuck").classList.add("active");
-    document.getElementById("tabGifts").classList.remove("active");
-    document.getElementById("sectionLuck").classList.remove("hidden");
-    document.getElementById("sectionGifts").classList.add("hidden");
-    renderCases();
-  };
+function openDetails(g) {
+  selectedGift = g; sender = "@echoaxxs"; addSignature = false;
+  document.getElementById("screenCatalog").classList.add("hidden");
+  document.getElementById("screenDetails").classList.remove("hidden");
+  document.getElementById("detailsTitle").textContent = g.title;
+  document.getElementById("detailsGif").src = g.gif_url;
+  document.getElementById("signatureToggle").classList.remove("on");
+  document.getElementById("senderOptions").classList.remove("expanded");
+  syncSenderUI(); updateTotalUI(); window.scrollTo(0, 0);
+}
 
-  document.getElementById("toggleSignature").onclick = () => {
-    addSignature = !addSignature;
-    document.getElementById("signatureToggle").classList.toggle("on", addSignature);
-    document.getElementById("senderOptions").classList.toggle("expanded", addSignature);
-    updateTotalUI();
-    
-    // Плавный скролл вниз, если опции раскрылись и не влезают
-    if (addSignature) {
-      setTimeout(() => {
-        window.scrollBy({ top: 200, behavior: 'smooth' });
-      }, 300);
-    }
-  };
+function closeDetails() { document.getElementById("screenDetails").classList.add("hidden"); document.getElementById("screenCatalog").classList.remove("hidden"); }
+function syncSenderUI() { document.querySelectorAll('.sender-option .check').forEach(c => c.classList.remove('on')); const o = document.querySelector(`.sender-option[data-sender="${sender}"] .check`); if (o) o.classList.add('on'); }
+function totalPrice() { return selectedGift ? selectedGift.price + (addSignature ? (SIGNATURE_COSTS[sender] || 2) : 0) : 0; }
+function updateTotalUI() {
+  const t = totalPrice();
+  document.getElementById("totalAmount").textContent = t;
+  document.getElementById("buyAmount").textContent = t;
+  const balBtn = document.getElementById("btnBuyBalance"), balAmt = document.getElementById("buyBalanceAmount");
+  if (starBalance > 0) { balBtn.classList.remove("hidden"); balAmt.textContent = t; balBtn.classList.toggle("disabled", starBalance < t); } else { balBtn.classList.add("hidden"); }
+}
 
-  document.getElementById("optFree").onclick = () => { sender = FREE_SENDER; syncSenderUI(); updateTotalUI(); };
-  document.getElementById("optPaid").onclick = () => { sender = PAID_SENDER; syncSenderUI(); updateTotalUI(); };
-  document.getElementById("optBoth").onclick = () => { sender = BOTH_SENDER; syncSenderUI(); updateTotalUI(); };
-  document.getElementById("btnBack").onclick = closeDetails;
+function openCase(c) {
+  if (c.id === "weekly") { if (!isWeeklyAvailable()) return; showRoulette(c, true); return; }
+  if (c.price === 0) { showRoulette(c, false); return; }
+  pendingCase = c;
+  document.getElementById("choiceTitle").textContent = c.name;
+  document.getElementById("choicePrice").textContent = c.price + "⭐";
+  const balBtn = document.getElementById("choiceBalance");
+  if (starBalance >= c.price) { balBtn.classList.remove("disabled"); balBtn.textContent = `Баланс (${starBalance}⭐)`; } else { balBtn.classList.add("disabled"); balBtn.textContent = `Баланс (${starBalance}⭐)`; }
+  document.getElementById("caseChoice").classList.remove("hidden");
+}
 
-  document.getElementById("btnBuy").onclick = async () => {
-    const t = totalPrice();
-    if (!tg?.initData || !API_BASE) {
-      alert(`Тест: ${selectedGift.title}${addSignature ? `\nОт: ${sender}` : ''}\nИтого: ${t}⭐`);
-      return;
-    }
-    try {
-      const resp = await safeFetch(`${API_BASE}/api/create-invoice`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ initData: tg.initData, giftId: selectedGift.id, sender: addSignature ? sender : null })
-      });
-      const data = await resp.json();
-      if (data.link) {
-        tg.openInvoice(data.link, (status) => { if (status === "paid") tg.close(); });
-      } else {
-        alert("Не удалось создать счёт");
-      }
-    } catch (e) {
-      alert("Ошибка: " + e.message);
-    }
-  };
+document.getElementById("choiceCancel").onclick = () => { document.getElementById("caseChoice").classList.add("hidden"); pendingCase = null; };
+document.getElementById("choiceStars").onclick = async () => {
+  document.getElementById("caseChoice").classList.add("hidden");
+  if (!tg?.initData) { showRoulette(pendingCase, false); return; }
+  try {
+    const r = await safeFetch(`${API_BASE}/api/create-invoice`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ initData: tg.initData, caseId: pendingCase.id }) });
+    const d = await r.json();
+    if (d.link) tg.openInvoice(d.link, s => { if (s === "paid") showRoulette(pendingCase, false); });
+  } catch (e) { alert("Ошибка: " + e.message); }
+};
+document.getElementById("choiceBalance").onclick = async () => {
+  document.getElementById("caseChoice").classList.add("hidden");
+  if (!tg?.initData) { starBalance -= pendingCase.price; updateBalanceUI(); showRoulette(pendingCase, false); return; }
+  try {
+    const r = await safeFetch(`${API_BASE}/api/buy-with-balance`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ initData: tg.initData, caseId: pendingCase.id }) });
+    const d = await r.json();
+    starBalance = d.newBalance; updateBalanceUI();
+    if (d.type === "stars") { showStarResult(pendingCase, d.won); }
+    else if (d.type === "nothing") { showNothingResult(pendingCase); }
+    else { showGiftResult(pendingCase, d.won, d.multiplier); }
+  } catch (e) { alert("Ошибка: " + e.message); }
+};
 
-  document.getElementById("rouletteClose").onclick = () => {
-    document.getElementById("rouletteOverlay").classList.add("hidden");
-    document.getElementById("rouletteBox").classList.remove("jackpot");
-    document.getElementById("multiplierBox").classList.remove("show");
-    document.getElementById("wonGifts").classList.remove("show");
-    document.querySelectorAll('.confetti').forEach(el => el.remove());
-    renderCases();
-  };
+function showRoulette(c, isWeekly) {
+  const overlay = document.getElementById("rouletteOverlay"), strip = document.getElementById("rouletteStrip"), title = document.getElementById("rouletteTitle"), result = document.getElementById("rouletteResult"), closeBtn = document.getElementById("rouletteClose"), pointer = document.getElementById("roulettePointer"), multBox = document.getElementById("multiplierBox"), multVal = document.getElementById("multiplierValue"), wonGifts = document.getElementById("wonGifts");
+  overlay.classList.remove("hidden"); pointer.className = "roulette-pointer"; closeBtn.className = "roulette-close hidden"; multBox.classList.remove("show"); wonGifts.classList.remove("show"); title.textContent = c.name; result.textContent = ""; result.className = "roulette-result";
+  if (c.type === "star") { pointer.classList.add("stars"); showStarRoulette(c); return; }
+  let giftCount = 1;
+  if (c.multiplier?.enabled) { const r = Math.random(); let cum = 0; for (const o of c.multiplier.chances) { cum += o.chance; if (r < cum) { giftCount = o.count; break; } } }
+  const isJackpot = giftCount > 1;
+  if (isJackpot) { multVal.textContent = `x${giftCount}`; multBox.classList.add("show"); pointer.classList.add("jackpot"); }
+  const caseGifts = c.drops.map(id => GIFTS.find(g => g.id === id)).filter(Boolean), nothingChance = isWeekly || c.id === "mini" ? 1.0 : c.nothingChance;
+  let wonList = [];
+  for (let i = 0; i < giftCount; i++) { if (Math.random() < nothingChance && !isJackpot) wonList.push(null); else if (caseGifts.length) wonList.push(caseGifts[Math.floor(Math.random()*caseGifts.length)]); else wonList.push(null); }
+  const hasWin = wonList.some(g => g !== null), nothingItem = { id: "nothing", isNothing: true }, items = [];
+  for (let i = 0; i < 50; i++) { if (!caseGifts.length || Math.random() < 0.4) items.push(nothingItem); else items.push(caseGifts[Math.floor(Math.random()*caseGifts.length)]); }
+  const winIndex = 35; items[winIndex] = hasWin ? (wonList.find(g => g) || nothingItem) : nothingItem;
+  strip.innerHTML = items.map(it => it.isNothing ? `<div class="roulette-item">${ICONS.nothing}</div>` : `<div class="roulette-item"><img src="${it.gif_url}"></div>`).join("");
+  strip.style.transition = "none"; strip.style.transform = "translateX(0)";
+  const cw = document.querySelector('.roulette-window').offsetWidth, iw = 90, co = (cw/2)-(iw/2), delay = isJackpot ? 800 : 100;
+  setTimeout(() => { strip.style.transition = "transform 5s cubic-bezier(0.12,0.8,0.3,1)"; strip.style.transform = `translateX(-${winIndex*iw-co}px)`; }, delay);
+  setTimeout(() => {
+    if (!hasWin) { result.textContent = "Увы, ничего..."; result.classList.add("lose"); }
+    else if (isJackpot) { result.innerHTML = `ДЖЕКПОТ x${giftCount}!`; result.classList.add("jackpot"); closeBtn.classList.add("jackpot"); const grid = document.getElementById("wonGiftsGrid"), counts = {}; wonList.filter(g=>g).forEach(g => counts[g.id]=(counts[g.id]||0)+1); grid.innerHTML = Object.entries(counts).map(([id,cnt]) => { const g = GIFTS.find(x=>x.id===id); return `<div class="won-gift"><img src="${g.gif_url}"><div class="won-gift-name">${g.title}</div>${cnt>1?`<div class="won-gift-count">x${cnt}</div>`:''}</div>`; }).join(""); wonGifts.classList.add("show"); }
+    else { const w = wonList[0]; result.textContent = `${w.title}!`; result.classList.add("win"); }
+    if (isWeekly) { weeklyUsed = new Date().toISOString(); localStorage.setItem('weeklyUsed', weeklyUsed); }
+    closeBtn.classList.remove("hidden"); closeBtn.textContent = hasWin ? (isJackpot ? "Забрать всё!" : "Забрать") : "Закрыть";
+  }, 5000 + delay);
+}
 
-  // === INIT ===
-  function init() {
-    renderGifts();
-    loadCredits();
-  }
+function showStarRoulette(c) {
+  const strip = document.getElementById("rouletteStrip"), result = document.getElementById("rouletteResult"), closeBtn = document.getElementById("rouletteClose");
+  const all = c.starDrops, winnable = all.filter(d => d.canWin), fake = all.filter(d => !d.canWin);
+  let won; const roll = Math.random(); let cum = 0; for (const d of winnable) { cum += d.chance; if (roll < cum) { won = d.stars; break; } } if (!won) won = winnable[0].stars;
+  const items = [];
+  for (let i = 0; i < 55; i++) { if (i < 30 && Math.random() < 0.6 && fake.length) items.push({ stars: fake[Math.floor(Math.random()*fake.length)].stars }); else items.push({ stars: all[Math.floor(Math.random()*all.length)].stars }); }
+  const winIndex = 38; if (fake.length) items[winIndex-1] = { stars: fake[Math.floor(Math.random()*fake.length)].stars }; items[winIndex] = { stars: won };
+  strip.innerHTML = items.map(it => `<div class="roulette-item"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FFD700"/></svg><div class="star-amount">${it.stars}</div></div>`).join("");
+  strip.style.transition = "none"; strip.style.transform = "translateX(0)";
+  const cw = document.querySelector('.roulette-window').offsetWidth, iw = 90, co = (cw/2)-(iw/2);
+  setTimeout(() => { strip.style.transition = "transform 6s cubic-bezier(0.1,0.9,0.2,1)"; strip.style.transform = `translateX(-${winIndex*iw-co}px)`; }, 100);
+  setTimeout(() => { result.innerHTML = `+${won}⭐`; result.classList.add("stars"); closeBtn.classList.add("stars"); closeBtn.classList.remove("hidden"); closeBtn.textContent = "Забрать!"; starBalance += won; updateBalanceUI(); }, 6200);
+}
 
-  if (tg) {
-    tg.ready();
-    tg.expand();
-  }
+function showStarResult(c, stars) {
+  const overlay = document.getElementById("rouletteOverlay"), strip = document.getElementById("rouletteStrip"), result = document.getElementById("rouletteResult"), closeBtn = document.getElementById("rouletteClose"), pointer = document.getElementById("roulettePointer");
+  overlay.classList.remove("hidden"); pointer.className = "roulette-pointer stars"; document.getElementById("rouletteTitle").textContent = c.name;
+  strip.innerHTML = `<div class="result-box"><svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FFD700"/></svg><div class="big">+${stars}⭐</div></div>`;
+  result.innerHTML = `Получено ${stars}⭐`; result.className = "roulette-result stars"; closeBtn.className = "roulette-close stars"; closeBtn.textContent = "Отлично!"; closeBtn.classList.remove("hidden");
+}
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+function showNothingResult(c) {
+  const overlay = document.getElementById("rouletteOverlay"), strip = document.getElementById("rouletteStrip"), result = document.getElementById("rouletteResult"), closeBtn = document.getElementById("rouletteClose");
+  overlay.classList.remove("hidden"); document.getElementById("roulettePointer").className = "roulette-pointer"; document.getElementById("rouletteTitle").textContent = c.name;
+  strip.innerHTML = `<div class="result-box">${ICONS.nothing}</div>`;
+  result.textContent = "Увы, ничего..."; result.className = "roulette-result lose"; closeBtn.className = "roulette-close"; closeBtn.textContent = "Закрыть"; closeBtn.classList.remove("hidden");
+}
+
+function showGiftResult(c, gifts, mult) {
+  const overlay = document.getElementById("rouletteOverlay"), result = document.getElementById("rouletteResult"), closeBtn = document.getElementById("rouletteClose"), wonGifts = document.getElementById("wonGifts"), wonGrid = document.getElementById("wonGiftsGrid"), pointer = document.getElementById("roulettePointer"), multBox = document.getElementById("multiplierBox");
+  overlay.classList.remove("hidden"); pointer.className = mult > 1 ? "roulette-pointer jackpot" : "roulette-pointer"; document.getElementById("rouletteTitle").textContent = c.name;
+  if (mult > 1) { document.getElementById("multiplierValue").textContent = `x${mult}`; multBox.classList.add("show"); }
+  const counts = {}; gifts.forEach(g => counts[g] = (counts[g]||0)+1);
+  wonGrid.innerHTML = Object.entries(counts).map(([name, cnt]) => { const g = GIFTS.find(x => x.title === name); return `<div class="won-gift">${g?`<img src="${g.gif_url}"`:''}<div class="won-gift-name">${name}</div>${cnt>1?`<div class="won-gift-count">x${cnt}</div>`:''}</div>`; }).join("");
+  wonGifts.classList.add("show");
+  document.getElementById("rouletteStrip").innerHTML = '';
+  result.textContent = mult > 1 ? `ДЖЕКПОТ x${mult}!` : gifts[0]; result.className = mult > 1 ? "roulette-result jackpot" : "roulette-result win";
+  closeBtn.className = mult > 1 ? "roulette-close jackpot" : "roulette-close"; closeBtn.textContent = mult > 1 ? "Забрать всё!" : "Забрать"; closeBtn.classList.remove("hidden");
+}
+
+function showTab(id) {
+  ['Gifts','Luck','Promo','Donate'].forEach(t => { document.getElementById(`tab${t}`).classList.remove('active'); document.getElementById(`section${t}`).classList.add('hidden'); });
+  document.getElementById(`tab${id}`).classList.add('active'); document.getElementById(`section${id}`).classList.remove('hidden');
+  if (id === 'Luck') renderCases(); if (id === 'Donate') renderDonate();
+}
+
+document.getElementById("tabGifts").onclick = () => showTab('Gifts');
+document.getElementById("tabLuck").onclick = () => showTab('Luck');
+document.getElementById("tabPromo").onclick = () => showTab('Promo');
+document.getElementById("tabDonate").onclick = () => showTab('Donate');
+
+document.getElementById("promoBtn").onclick = async () => {
+  const code = document.getElementById("promoInput").value.trim(), res = document.getElementById("promoResult");
+  if (!code) return;
+  if (!tg?.initData) { res.textContent = "Тест: " + code; res.className = "promo-result success"; res.classList.remove("hidden"); return; }
+  try {
+    const r = await safeFetch(`${API_BASE}/api/activate-promocode`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ initData: tg.initData, code }) });
+    const d = await r.json();
+    res.textContent = `✅ ${d.reward}`; res.className = "promo-result success";
+    if (d.newBalance !== undefined) { starBalance = d.newBalance; updateBalanceUI(); }
+  } catch (e) { res.textContent = "❌ " + e.message; res.className = "promo-result error"; }
+  res.classList.remove("hidden"); document.getElementById("promoInput").value = '';
+};
+
+document.getElementById("toggleSignature").onclick = () => { addSignature = !addSignature; document.getElementById("signatureToggle").classList.toggle("on", addSignature); document.getElementById("senderOptions").classList.toggle("expanded", addSignature); updateTotalUI(); };
+document.querySelectorAll('.sender-option').forEach(o => { o.onclick = () => { sender = o.dataset.sender; syncSenderUI(); updateTotalUI(); }; });
+document.getElementById("btnBack").onclick = closeDetails;
+
+document.getElementById("btnBuy").onclick = async () => {
+  if (!tg?.initData) { alert(`Тест: ${selectedGift.title} за ${totalPrice()}⭐`); return; }
+  try {
+    const r = await safeFetch(`${API_BASE}/api/create-invoice`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ initData: tg.initData, giftId: selectedGift.id, sender: addSignature ? sender : null }) });
+    const d = await r.json();
+    if (d.link) tg.openInvoice(d.link, s => { if (s === "paid") tg.close(); });
+  } catch (e) { alert("Ошибка: " + e.message); }
+};
+
+document.getElementById("btnBuyBalance").onclick = async () => {
+  const price = totalPrice();
+  if (starBalance < price) { alert(`Нужно ${price}⭐, есть ${starBalance}⭐`); return; }
+  if (!tg?.initData) { starBalance -= price; updateBalanceUI(); updateTotalUI(); alert("Тест: куплено!"); return; }
+  try {
+    const r = await safeFetch(`${API_BASE}/api/buy-with-balance`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ initData: tg.initData, giftId: selectedGift.id, sender: addSignature ? sender : null }) });
+    const d = await r.json();
+    if (d.success) { starBalance = d.newBalance; updateBalanceUI(); alert(`✅ ${d.reward} отправлен!`); closeDetails(); }
+  } catch (e) { alert("Ошибка: " + e.message); }
+};
+
+document.getElementById("rouletteClose").onclick = () => { document.getElementById("rouletteOverlay").classList.add("hidden"); document.getElementById("multiplierBox").classList.remove("show"); document.getElementById("wonGifts").classList.remove("show"); renderCases(); loadData(); };
+
+function init() { renderGifts(); loadData(); }
+if (tg) { tg.ready(); tg.expand(); }
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 </script>
 </body>
 </html>
-
