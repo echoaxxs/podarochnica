@@ -120,7 +120,7 @@
     .promo-result.success { background: rgba(50,215,75,0.15); color: var(--green); }
     .promo-result.error { background: rgba(255,69,58,0.15); color: var(--red); }
 
-      /* === DONATE SECTION === */
+    /* === DONATE SECTION === */
     .donate-card { background: var(--card); border-radius: var(--radius-lg); padding: 24px 20px; border: 1px solid var(--border); }
     .donate-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
     .donate-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--pink), #FF6B6B); border-radius: 14px; display: flex; align-items: center; justify-content: center; }
@@ -135,16 +135,12 @@
     .donate-custom { display: flex; align-items: center; background: var(--bg); border-radius: 14px; padding: 6px; border: 1px solid var(--border); margin-bottom: 16px; }
     .donate-custom-icon { width: 46px; height: 46px; background: var(--card2); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .donate-custom-icon svg { width: 20px; height: 20px; color: var(--gold); }
-    
-    /* Исправил текстовое поле (выравнивание) */
     .donate-custom input { flex: 1; width: 100%; height: 46px; background: transparent; border: none; padding: 0 12px; font-size: 20px; font-family: inherit; color: var(--text); font-weight: 700; text-align: left; }
     .donate-custom input::placeholder { color: var(--text3); font-weight: 400; font-size: 16px; }
     .donate-custom input:focus { outline: none; }
     .donate-custom-label { padding-right: 16px; font-size: 16px; color: var(--text3); font-weight: 600; flex-shrink: 0; }
     
     .donate-send { width: 100%; height: 56px; background: linear-gradient(135deg, var(--pink), #FF6B6B); border: none; border-radius: 14px; color: #fff; font-size: 17px; font-weight: 600; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-    
-    /* ВОТ ЭТА СТРОКА УСМИРЯЕТ ГИГАНТСКОЕ СЕРДЦЕ */
     .donate-send svg { width: 22px; height: 22px; flex-shrink: 0; }
 
     /* === DETAIL SCREEN === */
@@ -200,7 +196,7 @@
     .case-choice-btn.balance.disabled { opacity: 0.4; pointer-events: none; }
     .case-choice-btn.cancel { background: var(--card2); color: var(--text); }
 
-    /* === NEW ROULETTE STYLES === */
+    /* === ROULETTE STYLES === */
     .roulette-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.3s; }
     .roulette-box { width: 100%; max-width: 380px; }
     .roulette-title { text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -210,14 +206,12 @@
     .multiplier-label { font-size: 12px; color: var(--orange); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
     .multiplier-value { font-size: 48px; font-weight: 900; background: linear-gradient(135deg, var(--gold), var(--orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
-    /* Roulette Core */
     .roulette-window { position: relative; height: 150px; overflow: hidden; border-radius: 12px; background: var(--bg2); border: 1px solid var(--border); box-shadow: inset 0 0 30px rgba(0,0,0,0.6); }
     .roulette-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #fff; transform: translateX(-50%); z-index: 10; box-shadow: 0 0 10px rgba(255,255,255,0.8); }
     .roulette-pointer::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 12px solid #fff; }
     .roulette-pointer::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 12px solid #fff; }
     .roulette-strip { display: flex; height: 100%; align-items: center; gap: 6px; padding: 0 3px; }
     
-    /* Roulette Cards */
     .r-item { width: 100px; height: 130px; background: var(--card); border-radius: 12px; display: flex; flex-direction: column; align-items: center; padding: 10px 6px; flex-shrink: 0; border: 2px solid var(--border); box-sizing: border-box; }
     .r-item.star-theme { background: linear-gradient(135deg, #FFD60A, #FF9F0A); border: none; color: #000; }
     .r-img-wrap { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
@@ -361,11 +355,17 @@ const CASES = [
   { id: "premium", name: "Премиум", price: 50, type: "premium", icon: "diamond", drops: ["rose", "box", "rocket"], nothingChance: 0.3 },
   { id: "rich", name: "Богач", price: 100, type: "rich", icon: "money", drops: ["rose", "box", "brilliant_ring", "rocket"], nothingChance: 0.15 },
   { id: "ultra", name: "Ультра", price: 500, type: "ultra", icon: "fire", drops: ["brilliant_ring", "diamond", "heroic_cup"], nothingChance: 0.05, multiplier: { enabled: true, chances: [{ count: 1, chance: 0.50 }, { count: 2, chance: 0.35 }, { count: 3, chance: 0.15 }] } },
-  { id: "star", name: "Star", price: 1000, type: "star", icon: "starCase", starDrops: [
-    { stars: 500, chance: 0.40, canWin: true }, { stars: 800, chance: 0.30, canWin: true }, { stars: 900, chance: 0.15, canWin: true },
-    { stars: 999, chance: 0.05, canWin: true }, { stars: 1000, chance: 0.05, canWin: true },
-    { stars: 1200, chance: 0.02, canWin: false }, { stars: 1500, chance: 0.015, canWin: false }, { stars: 3000, chance: 0.01, canWin: false },
-    { stars: 5000, chance: 0.004, canWin: false }, { stars: 10000, chance: 0.001, canWin: false },
+  { id: "star-1", name: "Star 100", price: 100, type: "stars", icon: "starCase", starDrops: [
+    { stars: 50, chance: 0.70, canWin: true }, { stars: 100, chance: 0.30, canWin: true },
+    { stars: 250, chance: 0.50, canWin: false }, { stars: 500, chance: 0.40, canWin: false }, { stars: 800, chance: 0.10, canWin: false }, { stars: 900, chance: 0.05, canWin: false }, { stars: 999, chance: 0.025, canWin: false }, { stars: 1000, chance: 0.02, canWin: false }, { stars: 1200, chance: 0.01, canWin: false }, { stars: 1500, chance: 0.005, canWin: false }, { stars: 3000, chance: 0.004, canWin: false }, { stars: 5000, chance: 0.003, canWin: false }, { stars: 10000, chance: 0.001, canWin: false },
+  ]},
+  { id: "star-2", name: "Star 500", price: 500, type: "stars", icon: "starCase", starDrops: [
+    { stars: 250, chance: 0.50, canWin: true }, { stars: 500, chance: 0.40, canWin: true },
+    { stars: 800, chance: 0.10, canWin: false }, { stars: 900, chance: 0.05, canWin: false }, { stars: 999, chance: 0.025, canWin: false }, { stars: 1000, chance: 0.02, canWin: false }, { stars: 1200, chance: 0.01, canWin: false }, { stars: 1500, chance: 0.005, canWin: false }, { stars: 3000, chance: 0.004, canWin: false }, { stars: 5000, chance: 0.003, canWin: false }, { stars: 10000, chance: 0.001, canWin: false },
+  ]},
+  { id: "star-3", name: "Star 1000", price: 1000, type: "stars", icon: "starCase", starDrops: [
+    { stars: 500, chance: 0.40, canWin: true }, { stars: 800, chance: 0.30, canWin: true }, { stars: 900, chance: 0.15, canWin: true }, { stars: 999, chance: 0.05, canWin: true }, { stars: 1000, chance: 0.05, canWin: true },
+    { stars: 1200, chance: 0.02, canWin: false }, { stars: 1500, chance: 0.015, canWin: false }, { stars: 3000, chance: 0.01, canWin: false }, { stars: 5000, chance: 0.004, canWin: false }, { stars: 10000, chance: 0.001, canWin: false },
   ]},
 ];
 
@@ -413,11 +413,11 @@ function renderCases() {
     const isWeekly = c.id === "weekly", available = !isWeekly || isWeeklyAvailable(), cooldown = isWeekly ? getWeeklyCooldown() : null;
     let badges = '';
     if (c.multiplier?.enabled) badges += `<div class="case-badge jackpot">${ICONS.fire}x3</div>`;
-    if (c.type === "star") badges += `<div class="case-badge stars">${ICONS.star}</div>`;
+    if (c.type === "stars") badges += `<div class="case-badge stars">${ICONS.star}</div>`;
     if (cooldown) badges = `<div class="case-cooldown"><svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg>${cooldown}</div>`;
     const price = c.price === 0 ? "Бесплатно" : `${ICONS.star}${c.price}`;
     return `
-      <div class="case-card ${c.type}${!available ? ' disabled' : ''}" data-id="${c.id}">
+      <div class="case-card ${c.type === 'stars' ? 'star' : c.type}${!available ? ' disabled' : ''}" data-id="${c.id}">
         <div class="case-icon">${ICONS[c.icon] || ICONS.box}</div>
         <div class="case-name">${c.name}</div>
         <div class="case-price">${price}</div>
@@ -475,7 +475,7 @@ function openCase(c) {
   pendingCase = c;
   document.getElementById("choiceIcon").innerHTML = ICONS[c.icon] || ICONS.box;
   document.getElementById("choiceTitle").textContent = c.name;
-  document.getElementById("choicePrice").textContent = c.price;
+  document.getElementById("choicePrice").innerHTML = `<svg viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg><span>${c.price}</span>`;
   const balBtn = document.getElementById("choiceBalance");
   if (starBalance >= c.price) { balBtn.classList.remove("disabled"); balBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9z"/></svg>Баланс (${starBalance})`; }
   else { balBtn.classList.add("disabled"); balBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9z"/></svg>Баланс (${starBalance})`; }
@@ -499,19 +499,18 @@ document.getElementById("choiceBalance").onclick = async () => {
     const r = await safeFetch(`${API_BASE}/api/buy-with-balance`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ initData: tg.initData, caseId: pendingCase.id }) });
     const d = await r.json();
     starBalance = d.newBalance; updateBalanceUI();
-    if (pendingCase.type === "star") { showStarRoulette(pendingCase, d.type === "stars" ? d.won : 0); }
+    if (pendingCase.type === "stars") { showStarRoulette(pendingCase, d.type === "stars" ? d.won : 0); }
     else { showRoulette(pendingCase, false, d); }
   } catch (e) { alert("Ошибка: " + e.message); }
 };
 
-// РУЛЕТКА ДЛЯ ОБЫЧНЫХ КЕЙСОВ
 // РУЛЕТКА ДЛЯ ОБЫЧНЫХ КЕЙСОВ
 function showRoulette(c, isWeekly, preRolledData = null) {
   const overlay = document.getElementById("rouletteOverlay"), strip = document.getElementById("rouletteStrip"), titleText = document.getElementById("rouletteTitleText"), titleIcon = document.getElementById("rouletteTitleIcon"), result = document.getElementById("rouletteResult"), closeBtn = document.getElementById("rouletteClose"), pointer = document.getElementById("roulettePointer"), multBox = document.getElementById("multiplierBox"), multVal = document.getElementById("multiplierValue"), wonGifts = document.getElementById("wonGifts");
   overlay.classList.remove("hidden"); pointer.className = "roulette-pointer"; closeBtn.className = "roulette-close hidden"; multBox.classList.remove("show"); wonGifts.classList.remove("show");
   titleText.textContent = c.name; titleIcon.innerHTML = ICONS[c.icon] || ''; result.textContent = ""; result.className = "roulette-result";
   
-  if (c.type === "star") { pointer.classList.add("stars"); showStarRoulette(c); return; }
+  if (c.type === "stars") { pointer.classList.add("stars"); showStarRoulette(c); return; }
   
   let giftCount = 1;
   let wonList = [];
@@ -565,7 +564,6 @@ function showRoulette(c, isWeekly, preRolledData = null) {
   const itemCenter = 3 + (winIndex * advance) + (itemWidth / 2);
   
   // ЭФФЕКТ СМЕЩЕНИЯ (Останавливается не по центру, а чуть с краю)
-  // Рандом от -42 до +42 пикселей (при ширине карточки 100 это прям почти на границе)
   const randomOffset = (Math.random() * 84) - 42;
   const targetX = (containerWidth / 2) - itemCenter + randomOffset;
   
@@ -608,7 +606,6 @@ function showStarRoulette(c, preRolledStars = null) {
   const itemWidth = 100, gap = 6; const advance = itemWidth + gap;
   const itemCenter = 3 + (winIndex * advance) + (itemWidth / 2);
   
-  // ЭФФЕКТ СМЕЩЕНИЯ ДЛЯ STAR КЕЙСА
   const randomOffset = (Math.random() * 84) - 42;
   const targetX = (containerWidth / 2) - itemCenter + randomOffset;
   
@@ -677,5 +674,3 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 </script>
 </body>
 </html>
-
-
