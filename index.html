@@ -12,182 +12,82 @@
     :root {
       --bg: #000000;
       --bg2: #0a0a0c;
-      --card: #151517;
-      --card2: #1f1f23;
-      --card3: #2a2a2e;
+      --card: #1c1c1e;
+      --card2: #2c2c2e;
+      --card3: #3a3a3c;
       --text: #ffffff;
-      --text2: rgba(255,255,255,0.65);
-      --text3: rgba(255,255,255,0.35);
-      --border: rgba(255,255,255,0.06);
+      --text2: rgba(255,255,255,0.7);
+      --text3: rgba(255,255,255,0.4);
+      --border: rgba(255,255,255,0.08);
       --accent: #0A84FF;
       --gold: #FFD60A;
       --gold2: #FF9F0A;
-      --green: #30D158;
+      --green: #32D74B;
       --red: #FF453A;
       --purple: #BF5AF2;
       --cyan: #64D2FF;
       --pink: #FF375F;
-      --radius-xl: 24px;
-      --radius-lg: 18px;
-      --radius-md: 12px;
-      --radius-sm: 8px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { width: 100%; min-height: 100vh; font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-    
-    .app { 
-      display: flex; 
-      flex-direction: column; 
-      width: 100%; 
-      min-height: 100vh; 
-      padding-bottom: calc(70px + env(safe-area-inset-bottom)); 
-    }
-    
+    .app { display: flex; flex-direction: column; width: 100%; min-height: 100vh; padding-bottom: calc(56px + env(safe-area-inset-bottom)); }
     .hidden { display: none !important; }
     
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-    @keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(255,214,10,0.3); } 50% { box-shadow: 0 0 30px rgba(255,214,10,0.5); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.95); } }
 
     /* === БАЛАНС === */
-    .balance-widget { 
-      position: fixed; 
-      top: max(10px, env(safe-area-inset-top)); 
-      right: max(12px, env(safe-area-inset-right)); 
-      z-index: 100; 
-      display: flex; 
-      align-items: center; 
-      gap: 5px; 
-      padding: 6px 12px; 
-      background: linear-gradient(135deg, rgba(255,214,10,0.15), rgba(255,159,10,0.1)); 
-      border: 1px solid rgba(255,214,10,0.25); 
-      border-radius: 16px; 
-      backdrop-filter: blur(12px);
-      animation: glow 3s ease-in-out infinite;
-    }
-    .balance-widget svg { width: 14px; height: 14px; color: var(--gold); }
-    .balance-widget span { font-size: 13px; font-weight: 700; color: var(--gold); }
+    .balance-widget { position: fixed; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); z-index: 100; display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: linear-gradient(135deg, rgba(255,214,10,0.2), rgba(255,159,10,0.15)); border: 1px solid rgba(255,214,10,0.3); border-radius: 20px; backdrop-filter: blur(10px); }
+    .balance-widget svg { width: 16px; height: 16px; color: var(--gold); }
+    .balance-widget span { font-size: 14px; font-weight: 700; color: var(--gold); }
 
     /* === СЕКЦИИ === */
-    .section { 
-      width: 100%; 
-      padding: 12px 14px; 
-      animation: fadeIn 0.2s ease-out; 
-    }
-    .section-header { 
-      display: flex; 
-      align-items: center; 
-      gap: 8px; 
-      margin-bottom: 14px; 
-      padding-top: calc(38px + env(safe-area-inset-top)); 
-    }
-    .section-title { 
-      font-size: 22px; 
-      font-weight: 800; 
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #fff, rgba(255,255,255,0.8));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+    .section { width: 100%; padding: 16px; animation: fadeIn 0.2s ease-out; }
+    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-top: calc(44px + env(safe-area-inset-top)); }
+    .section-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
 
     /* === НОВОСТИ === */
-    .news-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-    .news-card { 
-      width: 100%; 
-      background: var(--card); 
-      border-radius: var(--radius-lg); 
-      overflow: hidden; 
-      border: 1px solid var(--border);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-    .news-card:active { transform: scale(0.98); }
-    .news-img { 
-      width: 100%; 
-      aspect-ratio: 2/1; 
-      max-height: 160px; 
-      background: linear-gradient(135deg, var(--card2), var(--card3)); 
-      display: flex; 
-      align-items: center; 
-      justify-content: center;
-      font-size: 32px;
-    }
+    .news-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+    .news-card { width: 100%; background: var(--card); border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border); }
+    .news-img { width: 100%; aspect-ratio: 16/9; max-height: 200px; background: linear-gradient(135deg, var(--card2), var(--card3)); display: flex; align-items: center; justify-content: center; }
     .news-img img { width: 100%; height: 100%; object-fit: cover; }
-    .news-content { padding: 14px; }
-    .news-date { font-size: 10px; color: var(--text3); margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-    .news-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; line-height: 1.25; }
-    .news-text { 
-      font-size: 13px; 
-      color: var(--text2); 
-      line-height: 1.5; 
-      white-space: pre-line;
-    }
+    .news-content { padding: 16px; }
+    .news-date { font-size: 11px; color: var(--text3); margin-bottom: 6px; font-weight: 500; }
+    .news-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; line-height: 1.2; word-break: break-word; }
+    .news-text { font-size: 14px; color: var(--text2); line-height: 1.5; word-break: break-word; white-space: pre-line; }
 
     /* === ПРОМОКОД === */
-    .promo-card { 
-      background: linear-gradient(135deg, var(--card), var(--card2)); 
-      border-radius: var(--radius-lg); 
-      padding: 16px; 
-      border: 1px solid var(--border); 
-    }
-    .promo-title { 
-      font-size: 14px; 
-      font-weight: 700; 
-      margin-bottom: 12px; 
-      display: flex; 
-      align-items: center; 
-      gap: 6px; 
-      color: var(--cyan);
-    }
-    .promo-input-row { display: flex; gap: 8px; }
-    .promo-input { 
-      flex: 1; 
-      height: 46px; 
-      background: var(--bg); 
-      border: 1px solid var(--border); 
-      border-radius: var(--radius-md); 
-      padding: 0 14px; 
-      font-size: 15px; 
-      color: var(--text); 
-      text-transform: uppercase;
-      transition: border-color 0.15s;
-    }
-    .promo-input:focus { border-color: var(--accent); outline: none; }
+    .promo-card { background: var(--card); border-radius: var(--radius-lg); padding: 20px; border: 1px solid var(--border); width: 100%; }
+    .promo-title { font-size: 15px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .promo-title svg { width: 20px; height: 20px; color: var(--cyan); }
+    .promo-input-row { display: flex; gap: 10px; width: 100%; }
+    .promo-input { flex: 1; width: 100%; height: 50px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0 16px; font-size: 16px; color: var(--text); text-transform: uppercase; }
     .promo-input::placeholder { text-transform: none; color: var(--text3); }
-    .promo-btn { 
-      width: 46px; 
-      height: 46px; 
-      background: var(--accent); 
-      border: none; 
-      border-radius: var(--radius-md); 
-      color: #fff; 
-      cursor: pointer;
-      transition: transform 0.1s, opacity 0.1s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-    .promo-btn:active { transform: scale(0.92); }
-    .promo-result { 
-      margin-top: 12px; 
-      padding: 12px; 
-      border-radius: var(--radius-sm); 
-      font-size: 13px; 
-      font-weight: 600; 
-    }
-    .promo-result.success { background: rgba(48,209,88,0.12); color: var(--green); }
-    .promo-result.error { background: rgba(255,69,58,0.12); color: var(--red); }
+    .promo-btn { width: 50px; height: 50px; flex-shrink: 0; background: var(--accent); border: none; border-radius: var(--radius-md); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.1s, opacity 0.1s; }
+    .promo-btn:active { transform: scale(0.95); opacity: 0.8; }
+    .promo-result { margin-top: 14px; padding: 14px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    .promo-result.success { background: rgba(50,215,75,0.15); color: var(--green); }
+    .promo-result.error { background: rgba(255,69,58,0.15); color: var(--red); }
 
-    /* === КЕЙСЫ === */
+    /* === АДМИН ПАНЕЛЬ === */
+    .admin-form { background: var(--card); border-radius: var(--radius-lg); padding: 16px; border: 1px solid var(--border); }
+    .admin-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; width: 100%; }
+    .admin-input, .admin-select { flex: 1; min-width: 100px; height: 46px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 12px; color: var(--text); font-size: 14px; }
+    .admin-btn { height: 46px; padding: 0 20px; background: var(--accent); border: none; border-radius: var(--radius-sm); color: #fff; font-weight: 600; }
+    .admin-promo-item { display: flex; align-items: center; justify-content: space-between; padding: 14px; background: var(--card); border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 8px; word-break: break-all; }
+    .admin-promo-del { width: 36px; height: 36px; flex-shrink: 0; background: rgba(255,69,58,0.2); border: none; border-radius: 10px; color: var(--red); display: flex; align-items: center; justify-content: center; cursor:pointer;}
+
+    /* === КЕЙСЫ (УЛУЧШЕННЫЙ ДИЗАЙН) === */
     .case-categories { 
       display: flex; 
       gap: 6px; 
       margin-bottom: 14px; 
       overflow-x: auto; 
-      padding-bottom: 6px;
+      padding: 4px 0; 
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
     }
@@ -195,492 +95,163 @@
     .cat-btn { 
       flex-shrink: 0; 
       padding: 8px 16px; 
-      background: var(--card); 
-      border: 1px solid var(--border); 
-      border-radius: 14px; 
-      color: var(--text2); 
-      font-size: 12px; 
+      background: transparent; 
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text3); 
+      font-size: 13px; 
       font-weight: 600; 
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.15s ease;
     }
-    .cat-btn:active { transform: scale(0.95); }
+    .cat-btn:active { transform: scale(0.97); }
     .cat-btn.active { 
-      background: var(--accent); 
-      border-color: var(--accent); 
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(10,132,255,0.3);
+      color: var(--accent);
+      border-bottom-color: var(--accent);
     }
     
     .case-grid { 
       display: grid; 
       grid-template-columns: repeat(2, 1fr); 
       gap: 10px; 
+      width: 100%; 
     }
     .case-card { 
       background: var(--card); 
       border-radius: var(--radius-lg); 
-      padding: 16px 12px; 
+      padding: 16px 10px; 
       display: flex; 
       flex-direction: column; 
       align-items: center; 
       gap: 8px; 
       border: 1px solid var(--border); 
-      position: relative;
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
-      will-change: transform;
-    }
-    .case-card:active { transform: scale(0.95); }
-    .case-card.cheap { border-top: 2px solid var(--green); }
-    .case-card.gifts { border-top: 2px solid var(--purple); }
-    .case-card.stars { 
-      border-top: 2px solid var(--gold); 
-      background: linear-gradient(180deg, rgba(255,214,10,0.08) 0%, var(--card) 100%); 
-    }
-    .case-icon { width: 44px; height: 44px; }
-    .case-icon svg { width: 100%; height: 100%; }
-    .case-name { font-size: 13px; font-weight: 700; text-align: center; }
-    .case-price-row { 
-      display: flex; 
-      align-items: center; 
-      gap: 3px; 
-      font-size: 14px; 
-      font-weight: 700; 
-      color: var(--gold); 
-    }
-
-    /* === ПОДАРКИ === */
-    .gift-grid { 
-      display: grid; 
-      grid-template-columns: repeat(3, 1fr); 
-      gap: 8px; 
-    }
-    .gift-card { 
-      background: var(--card); 
-      border-radius: var(--radius-md); 
-      padding: 10px 8px; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      gap: 6px; 
-      border: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
+      position: relative; 
+      width: 100%;
       transition: transform 0.1s ease;
       will-change: transform;
     }
+    .case-card:active { transform: scale(0.96); }
+    .case-card.cheap { border-top: 3px solid var(--green); }
+    .case-card.gifts { border-top: 3px solid var(--purple); }
+    .case-card.stars { border-top: 3px solid var(--gold); background: linear-gradient(180deg, rgba(255,214,10,0.12) 0%, var(--card) 100%); }
+    .case-icon { width: 48px; height: 48px; }
+    .case-icon svg { width: 100%; height: 100%; }
+    .case-name { font-size: 13px; font-weight: 700; text-align: center; }
+    .case-price-row { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700; color: var(--gold); }
+
+    /* === ПОДАРКИ === */
+    .gift-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; width: 100%; }
+    .gift-card { background: var(--card); border-radius: var(--radius-md); padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; border: 1px solid var(--border); width: 100%; position: relative; overflow: hidden; transition: transform 0.1s ease; }
     .gift-card:active { transform: scale(0.94); background: var(--card2); }
-    .gift-img { 
-      width: 100%; 
-      aspect-ratio: 1; 
-      border-radius: var(--radius-sm); 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      padding: 6px;
-    }
+    .gift-img { width: 100%; aspect-ratio: 1; border-radius: var(--radius-sm); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; padding: 8px; overflow: hidden; }
     .gift-img img { width: 100%; height: 100%; object-fit: contain; }
-    .gift-price { 
-      display: flex; 
-      align-items: center; 
-      gap: 3px; 
-      font-size: 12px; 
-      font-weight: 700; 
-      color: var(--gold); 
-    }
-    .gift-sale-corner {
-      position: absolute;
-      top: 8px;
-      right: -28px;
-      width: 90px;
-      transform: rotate(45deg);
-      background: linear-gradient(135deg, #FF3B30, #FF6B6B);
-      color: #fff;
-      text-align: center;
-      font-size: 9px;
-      font-weight: 800;
-      padding: 4px 0;
-      z-index: 3;
-    }
+    .gift-price { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; color: var(--gold); }
+    .gift-sale-corner { position: absolute; top: 10px; right: -34px; width: 120px; transform: rotate(45deg); background: #FF3B30; color: #fff; text-align: center; font-size: 11px; font-weight: 800; padding: 6px 0; z-index: 3; box-shadow: 0 6px 14px rgba(255,59,48,0.35); pointer-events: none; }
 
     /* === ДОНАТ === */
-    .donate-card { 
-      background: linear-gradient(180deg, var(--card), var(--card2)); 
-      border-radius: var(--radius-xl); 
-      padding: 20px 16px; 
-      border: 1px solid var(--border); 
-    }
-    .donate-icon { font-size: 40px; margin-bottom: 12px; text-align: center; }
-    .donate-text { text-align: center; font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.4; }
-    .donate-amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
-    .donate-btn { 
-      height: 44px; 
-      background: var(--card3); 
-      border: 2px solid transparent; 
-      border-radius: 10px; 
-      color: var(--text); 
-      font-size: 14px; 
-      font-weight: 700; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      gap: 4px; 
-      cursor: pointer;
-      transition: all 0.15s;
-    }
+    .donate-card { background: var(--card); border-radius: var(--radius-lg); padding: 24px 20px; border: 1px solid var(--border); }
+    .donate-icon { font-size: 48px; margin-bottom: 16px; text-align: center; }
+    .donate-text { text-align: center; font-size: 14px; color: var(--text2); margin-bottom: 24px; }
+    .donate-amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+    .donate-btn { height: 50px; background: var(--card2); border: 2px solid var(--border); border-radius: 12px; color: var(--text); font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: all 0.15s; }
     .donate-btn:active { transform: scale(0.95); }
-    .donate-btn svg { width: 16px; height: 16px; }
+    .donate-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
     .donate-btn.selected { border-color: var(--pink); background: rgba(255,55,95,0.15); }
-    .donate-custom { 
-      display: flex; 
-      align-items: center; 
-      background: var(--bg); 
-      border-radius: 10px; 
-      padding: 4px; 
-      border: 1px solid var(--border); 
-      margin-bottom: 16px; 
-    }
-    .donate-custom input { 
-      flex: 1; 
-      height: 40px; 
-      background: transparent; 
-      border: none; 
-      padding: 0 12px; 
-      font-size: 16px; 
-      font-weight: 700; 
-      color: var(--text); 
-    }
+    .donate-custom { display: flex; align-items: center; background: var(--bg); border-radius: 12px; padding: 6px; border: 1px solid var(--border); margin-bottom: 20px; }
+    .donate-custom input { flex: 1; height: 46px; background: transparent; border: none; padding: 0 16px; font-size: 18px; font-weight: 700; color: var(--text); }
     .donate-custom input:focus { outline: none; }
-    .donate-custom span { padding-right: 12px; color: var(--text3); font-weight: 600; font-size: 14px; }
-    .donate-send { 
-      width: 100%; 
-      height: 50px; 
-      background: linear-gradient(135deg, var(--pink), #FF6B6B); 
-      border: none; 
-      border-radius: 12px; 
-      color: #fff; 
-      font-size: 15px; 
-      font-weight: 600; 
-      cursor: pointer;
-      transition: transform 0.1s, opacity 0.1s;
-    }
-    .donate-send:active { transform: scale(0.97); opacity: 0.9; }
+    .donate-custom span { padding-right: 16px; color: var(--text3); font-weight: 600; }
+    .donate-send { width: 100%; height: 54px; background: linear-gradient(135deg, var(--pink), #FF6B6B); border: none; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.1s, opacity 0.1s; }
+    .donate-send:active { transform: scale(0.98); opacity: 0.9; }
 
     /* === МОДАЛЬНЫЕ ОКНА === */
-    .modal-overlay { 
-      position: fixed; 
-      top: 0; left: 0; 
-      width: 100vw; height: 100vh; 
-      background: rgba(0,0,0,0.9); 
-      backdrop-filter: blur(16px); 
-      z-index: 500; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      padding: 16px; 
-      animation: fadeIn 0.15s ease-out;
-      overscroll-behavior: none;
-    }
-    .modal-box { 
-      background: var(--card); 
-      border-radius: var(--radius-xl); 
-      padding: 20px 16px; 
-      width: 100%; 
-      max-width: 340px; 
-      max-height: 80vh; 
-      overflow-y: auto; 
-      border: 1px solid var(--border); 
-      position: relative;
-      scrollbar-width: none;
-      animation: fadeUp 0.2s ease-out;
-    }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeIn 0.15s; overscroll-behavior: none; }
+    .modal-box { background: var(--card); border-radius: var(--radius-lg); padding: 24px 20px; width: 100%; max-width: 360px; max-height: 85vh; overflow-y: auto; border: 1px solid var(--border); position: relative; scrollbar-width: none; }
     .modal-box::-webkit-scrollbar { display: none; }
-    .modal-close-btn { 
-      position: absolute; 
-      top: 10px; right: 10px; 
-      width: 28px; height: 28px; 
-      background: var(--card2); 
-      border: none; 
-      border-radius: 50%; 
-      color: var(--text2); 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      cursor: pointer;
-      transition: all 0.1s;
-    }
-    .modal-close-btn:active { background: var(--card3); transform: scale(0.9); }
-    .modal-close-btn svg { width: 16px; height: 16px; }
+    .modal-close-btn { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; background: var(--card2); border: none; border-radius: 50%; color: var(--text2); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; transition: all 0.1s; }
+    .modal-close-btn:active { background: var(--card3); color: #fff; transform: scale(0.9); }
+    .modal-close-btn svg { width: 18px; height: 18px; }
 
-    .choice-btn { 
-      width: 100%; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      gap: 8px; 
-      height: 46px; 
-      border-radius: var(--radius-md); 
-      border: none; 
-      font-size: 14px; 
-      font-weight: 600; 
-      color: #fff; 
-      margin-bottom: 6px; 
-      cursor: pointer;
-      transition: transform 0.1s, opacity 0.1s;
-    }
+    .choice-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; height: 50px; border-radius: var(--radius-md); border: none; font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 8px; cursor: pointer; transition: transform 0.1s; }
     .choice-btn:active { transform: scale(0.97); }
     .choice-btn.stars { background: var(--accent); }
     .choice-btn.balance { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #000; }
-    .choice-btn.cancel { background: var(--card2); margin-top: 8px; }
-    .choice-btn.disabled { opacity: 0.35; pointer-events: none; }
+    .choice-btn.cancel { background: var(--card2); margin-top: 12px; }
+    .choice-btn.balance.disabled { opacity: 0.4; pointer-events: none; }
 
     /* ДЕТАЛИ ПОДАРКА */
-    .gift-detail-preview { width: 100px; height: 100px; margin: 0 auto 10px; }
-    .gift-detail-preview img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4)); }
-    .gift-detail-title { text-align: center; font-size: 18px; font-weight: 700; margin-bottom: 14px; }
-    .signature-toggle { 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-between; 
-      padding: 10px 14px; 
-      background: var(--card2); 
-      border-radius: var(--radius-md); 
-      margin-bottom: 10px; 
-    }
-    .toggle-switch { 
-      width: 42px; height: 26px; 
-      background: #39393D; 
-      border-radius: 26px; 
-      position: relative; 
-      transition: 0.2s; 
-    }
+    .gift-detail-preview { width: 120px; height: 120px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
+    .gift-detail-preview img { width: 90%; height: 90%; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
+    .gift-detail-title { text-align: center; font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+    .signature-toggle { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card2); border-radius: var(--radius-md); margin-bottom: 12px; }
+    .toggle-switch { width: 46px; height: 28px; background: #39393D; border-radius: 30px; position: relative; flex-shrink: 0; transition: 0.2s; }
     .toggle-switch.on { background: var(--green); }
-    .toggle-switch::after { 
-      content: ""; 
-      position: absolute; 
-      width: 22px; height: 22px; 
-      background: #fff; 
-      border-radius: 50%; 
-      top: 2px; left: 2px; 
-      transition: 0.2s; 
-    }
-    .toggle-switch.on::after { transform: translateX(16px); }
-    .sender-options { display: none; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+    .toggle-switch::after { content: ""; position: absolute; width: 24px; height: 24px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: 0.2s; }
+    .toggle-switch.on::after { transform: translateX(18px); }
+    .sender-options { display: none; flex-direction: column; gap: 6px; margin-bottom: 14px; }
     .sender-options.show { display: flex; }
-    .sender-option { 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-between; 
-      padding: 10px 12px; 
-      background: var(--card2); 
-      border-radius: var(--radius-sm); 
-      border: 2px solid transparent; 
-      cursor: pointer;
-      transition: all 0.1s;
-    }
+    .sender-option { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--card2); border-radius: var(--radius-sm); border: 2px solid transparent; cursor: pointer; transition: all 0.1s; }
     .sender-option:active { transform: scale(0.98); }
-    .sender-option.selected { border-color: var(--accent); background: rgba(10,132,255,0.08); }
-    .gift-total { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      padding: 12px 14px; 
-      background: rgba(255,214,10,0.08); 
-      border-radius: var(--radius-md); 
-      margin-bottom: 14px; 
-    }
-    .gift-buy-btns { display: flex; gap: 6px; }
-    .gift-buy-btn { 
-      flex: 1; 
-      height: 46px; 
-      border-radius: var(--radius-md); 
-      border: none; 
-      font-size: 13px; 
-      font-weight: 600; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      gap: 4px; 
-      cursor: pointer;
-      transition: transform 0.1s;
-    }
-    .gift-buy-btn:active { transform: scale(0.96); }
+    .sender-option.selected { border-color: var(--accent); background: rgba(10,132,255,0.1); }
+    .gift-total { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: rgba(255,214,10,0.1); border-radius: var(--radius-md); margin-bottom: 16px; }
+    .gift-buy-btns { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+    .gift-buy-btn { flex: 1; min-width: 130px; height: 50px; border-radius: var(--radius-md); border: none; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: transform 0.1s; }
+    .gift-buy-btn:active { transform: scale(0.97); }
     .gift-buy-btn.primary { background: var(--accent); color: #fff; }
     .gift-buy-btn.balance { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #000; }
-    .gift-buy-btn.disabled { opacity: 0.35; pointer-events: none; }
+    .gift-buy-btn.disabled { opacity: 0.4; pointer-events: none; }
 
     /* === РУЛЕТКА === */
-    .roulette-wrapper { 
-      position: fixed; 
-      top: 0; left: 0; 
-      width: 100vw; height: 100vh; 
-      background: rgba(0,0,0,0.96); 
-      z-index: 9999; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      padding: 16px;
-      overscroll-behavior: none;
-    }
-    .roulette-box { width: 100%; max-width: 360px; }
-    .roulette-title { 
-      text-align: center; 
-      font-size: 18px; 
-      font-weight: 800; 
-      margin-bottom: 16px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      gap: 6px; 
-    }
-    .roulette-title svg { width: 22px; height: 22px; }
-    .roulette-window { 
-      position: relative; 
-      height: 140px; 
-      overflow: hidden; 
-      border-radius: 14px; 
-      background: var(--bg2); 
-      border: 1px solid var(--border);
-      box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
-    }
-    .roulette-pointer { 
-      position: absolute; 
-      left: 50%; top: 0; bottom: 0; 
-      width: 2px; 
-      background: #fff; 
-      transform: translateX(-50%); 
-      z-index: 10;
-      box-shadow: 0 0 12px rgba(255,255,255,0.6);
-    }
-    .roulette-pointer::before { 
-      content: ''; 
-      position: absolute; 
-      top: 0; left: 50%; 
-      transform: translateX(-50%); 
-      border-left: 7px solid transparent; 
-      border-right: 7px solid transparent; 
-      border-top: 10px solid #fff; 
-    }
-    .roulette-pointer::after { 
-      content: ''; 
-      position: absolute; 
-      bottom: 0; left: 50%; 
-      transform: translateX(-50%); 
-      border-left: 7px solid transparent; 
-      border-right: 7px solid transparent; 
-      border-bottom: 10px solid #fff; 
-    }
-    .roulette-strip { 
-      display: flex; 
-      height: 100%; 
-      align-items: center; 
-      gap: 5px; 
-      padding: 0 3px;
-      will-change: transform;
-    }
-    .r-item { 
-      width: 90px; height: 120px; 
-      background: var(--card); 
-      border-radius: 10px; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      padding: 8px 5px; 
-      flex-shrink: 0; 
-      border: 2px solid var(--border);
-    }
-    .r-item.star-theme { 
-      background: linear-gradient(135deg, #FFD60A, #FF9F0A); 
-      border: none; 
-      color: #000; 
-    }
-    .r-img-wrap { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+    .roulette-wrapper { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; overscroll-behavior: none; }
+    .roulette-box { width: 100%; max-width: 380px; }
+    .roulette-title { text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .roulette-title svg { width: 24px; height: 24px; }
+    .roulette-window { position: relative; height: 150px; overflow: hidden; border-radius: 12px; background: var(--bg2); border: 1px solid var(--border); box-shadow: inset 0 0 30px rgba(0,0,0,0.6); }
+    .roulette-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #fff; transform: translateX(-50%); z-index: 10; box-shadow: 0 0 10px rgba(255,255,255,0.8); }
+    .roulette-pointer::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 12px solid #fff; }
+    .roulette-pointer::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 12px solid #fff; }
+    .roulette-strip { display: flex; height: 100%; align-items: center; gap: 6px; padding: 0 3px; will-change: transform; }
+    .r-item { width: 100px; height: 130px; background: var(--card); border-radius: 12px; display: flex; flex-direction: column; align-items: center; padding: 10px 6px; flex-shrink: 0; border: 2px solid var(--border); box-sizing: border-box; }
+    .r-item.star-theme { background: linear-gradient(135deg, #FFD60A, #FF9F0A); border: none; color: #000; }
+    .r-img-wrap { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
     .r-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
-    .r-img-wrap svg { width: 40px; height: 40px; }
-    .r-title { 
-      font-size: 10px; 
-      font-weight: 700; 
-      text-align: center; 
-      margin-bottom: 4px; 
-      width: 100%; 
-      white-space: nowrap; 
-      overflow: hidden; 
-      text-overflow: ellipsis; 
-    }
-    .r-price { 
-      background: #111; 
-      color: #fff; 
-      border-radius: 8px; 
-      padding: 2px 6px; 
-      font-size: 10px; 
-      font-weight: 700; 
-      display: flex; 
-      align-items: center; 
-      gap: 3px; 
-      margin-top: auto; 
-    }
-    .r-item.star-theme .r-price { background: rgba(0,0,0,0.12); color: #000; }
-    .r-price svg { width: 10px; height: 10px; }
-
-    .roulette-result { 
-      text-align: center; 
-      margin-top: 16px; 
-      font-size: 16px; 
-      font-weight: 700; 
-      min-height: 24px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      gap: 6px; 
-    }
-    .roulette-result svg { width: 20px; height: 20px; }
+    .r-img-wrap svg { width: 44px; height: 44px; }
+    .r-title { font-size: 11px; font-weight: 800; text-align: center; line-height: 1.2; margin-bottom: 6px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .r-price { background: #111; color: #fff; border-radius: 10px; padding: 3px 8px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 4px; margin-top: auto; }
+    .r-item.star-theme .r-price { background: rgba(0,0,0,0.15); color: #000; }
+    .r-price svg { width: 12px; height: 12px; }
+    .roulette-result { text-align: center; margin-top: 20px; font-size: 18px; font-weight: 700; min-height: 28px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .roulette-result svg { width: 24px; height: 24px; flex-shrink: 0; }
     .roulette-result.win { color: var(--green); }
     .roulette-result.lose { color: var(--text3); font-weight: 500; }
-    .roulette-result.stars { color: var(--gold); font-size: 20px; }
-    
-    .roulette-close { 
-      width: 100%; 
-      height: 46px; 
-      margin-top: 16px; 
-      border-radius: 12px; 
-      border: none; 
-      background: var(--card2); 
-      color: var(--text); 
-      font-size: 15px; 
-      font-weight: 600; 
-      cursor: pointer;
-      transition: transform 0.1s;
-    }
-    .roulette-close:active { transform: scale(0.97); }
-    
-    .loading-container { 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      gap: 14px; 
-      animation: pulse 1.2s ease-in-out infinite; 
-    }
-    .loading-icon { font-size: 44px; }
-    .loading-text { font-size: 16px; font-weight: 700; }
+    .roulette-result.stars { color: var(--gold); font-size: 24px; }
+    .roulette-close { width: 100%; height: 50px; margin-top: 20px; border-radius: 12px; border: none; background: var(--card2); color: var(--text); font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .roulette-close svg { width: 20px; height: 20px; }
+    .loading-container { display: flex; flex-direction: column; align-items: center; gap: 16px; animation: pulse 1.5s ease-in-out infinite; text-align: center; }
+    .loading-icon { font-size: 48px; }
+    .loading-text { font-size: 18px; font-weight: 700; color: var(--text); }
 
-    /* === КОМПАКТНЫЕ ТАБЫ === */
+    /* === КОМПАКТНЫЕ НИЖНИЕ ТАБЫ === */
     .bottom-tabs { 
       position: fixed; 
-      bottom: 0; left: 0; right: 0; 
-      display: flex;
+      bottom: 0; 
+      left: 0; 
+      right: 0; 
+      display: flex; 
       justify-content: space-around;
-      background: rgba(12,12,14,0.95); 
+      align-items: center;
+      background: rgba(10,10,12,0.95); 
       backdrop-filter: blur(20px); 
       border-top: 1px solid var(--border); 
-      padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); 
-      z-index: 50;
+      padding: 4px 8px calc(4px + env(safe-area-inset-bottom)); 
+      z-index: 50; 
+      height: calc(52px + env(safe-area-inset-bottom));
     }
     .bottom-tab { 
-      flex: 1;
-      max-width: 72px;
       display: flex; 
       flex-direction: column; 
       align-items: center; 
+      justify-content: center;
       gap: 2px; 
       background: none; 
       border: none; 
@@ -688,78 +259,19 @@
       font-size: 9px; 
       font-weight: 600; 
       cursor: pointer;
-      padding: 4px 0;
-      transition: color 0.15s, transform 0.1s;
+      padding: 6px 12px;
+      border-radius: 12px;
+      transition: all 0.15s ease;
+      min-width: 56px;
     }
-    .bottom-tab:active { transform: scale(0.9); }
-    .bottom-tab.active { color: var(--accent); }
-    .bottom-tab svg { width: 22px; height: 22px; }
-
-    /* === АДМИН ПАНЕЛЬ === */
-    .admin-form { 
-      background: var(--card); 
-      border-radius: var(--radius-lg); 
-      padding: 14px; 
-      border: 1px solid var(--border); 
-      margin-bottom: 12px;
+    .bottom-tab:active { transform: scale(0.92); }
+    .bottom-tab svg { width: 22px; height: 22px; transition: all 0.15s ease; }
+    .bottom-tab span { transition: all 0.15s ease; }
+    .bottom-tab.active { 
+      color: var(--accent);
+      background: rgba(10,132,255,0.12);
     }
-    .admin-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
-    .admin-input, .admin-select { 
-      flex: 1; 
-      min-width: 90px; 
-      height: 42px; 
-      background: var(--bg); 
-      border: 1px solid var(--border); 
-      border-radius: var(--radius-sm); 
-      padding: 0 10px; 
-      color: var(--text); 
-      font-size: 13px; 
-    }
-    .admin-btn { 
-      height: 42px; 
-      padding: 0 16px; 
-      background: var(--accent); 
-      border: none; 
-      border-radius: var(--radius-sm); 
-      color: #fff; 
-      font-weight: 600;
-      font-size: 13px;
-    }
-    .admin-promo-item { 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-between; 
-      padding: 12px; 
-      background: var(--card); 
-      border-radius: var(--radius-sm); 
-      border: 1px solid var(--border); 
-      margin-bottom: 6px;
-      font-size: 13px;
-    }
-    .admin-promo-del { 
-      width: 32px; height: 32px; 
-      background: rgba(255,69,58,0.15); 
-      border: none; 
-      border-radius: 8px; 
-      color: var(--red); 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      cursor: pointer;
-    }
-
-    /* SUBSCRIBE */
-    .subscribe-channel {
-      display: flex;
-      align-items: center;
-      padding: 12px 14px;
-      background: var(--card2);
-      border-radius: var(--radius-md);
-      text-decoration: none;
-      color: var(--text);
-      transition: transform 0.1s;
-    }
-    .subscribe-channel:active { transform: scale(0.98); }
+    .bottom-tab.active svg { transform: scale(1.1); }
   </style>
 </head>
 
@@ -787,10 +299,10 @@
 
 <div class="modal-overlay hidden" id="subscribeOverlay">
   <div class="modal-box">
-    <div style="font-size: 44px; margin-bottom: 10px; text-align:center;">🔔</div>
-    <h2 style="margin-bottom:6px; text-align:center; font-size:18px;">Подпишись на каналы</h2>
-    <p style="color:var(--text2); font-size:13px; margin-bottom:16px; text-align:center;">Для работы бота нужна подписка</p>
-    <div id="subscribeChannels" style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;"></div>
+    <div style="font-size: 48px; margin-bottom: 12px; text-align:center;">🔔</div>
+    <h2 style="margin-bottom:8px; text-align:center;">Подпишись на каналы</h2>
+    <p style="color:var(--text2); font-size:14px; margin-bottom:20px; text-align:center;">Для работы бота нужна подписка</p>
+    <div id="subscribeChannels" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;"></div>
     <button class="choice-btn stars" id="subscribeCheck">Проверить подписку</button>
   </div>
 </div>
@@ -800,10 +312,10 @@
     <button class="modal-close-btn" onclick="document.getElementById('caseChoiceModal').classList.add('hidden')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
-    <div id="choiceIcon" style="width:56px;height:56px;margin:0 auto 12px;"></div>
-    <div id="choiceTitle" style="text-align:center;font-size:18px;font-weight:700;margin-bottom:16px;"></div>
-    <button class="choice-btn stars" id="choiceStars"><svg viewBox="0 0 24 24" fill="#FFD700" width="18" height="18"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> <span id="choicePriceStars"></span> Stars</button>
-    <button class="choice-btn balance" id="choiceBalance"><svg viewBox="0 0 24 24" fill="#000" width="18" height="18"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> <span id="choicePriceBalance"></span> С баланса</button>
+    <div class="case-choice-icon" id="choiceIcon" style="width:64px;height:64px;margin:0 auto 16px;"></div>
+    <div class="case-choice-title" id="choiceTitle" style="text-align:center;font-size:20px;font-weight:700;margin-bottom:20px;"></div>
+    <button class="choice-btn stars" id="choiceStars"><svg viewBox="0 0 24 24" fill="#FFD700" width="20" height="20"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> <span id="choicePriceStars"></span> Stars</button>
+    <button class="choice-btn balance" id="choiceBalance"><svg viewBox="0 0 24 24" fill="#000" width="20" height="20"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> <span id="choicePriceBalance"></span> С баланса</button>
   </div>
 </div>
 
@@ -815,16 +327,16 @@
     <div class="gift-detail-preview"><img id="giftDetailImg" src="" alt="" /></div>
     <div class="gift-detail-title" id="giftDetailTitle"></div>
     <div class="signature-toggle" id="signatureToggle">
-      <div><div style="font-size:13px;font-weight:500;">Добавить подпись</div><div style="font-size:11px;color:var(--text3);">от +2 Stars</div></div>
+      <div><div style="font-size:14px;font-weight:500;">Добавить подпись</div><div style="font-size:12px;color:var(--text3);">от +2 Stars</div></div>
       <div class="toggle-switch" id="signatureSwitch"></div>
     </div>
     <div class="sender-options" id="senderOptions"></div>
     <div class="gift-total">
-      <span style="font-size:13px;color:var(--text2);">Итого</span>
-      <span style="font-size:18px;font-weight:800;color:var(--gold);display:flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="#FFD700" width="18" height="18"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> <span id="giftTotalAmount">0</span></span>
+      <span style="font-size:14px;color:var(--text2);">Итого</span>
+      <span style="font-size:20px;font-weight:800;color:var(--gold);display:flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" fill="#FFD700" width="20" height="20"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> <span id="giftTotalAmount">0</span></span>
     </div>
     <div class="gift-buy-btns">
-      <button class="gift-buy-btn primary" id="giftBuyStars"><svg viewBox="0 0 24 24" fill="#FFD700" width="16" height="16"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> <span id="giftBuyStarsAmount">0</span></button>
+      <button class="gift-buy-btn primary" id="giftBuyStars"><svg viewBox="0 0 24 24" fill="#FFD700" width="18" height="18"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> <span id="giftBuyStarsAmount">0</span></button>
       <button class="gift-buy-btn balance" id="giftBuyBalance">Баланс <span id="giftBuyBalanceAmount">0</span></button>
     </div>
   </div>
@@ -833,7 +345,7 @@
 <div class="roulette-wrapper hidden" id="rouletteOverlay">
   <div class="loading-container hidden" id="rouletteLoading">
     <div class="loading-icon">⏳</div>
-    <div class="loading-text">Подождите...</div>
+    <div class="loading-text">Пожалуйста, подождите...</div>
   </div>
   <div class="roulette-box hidden" id="rouletteMain">
     <div id="rouletteTitle" class="roulette-title"></div>
@@ -842,15 +354,15 @@
       <div class="roulette-strip" id="rouletteStrip"></div>
     </div>
     <div id="rouletteResult" class="roulette-result"></div>
-    <button class="choice-btn cancel hidden" id="rouletteClose" style="margin-top:16px;">Закрыть</button>
+    <button class="choice-btn cancel hidden" id="rouletteClose" style="margin-top:20px;">Закрыть</button>
   </div>
 </div>
 
 <div class="modal-overlay hidden" id="maintenanceOverlay">
   <div class="modal-box" style="text-align:center;">
-    <div style="font-size:48px; margin-bottom:10px;">🛠</div>
-    <h2 style="margin-bottom:8px;font-size:18px;">Технический перерыв</h2>
-    <p id="maintenanceText" style="color:var(--text2); font-size:13px; line-height:1.4;">Идёт тех. перерыв. Попробуй позже.</p>
+    <div style="font-size:56px; margin-bottom:12px;">🛠</div>
+    <h2 style="margin-bottom:10px;">Технический перерыв</h2>
+    <p id="maintenanceText" style="color:var(--text2); font-size:14px; line-height:1.45;">Идёт тех. перерыв, мы улучшаем Подарочницу. Попробуй позже.</p>
   </div>
 </div>
 
@@ -865,7 +377,7 @@ const state = {
   selectedGift: null, selectedCase: null, addSignature: false, sender: "@echoaxxs", currentCategory: "cheap"
 };
 
-const SENDERS = [{ key: "@echoaxxs", label: "@echoaxxs", cost: 2 }, { key: "@bogclm", label: "@bogclm", cost: 2 }, { key: "@bogclm и @echoaxxs", label: "Оба", cost: 5 }];
+const SENDERS = [{ key: "@echoaxxs", label: "@echoaxxs", cost: 2 }, { key: "@bogclm", label: "@bogclm", cost: 2 }, { key: "@bogclm и @echoaxxs", label: "@bogclm и @echoaxxs", cost: 5 }];
 const DONATE_AMOUNTS = [10, 25, 50, 100, 250, 500];
 
 const ICONS = {
@@ -936,8 +448,8 @@ const updateUI = () => { document.getElementById("balanceValue").textContent = s
 
 const showSubscribeOverlay = () => {
   document.getElementById("subscribeChannels").innerHTML = state.channels.map(ch => `
-    <a href="${ch.username ? `https://t.me/${ch.username}` : `https://t.me/c/${ch.id.toString().replace('-100', '')}`}" target="_blank" class="subscribe-channel">
-      <div style="flex:1"><div style="font-weight:600;font-size:14px;">${ch.title||ch.id}</div><div style="font-size:11px;color:var(${ch.missing?'--text3':'--green'})">${ch.missing?'Подпишись':'✓'}</div></div>
+    <a href="${ch.username ? `https://t.me/${ch.username}` : `https://t.me/c/${ch.id.toString().replace('-100', '')}`}" target="_blank" style="display:flex;align-items:center;padding:12px 14px;background:var(--card2);border-radius:var(--radius-md);text-decoration:none;color:var(--text);">
+      <div style="flex:1"><div style="font-weight:600">${ch.title||ch.id}</div><div style="font-size:12px;color:var(${ch.missing?'--text3':'--green'})">${ch.missing?'Подпишись':'✓'}</div></div>
     </a>`).join("");
   document.getElementById("subscribeOverlay").classList.remove("hidden");
 };
@@ -1091,7 +603,7 @@ const renderGifts = () => {
     <div class="section-header"><div class="section-title">🎁 Подарки</div></div>
     <div class="gift-grid">${state.gifts.map(g => `
         <div class="gift-card" onclick="openGift('${g.id}')">
-          ${sale ? `<div class="gift-sale-corner">Скидка</div>` : ``}
+          ${sale ? `<div class="gift-sale-corner">SALE</div>` : ``}
           <div class="gift-img"><img src="${g.gif_url}" loading="lazy"></div>
           <div class="gift-price">${ICONS.star}${g.price}</div>
         </div>`).join("")}</div>`;
@@ -1170,8 +682,8 @@ const startRouletteSpin = (c, r) => {
   strip.style.transition = "none"; strip.style.transform = "translateX(0)";
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      const containerWidth = document.querySelector('.roulette-window').offsetWidth, itemWidth = 90, gap = 5, advance = itemWidth + gap;
-      const itemCenter = 3 + (winIndex * advance) + (itemWidth / 2), randomOffset = (Math.random() * 80) - 40;
+      const containerWidth = document.querySelector('.roulette-window').offsetWidth, itemWidth = 100, gap = 6, advance = itemWidth + gap;
+      const itemCenter = 3 + (winIndex * advance) + (itemWidth / 2), randomOffset = (Math.random() * 84) - 42;
       strip.style.transition = "transform 4.5s cubic-bezier(0.12, 0.8, 0.28, 1)";
       strip.style.transform = `translateX(${(containerWidth / 2) - itemCenter + randomOffset}px)`;
     });
