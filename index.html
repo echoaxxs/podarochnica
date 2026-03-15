@@ -1091,7 +1091,7 @@ const renderGifts = () => {
     <div class="section-header"><div class="section-title">🎁 Подарки</div></div>
     <div class="gift-grid">${state.gifts.map(g => `
         <div class="gift-card" onclick="openGift('${g.id}')">
-          ${sale ? `<div class="gift-sale-corner">SALE</div>` : ``}
+          ${sale ? `<div class="gift-sale-corner">Скидка</div>` : ``}
           <div class="gift-img"><img src="${g.gif_url}" loading="lazy"></div>
           <div class="gift-price">${ICONS.star}${g.price}</div>
         </div>`).join("")}</div>`;
