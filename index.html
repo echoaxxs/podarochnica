@@ -205,6 +205,25 @@
     .bottom-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; color: var(--text3); font-size: 10px; font-weight: 600; cursor: pointer; }
     .bottom-tab.active { color: var(--accent); }
     .bottom-tab svg { width: 24px; height: 24px; }
+
+    .gift-card { position: relative; overflow: hidden; }
+
+    .gift-sale-corner {
+      position: absolute;
+      top: 10px;
+      right: -34px;
+      width: 120px;
+      transform: rotate(45deg);
+      background: #FF3B30;
+      color: #fff;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 6px 0;
+      z-index: 3;
+      box-shadow: 0 6px 14px rgba(255,59,48,0.35);
+      pointer-events: none;
+    }
   </style>
 </head>
 
@@ -308,13 +327,24 @@
   </div>
 </div>
 
+<div class="modal-overlay hidden" id="maintenanceOverlay">
+  <div class="modal-box" style="text-align:center;">
+    <div style="font-size:56px; margin-bottom:12px;">🛠</div>
+    <h2 style="margin-bottom:10px;">Технический перерыв</h2>
+    <p id="maintenanceText" style="color:var(--text2); font-size:14px; line-height:1.45;">
+      Идёт тех. перерыв, мы улучшаем Подарочницу. Попробуй позже.
+    </p>
+  </div>
+</div>
+
 <script>
 const tg = window.Telegram?.WebApp;
 const API = "https://podarochnica-api.onrender.com";
 
 const state = {
   balance: 0, pitySpent: 0, pityThreshold: 20, isAdmin: false, subscribed: true,
-  channels: [], gifts: [], cases: {}, news: [],
+  channels: [], gifts: [], cases: {}, news: [], sales: [],
+  maintenance: false, maintenanceMessage: "",
   selectedGift: null, selectedCase: null, addSignature: false, sender: "@echoaxxs", currentCategory: "cheap"
 };
 
@@ -342,32 +372,81 @@ async function apiGet(endpoint) {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
+  
+function showMaintenance(message) {
+  state.maintenance = true;
+  state.maintenanceMessage = message || "Идёт тех. перерыв, мы улучшаем Подарочницу. Попробуй позже.";
+  document.getElementById("maintenanceText").textContent = state.maintenanceMessage;
+  document.getElementById("maintenanceOverlay").classList.remove("hidden");
+}
 
 async function init() {
-  if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#000000'); tg.setBackgroundColor('#000000'); }
+  if (tg) {
+    tg.ready();
+    tg.expand();
+    tg.setHeaderColor('#000000');
+    tg.setBackgroundColor('#000000');
+  }
+
   try {
     const sub = await api("/api/check-subscription");
-    state.subscribed = sub.subscribed; state.channels = sub.channels || [];
-    if (!state.subscribed && state.channels.length > 0) { showSubscribeOverlay(); return; }
-  } catch (e) {}
+    state.subscribed = sub.subscribed;
+    state.channels = sub.channels || [];
+
+    if (sub.maintenance) {
+      showMaintenance(sub.message);
+      return;
+    }
+
+    if (!state.subscribed && state.channels.length > 0) {
+      showSubscribeOverlay();
+      return;
+    }
+  } catch (e) {
+    alert("Ошибка запуска: " + e.message);
+    return;
+  }
+
   await loadApp();
 }
 
 async function loadApp() {
   try {
     const [u, n, g, c] = await Promise.all([
-      api("/api/get-user-data").catch(()=>({})), apiGet("/api/get-news").catch(()=>({news:[]})),
-      apiGet("/api/get-gifts").catch(()=>({gifts:[]})), apiGet("/api/get-cases").catch(()=>({categories:{}}))
+      api("/api/get-user-data"),
+      apiGet("/api/get-news").catch(()=>({news:[]})),
+      apiGet("/api/get-gifts").catch(()=>({gifts:[], sales:[]})),
+      apiGet("/api/get-cases").catch(()=>({categories:{}}))
     ]);
-    state.balance = u.starBalance || 0; state.pitySpent = u.pitySpent || 0; state.pityThreshold = u.pityThreshold || 20; state.isAdmin = u.isAdmin || false;
-    state.news = n.news || []; state.gifts = g.gifts || []; state.cases = c.categories || {};
-  } catch(e) {}
-  
+
+    state.balance = u.starBalance || 0;
+    state.pitySpent = u.pitySpent || 0;
+    state.pityThreshold = u.pityThreshold || 20;
+    state.isAdmin = u.isAdmin || false;
+    state.news = n.news || [];
+    state.gifts = g.gifts || [];
+    state.sales = g.sales || [];
+    state.cases = c.categories || {};
+  } catch(e) {
+    if (String(e.message || "").includes("тех. перерыв") || String(e.message || "").includes("Подарочницу")) {
+      showMaintenance(e.message);
+      return;
+    }
+    alert("Ошибка загрузки: " + e.message);
+    return;
+  }
+
   if (state.isAdmin) {
     document.getElementById("tabAdmin").classList.remove("hidden");
   }
-  
-  renderHome(); renderCases(); renderGifts(); renderDonate(); renderAdmin(); setupTabs(); updateUI();
+
+  renderHome();
+  renderCases();
+  renderGifts();
+  renderDonate();
+  renderAdmin();
+  setupTabs();
+  updateUI();
 }
 
 function updateUI() {
@@ -386,9 +465,25 @@ document.getElementById("subscribeCheck").onclick = async function() {
   this.textContent = "Проверяем...";
   try {
     const sub = await api("/api/check-subscription");
-    if (sub.subscribed) { document.getElementById("subscribeOverlay").classList.add("hidden"); await loadApp(); }
-    else { state.channels = sub.channels || []; showSubscribeOverlay(); this.textContent = "Проверить"; }
-  } catch(e) { this.textContent = "Проверить"; }
+
+    if (sub.maintenance) {
+      document.getElementById("subscribeOverlay").classList.add("hidden");
+      showMaintenance(sub.message);
+      this.textContent = "Проверить";
+      return;
+    }
+
+    if (sub.subscribed) {
+      document.getElementById("subscribeOverlay").classList.add("hidden");
+      await loadApp();
+    } else {
+      state.channels = sub.channels || [];
+      showSubscribeOverlay();
+      this.textContent = "Проверить";
+    }
+  } catch(e) {
+    this.textContent = "Проверить";
+  }
 };
 
 function setupTabs() {
@@ -416,11 +511,31 @@ function renderHome() {
     <div class="promo-card"><div class="promo-title">🎟 Промокод</div><div class="promo-input-row"><input id="promoInput" class="promo-input" placeholder="Код..."><button id="promoBtn" class="promo-btn">➜</button></div><div id="promoResult" class="promo-result hidden"></div></div>`;
     
   document.getElementById("promoBtn").onclick = async () => {
-    const val = document.getElementById("promoInput").value.trim(), res = document.getElementById("promoResult");
-    if (!val) return;
-    try { const r = await api("/api/activate-promocode", {code:val}); res.innerHTML=`✅ ${r.reward}`; res.className="promo-result success"; if(r.newBalance) {state.balance=r.newBalance; updateUI();} }
-    catch(e) { res.innerHTML=`❌ ${e.message}`; res.className="promo-result error"; }
+    const btn = document.getElementById("promoBtn");
+    const val = document.getElementById("promoInput").value.trim();
+    const res = document.getElementById("promoResult");
+  
+    if (!val || btn.disabled) return;
+  
+    btn.disabled = true;
+    btn.style.opacity = "0.6";
+  
+    try {
+      const r = await api("/api/activate-promocode", { code: val });
+      res.innerHTML = `✅ ${r.reward}`;
+      res.className = "promo-result success";
+      if (typeof r.newBalance !== "undefined") {
+        state.balance = r.newBalance;
+        updateUI();
+      }
+    } catch(e) {
+      res.innerHTML = `❌ ${e.message}`;
+      res.className = "promo-result error";
+    }
+  
     res.classList.remove("hidden");
+    btn.disabled = false;
+    btn.style.opacity = "1";
   };
 }
 
@@ -563,15 +678,32 @@ document.getElementById("choiceBalance").onclick = async () => {
   }
 };
 
+function getActiveSignatureSale() {
+  return (state.sales || []).find(s => s.only_with_signature);
+}
+
 function renderGifts() {
-  document.getElementById("sectionGifts").innerHTML = `<div class="section-header"><div class="section-title">🎁 Подарки</div></div>
-    <div class="gift-grid">${state.gifts.map(g=>`<div class="gift-card" onclick="openGift('${g.id}')"><div class="gift-img"><img src="${g.gif_url}"></div><div class="gift-price">${ICONS.star}${g.price}</div></div>`).join("")}</div>`;
+  const sale = getActiveSignatureSale();
+
+  document.getElementById("sectionGifts").innerHTML = `
+    <div class="section-header"><div class="section-title">🎁 Подарки</div></div>
+    <div class="gift-grid">
+      ${state.gifts.map(g => `
+        <div class="gift-card" onclick="openGift('${g.id}')">
+          ${sale ? `<div class="gift-sale-corner">Скидка</div>` : ``}
+          <div class="gift-img"><img src="${g.gif_url}"></div>
+          <div class="gift-price">${ICONS.star}${g.price}</div>
+        </div>
+      `).join("")}
+    </div>
+  `;
 }
 
 window.openGift = (id) => {
   const g = state.gifts.find(x=>x.id===id); if(!g) return;
   state.selectedGift = g; state.addSignature = false; state.sender = "@echoaxxs";
-  document.getElementById("giftDetailImg").src = g.gif_url; document.getElementById("giftDetailTitle").textContent = g.title;
+  document.getElementById("giftDetailImg").src = g.gif_url;
+  document.getElementById("giftDetailTitle").textContent = g.title;
   document.getElementById("signatureSwitch").classList.remove("on");
   const sDiv = document.getElementById("senderOptions");
   
@@ -593,10 +725,41 @@ window.setSender = (k) => {
   updateGiftTotal(); 
 };
 
+function getGiftPriceInfo(gift, addSignature, sender) {
+  const basePrice = gift?.price || 0;
+  const senderObj = SENDERS.find(x => x.key === sender);
+  const signatureCost = addSignature ? (senderObj?.cost || 0) : 0;
+
+  let discount = 0;
+  const sale = getActiveSignatureSale();
+
+  if (sale && addSignature) {
+    discount = Number(sale.discount || 0);
+  }
+
+  const discountedGiftPrice = Math.max(0, basePrice - discount);
+  const total = discountedGiftPrice + signatureCost;
+
+  return { basePrice, signatureCost, discount, total, sale };
+}
+
 function updateGiftTotal() {
-  const c = state.selectedGift.price + (state.addSignature ? SENDERS.find(x=>x.key===state.sender).cost : 0);
-  document.getElementById("giftTotalAmount").textContent = c; document.getElementById("giftBuyStarsAmount").textContent = c; document.getElementById("giftBuyBalanceAmount").textContent = c;
+  if (!state.selectedGift) return;
+
+  const info = getGiftPriceInfo(state.selectedGift, state.addSignature, state.sender);
+  const c = info.total;
+
+  document.getElementById("giftTotalAmount").textContent = c;
+  document.getElementById("giftBuyStarsAmount").textContent = c;
+  document.getElementById("giftBuyBalanceAmount").textContent = c;
   document.getElementById("giftBuyBalance").classList.toggle("disabled", state.balance < c);
+
+  const titleEl = document.getElementById("giftDetailTitle");
+  if (info.discount > 0 && state.addSignature) {
+    titleEl.innerHTML = `${state.selectedGift.title} <span style="color:var(--red);font-size:13px;font-weight:800;">−${info.discount}⭐ скидка</span>`;
+  } else {
+    titleEl.textContent = state.selectedGift.title;
+  }
 }
 
 document.getElementById("giftBuyStars").onclick = async () => {
