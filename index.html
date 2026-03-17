@@ -1821,6 +1821,45 @@
       font-size: 16px;
       font-weight: 500;
     }
+
+    /* Дополнительные стили для иконок подарков */
+    .gift-icon {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    }
+    
+    .gift-visual {
+      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    }
+    
+    .gift-card:hover .gift-icon {
+      transform: scale(1.1);
+      transition: transform 0.3s ease;
+    }
+    
+    /* Цветной фон для карточки */
+    .gift-card[data-color] {
+      --gift-color: attr(data-color);
+    }
+    
+    .gift-unavailable {
+      position: relative;
+    }
+    
+    .gift-unavailable::after {
+      content: "Недоступен";
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      color: var(--accent-red);
+      background: rgba(0,0,0,0.8);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
   </style>
 </head>
 
@@ -2256,12 +2295,12 @@ const renderHome = () => {
 const renderGifts = () => {
   const filters = [
     { key: "all", label: "Все", icon: "fa-th" },
-    { key: "regular", label: "Обычные", icon: "fa-gift" },
+    { key: "available", label: "Доступные", icon: "fa-check-circle" },
     { key: "limited", label: "Лимитированные", icon: "fa-fire" }
   ];
 
   const filteredGifts = state.gifts.filter(g => {
-    if (state.giftFilter === "regular") return !g.is_limited;
+    if (state.giftFilter === "available") return g.available && !g.sold_out;
     if (state.giftFilter === "limited") return g.is_limited;
     return true;
   });
@@ -2270,7 +2309,7 @@ const renderGifts = () => {
     <div class="section-head">
       <div>
         <h2><i class="fas fa-gift"></i> Подарки</h2>
-        <div class="section-subtitle">${state.gifts.length} подарков доступно</div>
+        <div class="section-subtitle">${state.gifts.filter(g => g.available).length} доступно из ${state.gifts.length}</div>
       </div>
     </div>
     
@@ -2284,17 +2323,20 @@ const renderGifts = () => {
     
     <div class="gifts-grid">
       ${filteredGifts.map(g => `
-        <div class="gift-card ${g.is_limited ? 'limited' : ''} ${g.sold_out ? 'sold-out' : ''}" onclick="openGift('${g.id}')">
+        <div class="gift-card ${g.is_limited ? 'limited' : ''} ${g.sold_out ? 'sold-out' : ''} ${!g.available ? 'gift-unavailable' : ''}" 
+             onclick="${g.available ? `openGift('${g.id}')` : ''}"
+             style="--gift-glow: ${g.color}20;">
           ${g.is_limited ? '<div class="limited-tag">Limited</div>' : ''}
           ${g.sold_out ? '<div class="sold-tag">Sold Out</div>' : ''}
           <div class="gift-visual">${renderGiftVisual(g)}</div>
-          <div class="gift-name">${g.title}</div>
+          <div class="gift-name">${g.emoji} ${g.title}</div>
           <div class="gift-price"><i class="fas fa-star"></i> ${g.price}</div>
         </div>
       `).join("")}
     </div>
   `;
 };
+
 
 window.setGiftFilter = (filter) => {
   state.giftFilter = filter;
@@ -2303,14 +2345,14 @@ window.setGiftFilter = (filter) => {
 
 window.openGift = (id) => {
   const gift = state.gifts.find(g => g.id === id);
-  if (!gift || gift.sold_out) return;
+  if (!gift || gift.sold_out || !gift.available) return;
   
   state.selectedGift = gift;
   state.addSignature = false;
   state.sender = "@echoaxxs";
   
   $("giftModalVisual").innerHTML = renderGiftVisual(gift, 150);
-  $("giftModalTitle").textContent = gift.title;
+  $("giftModalTitle").textContent = `${gift.emoji} ${gift.title}`;
   $("giftModalPrice").innerHTML = `<i class="fas fa-star"></i> ${gift.price} Stars`;
   $("signatureSwitch").classList.remove("on");
   
@@ -2578,7 +2620,7 @@ const startRoulette = (caseData, result) => {
     if (item.type === "star") {
       return `
         <div class="r-item star-item">
-          <div class="r-visual"><i class="fas fa-star"></i></div>
+          <div class="r-visual"><i class="fas fa-star" style="font-size:36px;"></i></div>
           <div class="r-title">Stars</div>
           <div class="r-price"><i class="fas fa-star"></i> ${item.value}</div>
         </div>
@@ -2587,16 +2629,17 @@ const startRoulette = (caseData, result) => {
     if (item.type === "nothing") {
       return `
         <div class="r-item">
-          <div class="r-visual"><i class="fas fa-times" style="color:var(--text-muted);"></i></div>
+          <div class="r-visual"><i class="fas fa-times" style="font-size:36px;color:var(--text-muted);"></i></div>
           <div class="r-title" style="color:var(--text-muted);">Пусто</div>
           <div class="r-price" style="opacity:0.4;">---</div>
         </div>
       `;
     }
+    // Подарок с иконкой
     return `
       <div class="r-item">
         <div class="r-visual">${renderGiftVisual(item.value, 60)}</div>
-        <div class="r-title">${item.value?.title || 'Подарок'}</div>
+        <div class="r-title">${item.value?.emoji || '🎁'} ${item.value?.title || 'Подарок'}</div>
         <div class="r-price"><i class="fas fa-star"></i> ${item.value?.price || '?'}</div>
       </div>
     `;
@@ -2778,6 +2821,25 @@ const renderAdmin = () => {
       </div>
     </div>
   `;
+
+  // === НОВЫЙ renderGiftVisual с SVG иконками ===
+const renderGiftVisual = (gift, size = 70) => {
+  if (!gift) {
+    return `<i class="fas fa-gift" style="font-size:${size * 0.5}px;color:var(--text-muted);"></i>`;
+  }
+  
+  // Используем SVG иконку из Twemoji
+  if (gift.icon) {
+    return `<img src="${gift.icon}" class="gift-icon" style="width:${size}px;height:${size}px;" alt="${gift.emoji}" loading="lazy">`;
+  }
+  
+  // Fallback на эмодзи
+  if (gift.emoji) {
+    return `<span style="font-size:${size * 0.6}px;">${gift.emoji}</span>`;
+  }
+  
+  return `<i class="fas fa-gift" style="font-size:${size * 0.5}px;color:var(--text-muted);"></i>`;
+};
   
   const updateRewardOptions = () => {
     const type = $("admType").value;
