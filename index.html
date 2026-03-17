@@ -5,400 +5,1353 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
   <title>Подарочница</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
   <style>
     :root {
-      --bg: #000000;
-      --bg2: #0a0a0c;
-      --card: #1c1c1e;
-      --card2: #2c2c2e;
-      --card3: #3a3a3c;
+      --bg: #0d0d0f;
+      --bg2: #151518;
+      --card: #1a1a1f;
+      --card2: #222228;
+      --card3: #2a2a32;
       --text: #ffffff;
-      --text2: rgba(255,255,255,0.7);
-      --text3: rgba(255,255,255,0.4);
-      --border: rgba(255,255,255,0.08);
-      --accent: #0A84FF;
+      --text2: rgba(255,255,255,0.65);
+      --text3: rgba(255,255,255,0.35);
+      --border: rgba(255,255,255,0.06);
+      --accent: #5B7FFF;
+      --accent2: #7B9FFF;
       --gold: #FFD60A;
       --gold2: #FF9F0A;
-      --green: #32D74B;
-      --red: #FF453A;
-      --purple: #BF5AF2;
-      --cyan: #64D2FF;
-      --pink: #FF375F;
-      --radius-lg: 20px;
-      --radius-md: 14px;
-      --radius-sm: 10px;
+      --green: #34D399;
+      --red: #F87171;
+      --purple: #A78BFA;
+      --pink: #F472B6;
+      --cyan: #22D3EE;
+      --limited: linear-gradient(135deg, #F472B6, #A78BFA);
+      --radius: 16px;
+      --radius-sm: 12px;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { 
       width: 100%; 
       min-height: 100vh; 
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif; 
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; 
       background: var(--bg); 
       color: var(--text); 
-      -webkit-font-smoothing: antialiased; 
-      overflow-x: hidden; 
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-    .app { display: flex; flex-direction: column; width: 100%; min-height: 100vh; padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
+    
+    .app { 
+      display: flex; 
+      flex-direction: column; 
+      width: 100%; 
+      min-height: 100vh; 
+      padding-bottom: calc(80px + env(safe-area-inset-bottom)); 
+    }
+    
     .hidden { display: none !important; }
     
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.95); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
-    /* === БАЛАНС === */
-    .balance-widget { position: fixed; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); z-index: 100; display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: linear-gradient(135deg, rgba(255,214,10,0.2), rgba(255,159,10,0.15)); border: 1px solid rgba(255,214,10,0.3); border-radius: 20px; backdrop-filter: blur(10px); }
-    .balance-widget svg { width: 16px; height: 16px; color: var(--gold); }
-    .balance-widget span { font-size: 14px; font-weight: 600; color: var(--gold); letter-spacing: -0.3px; }
-
-    /* === СЕКЦИИ === */
-    .section { width: 100%; padding: 16px; animation: fadeIn 0.2s ease-out; }
-    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-top: calc(44px + env(safe-area-inset-top)); }
-    .section-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
-
-    /* === НОВОСТИ === */
-    .news-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
-    .news-card { width: 100%; background: var(--card); border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border); }
-    .news-img { width: 100%; aspect-ratio: 16/9; max-height: 200px; background: linear-gradient(135deg, var(--card2), var(--card3)); display: flex; align-items: center; justify-content: center; }
-    .news-img img { width: 100%; height: 100%; object-fit: cover; }
-    .news-content { padding: 16px; }
-    .news-date { font-size: 11px; color: var(--text3); margin-bottom: 6px; font-weight: 500; letter-spacing: 0.3px; }
-    .news-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; line-height: 1.2; word-break: break-word; letter-spacing: -0.3px; }
-    .news-text { font-size: 14px; color: var(--text2); line-height: 1.5; word-break: break-word; white-space: pre-line; }
-
-    /* === ПРОМОКОД === */
-    .promo-card { background: var(--card); border-radius: var(--radius-lg); padding: 20px; border: 1px solid var(--border); width: 100%; }
-    .promo-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.2px; }
-    .promo-input-row { display: flex; gap: 10px; width: 100%; }
-    .promo-input { flex: 1; width: 100%; height: 50px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0 16px; font-size: 16px; color: var(--text); text-transform: uppercase; font-family: inherit; }
-    .promo-input::placeholder { text-transform: none; color: var(--text3); }
-    .promo-btn { width: 50px; height: 50px; flex-shrink: 0; background: var(--accent); border: none; border-radius: var(--radius-md); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.1s, opacity 0.1s; }
-    .promo-btn:active { transform: scale(0.95); opacity: 0.8; }
-    .promo-result { margin-top: 14px; padding: 14px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-    .promo-result.success { background: rgba(50,215,75,0.15); color: var(--green); }
-    .promo-result.error { background: rgba(255,69,58,0.15); color: var(--red); }
-
-    /* === АДМИН ПАНЕЛЬ === */
-    .admin-form { background: var(--card); border-radius: var(--radius-lg); padding: 16px; border: 1px solid var(--border); }
-    .admin-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; width: 100%; }
-    .admin-input, .admin-select { flex: 1; min-width: 100px; height: 46px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 12px; color: var(--text); font-size: 14px; font-family: inherit; }
-    .admin-btn { height: 46px; padding: 0 20px; background: var(--accent); border: none; border-radius: var(--radius-sm); color: #fff; font-weight: 600; font-family: inherit; }
-    .admin-promo-item { display: flex; align-items: center; justify-content: space-between; padding: 14px; background: var(--card); border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 8px; word-break: break-all; }
-    .admin-promo-del { width: 36px; height: 36px; flex-shrink: 0; background: rgba(255,69,58,0.2); border: none; border-radius: 10px; color: var(--red); display: flex; align-items: center; justify-content: center; cursor:pointer;}
-
-    /* === КЕЙСЫ === */
-    .case-categories { 
-      display: flex; 
-      gap: 6px; 
-      margin-bottom: 14px; 
-      overflow-x: auto; 
-      padding: 4px 0; 
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-    .case-categories::-webkit-scrollbar { display: none; }
-    .cat-btn { 
-      flex-shrink: 0; 
-      padding: 8px 16px; 
-      background: transparent; 
-      border: none;
-      border-bottom: 2px solid transparent;
-      color: var(--text3); 
-      font-size: 14px; 
-      font-weight: 500; 
-      cursor: pointer;
-      transition: all 0.15s ease;
-      font-family: inherit;
-      letter-spacing: -0.2px;
-    }
-    .cat-btn:active { transform: scale(0.97); }
-    .cat-btn.active { 
-      color: var(--accent);
-      border-bottom-color: var(--accent);
+    /* === HEADER === */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: max(12px, env(safe-area-inset-top)) 16px 12px;
+      background: linear-gradient(180deg, var(--bg) 60%, transparent 100%);
     }
     
-    .case-grid { 
-      display: grid; 
-      grid-template-columns: repeat(2, 1fr); 
-      gap: 10px; 
-      width: 100%; 
-    }
-    .case-card { 
-      background: var(--card); 
-      border-radius: var(--radius-lg); 
-      padding: 16px 10px; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      gap: 8px; 
-      border: 1px solid var(--border); 
-      position: relative; 
-      width: 100%;
-      transition: transform 0.1s ease;
-      will-change: transform;
-    }
-    .case-card:active { transform: scale(0.96); }
-    .case-card.cheap { border-top: 3px solid var(--green); }
-    .case-card.gifts { border-top: 3px solid var(--purple); }
-    .case-card.stars { border-top: 3px solid var(--gold); background: linear-gradient(180deg, rgba(255,214,10,0.12) 0%, var(--card) 100%); }
-    .case-icon { width: 48px; height: 48px; }
-    .case-icon svg { width: 100%; height: 100%; }
-    .case-name { font-size: 14px; font-weight: 600; text-align: center; letter-spacing: -0.2px; }
-    .case-price-row { display: flex; align-items: center; gap: 4px; font-size: 15px; font-weight: 600; color: var(--gold); }
-
-    /* === ПОДАРКИ === */
-    .gift-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; width: 100%; }
-    .gift-card { background: var(--card); border-radius: var(--radius-md); padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; border: 1px solid var(--border); width: 100%; position: relative; overflow: hidden; transition: transform 0.1s ease; }
-    .gift-card:active { transform: scale(0.94); background: var(--card2); }
-    .gift-img { width: 100%; aspect-ratio: 1; border-radius: var(--radius-sm); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; padding: 8px; overflow: hidden; }
-    .gift-img img { width: 100%; height: 100%; object-fit: contain; }
-    .gift-price { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: var(--gold); }
-    .gift-sale-corner { position: absolute; top: 10px; right: -34px; width: 120px; transform: rotate(45deg); background: #FF3B30; color: #fff; text-align: center; font-size: 10px; font-weight: 700; padding: 6px 0; z-index: 3; box-shadow: 0 6px 14px rgba(255,59,48,0.35); pointer-events: none; letter-spacing: -0.2px; }
-
-    /* === ДОНАТ === */
-    .donate-card { background: var(--card); border-radius: var(--radius-lg); padding: 24px 20px; border: 1px solid var(--border); }
-    .donate-icon { font-size: 48px; margin-bottom: 16px; text-align: center; }
-    .donate-text { text-align: center; font-size: 15px; color: var(--text2); margin-bottom: 24px; letter-spacing: -0.2px; }
-    .donate-amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
-    .donate-btn { height: 50px; background: var(--card2); border: 2px solid var(--border); border-radius: 12px; color: var(--text); font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: all 0.15s; font-family: inherit; }
-    .donate-btn:active { transform: scale(0.95); }
-    .donate-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
-    .donate-btn.selected { border-color: var(--pink); background: rgba(255,55,95,0.15); }
-    .donate-custom { display: flex; align-items: center; background: var(--bg); border-radius: 12px; padding: 6px; border: 1px solid var(--border); margin-bottom: 20px; }
-    .donate-custom input { flex: 1; height: 46px; background: transparent; border: none; padding: 0 16px; font-size: 18px; font-weight: 600; color: var(--text); font-family: inherit; }
-    .donate-custom input:focus { outline: none; }
-    .donate-custom span { padding-right: 16px; color: var(--text3); font-weight: 500; }
-    .donate-send { width: 100%; height: 54px; background: linear-gradient(135deg, var(--pink), #FF6B6B); border: none; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.1s, opacity 0.1s; font-family: inherit; letter-spacing: -0.2px; }
-    .donate-send:active { transform: scale(0.98); opacity: 0.9; }
-
-    /* === МОДАЛЬНЫЕ ОКНА === */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeIn 0.15s; overscroll-behavior: none; }
-    .modal-box { background: var(--card); border-radius: var(--radius-lg); padding: 24px 20px; width: 100%; max-width: 360px; max-height: 85vh; overflow-y: auto; border: 1px solid var(--border); position: relative; scrollbar-width: none; }
-    .modal-box::-webkit-scrollbar { display: none; }
-    .modal-close-btn { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; background: var(--card2); border: none; border-radius: 50%; color: var(--text2); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; transition: all 0.1s; }
-    .modal-close-btn:active { background: var(--card3); color: #fff; transform: scale(0.9); }
-    .modal-close-btn svg { width: 18px; height: 18px; }
-
-    .choice-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; height: 50px; border-radius: var(--radius-md); border: none; font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 8px; cursor: pointer; transition: transform 0.1s; font-family: inherit; letter-spacing: -0.2px; }
-    .choice-btn:active { transform: scale(0.97); }
-    .choice-btn.stars { background: var(--accent); }
-    .choice-btn.balance { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #000; }
-    .choice-btn.cancel { background: var(--card2); margin-top: 12px; }
-    .choice-btn.balance.disabled { opacity: 0.4; pointer-events: none; }
-
-    /* ДЕТАЛИ ПОДАРКА */
-    .gift-detail-preview { width: 120px; height: 120px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
-    .gift-detail-preview img { width: 90%; height: 90%; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
-    .gift-detail-title { text-align: center; font-size: 20px; font-weight: 600; margin-bottom: 16px; letter-spacing: -0.3px; }
-    .signature-toggle { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card2); border-radius: var(--radius-md); margin-bottom: 12px; }
-    .toggle-switch { width: 46px; height: 28px; background: #39393D; border-radius: 30px; position: relative; flex-shrink: 0; transition: 0.2s; }
-    .toggle-switch.on { background: var(--green); }
-    .toggle-switch::after { content: ""; position: absolute; width: 24px; height: 24px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: 0.2s; }
-    .toggle-switch.on::after { transform: translateX(18px); }
-    .sender-options { display: none; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-    .sender-options.show { display: flex; }
-    .sender-option { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--card2); border-radius: var(--radius-sm); border: 2px solid transparent; cursor: pointer; transition: all 0.1s; }
-    .sender-option:active { transform: scale(0.98); }
-    .sender-option.selected { border-color: var(--accent); background: rgba(10,132,255,0.1); }
-    .gift-total { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: rgba(255,214,10,0.1); border-radius: var(--radius-md); margin-bottom: 16px; }
-    .gift-buy-btns { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
-    .gift-buy-btn { flex: 1; min-width: 130px; height: 50px; border-radius: var(--radius-md); border: none; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: transform 0.1s; font-family: inherit; }
-    .gift-buy-btn:active { transform: scale(0.97); }
-    .gift-buy-btn.primary { background: var(--accent); color: #fff; }
-    .gift-buy-btn.balance { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #000; }
-    .gift-buy-btn.disabled { opacity: 0.4; pointer-events: none; }
-
-    /* === РУЛЕТКА === */
-    .roulette-wrapper { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; overscroll-behavior: none; }
-    .roulette-box { width: 100%; max-width: 380px; }
-    .roulette-title { text-align: center; font-size: 20px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: -0.3px; }
-    .roulette-title svg { width: 24px; height: 24px; }
-    .roulette-window { position: relative; height: 150px; overflow: hidden; border-radius: 12px; background: var(--bg2); border: 1px solid var(--border); box-shadow: inset 0 0 30px rgba(0,0,0,0.6); }
-    .roulette-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #fff; transform: translateX(-50%); z-index: 10; box-shadow: 0 0 10px rgba(255,255,255,0.8); }
-    .roulette-pointer::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 12px solid #fff; }
-    .roulette-pointer::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 12px solid #fff; }
-    .roulette-strip { display: flex; height: 100%; align-items: center; gap: 6px; padding: 0 3px; will-change: transform; }
-    .r-item { width: 100px; height: 130px; background: var(--card); border-radius: 12px; display: flex; flex-direction: column; align-items: center; padding: 10px 6px; flex-shrink: 0; border: 2px solid var(--border); box-sizing: border-box; }
-    .r-item.star-theme { background: linear-gradient(135deg, #FFD60A, #FF9F0A); border: none; color: #000; }
-    .r-img-wrap { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
-    .r-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
-    .r-img-wrap svg { width: 44px; height: 44px; }
-    .r-title { font-size: 11px; font-weight: 700; text-align: center; line-height: 1.2; margin-bottom: 6px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .r-price { background: #111; color: #fff; border-radius: 10px; padding: 3px 8px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; margin-top: auto; }
-    .r-item.star-theme .r-price { background: rgba(0,0,0,0.15); color: #000; }
-    .r-price svg { width: 12px; height: 12px; }
-    .roulette-result { text-align: center; margin-top: 20px; font-size: 18px; font-weight: 600; min-height: 28px; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: -0.3px; }
-    .roulette-result svg { width: 24px; height: 24px; flex-shrink: 0; }
-    .roulette-result.win { color: var(--green); }
-    .roulette-result.lose { color: var(--text3); font-weight: 500; }
-    .roulette-result.stars { color: var(--gold); font-size: 24px; }
-    .roulette-close { width: 100%; height: 50px; margin-top: 20px; border-radius: 12px; border: none; background: var(--card2); color: var(--text); font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .roulette-close svg { width: 20px; height: 20px; }
-    .loading-container { display: flex; flex-direction: column; align-items: center; gap: 16px; animation: pulse 1.5s ease-in-out infinite; text-align: center; }
-    .loading-icon { font-size: 48px; }
-    .loading-text { font-size: 18px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
-
-    /* === НОВЫЕ КОМПАКТНЫЕ ТАБЫ (iOS STYLE) === */
-    .bottom-tabs { 
-      position: fixed; 
-      bottom: 0; 
-      left: 0; 
-      right: 0; 
+    .logo {
       display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--limited);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
       justify-content: center;
+      font-size: 20px;
+    }
+    
+    .balance-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      background: linear-gradient(135deg, rgba(255,214,10,0.15), rgba(255,159,10,0.1));
+      border: 1px solid rgba(255,214,10,0.25);
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    
+    .balance-chip svg { width: 18px; height: 18px; }
+
+    /* === SECTIONS === */
+    .section {
+      width: 100%;
+      padding: 16px;
+      padding-top: calc(76px + env(safe-area-inset-top));
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    
+    .section-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--text3);
+      margin-top: 4px;
+    }
+
+    /* === CARDS === */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    /* === NEWS === */
+    .news-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 4px 0 20px;
+      margin: 0 -16px;
+      padding-left: 16px;
+      padding-right: 16px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .news-scroll::-webkit-scrollbar { display: none; }
+    
+    .news-card {
+      flex-shrink: 0;
+      width: 280px;
+      background: var(--card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: transform 0.2s;
+    }
+    
+    .news-card:active { transform: scale(0.98); }
+    
+    .news-img {
+      width: 100%;
+      height: 140px;
+      background: linear-gradient(135deg, var(--card2), var(--card3));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+    }
+    
+    .news-img img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .news-body { padding: 16px; }
+    .news-date { font-size: 11px; color: var(--text3); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+    .news-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+    .news-text { font-size: 13px; color: var(--text2); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* === PROMO === */
+    .promo-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .promo-header span { font-size: 22px; }
+    
+    .promo-input-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .promo-input {
+      flex: 1;
+      height: 52px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0 16px;
+      font-size: 16px;
+      color: var(--text);
+      text-transform: uppercase;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    
+    .promo-input:focus { outline: none; border-color: var(--accent); }
+    .promo-input::placeholder { text-transform: none; color: var(--text3); }
+    
+    .promo-btn {
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s, opacity 0.1s;
+    }
+    
+    .promo-btn:active { transform: scale(0.92); opacity: 0.9; }
+    
+    .promo-result {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .promo-result.success { background: rgba(52,211,153,0.12); color: var(--green); }
+    .promo-result.error { background: rgba(248,113,113,0.12); color: var(--red); }
+
+    /* === GIFTS GRID === */
+    .gifts-filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      padding: 4px 0;
+      scrollbar-width: none;
+    }
+    .gifts-filters::-webkit-scrollbar { display: none; }
+    
+    .filter-chip {
+      flex-shrink: 0;
+      padding: 10px 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    
+    .filter-chip:active { transform: scale(0.95); }
+    .filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    
+    .gifts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    
+    .gift-card {
+      background: var(--card);
+      border-radius: var(--radius-sm);
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    
+    .gift-card:active { transform: scale(0.94); }
+    
+    .gift-card.limited {
+      border: none;
+      background: linear-gradient(135deg, rgba(244,114,182,0.1), rgba(167,139,250,0.1));
+    }
+    
+    .gift-card.limited::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-sm);
+      padding: 1.5px;
+      background: var(--limited);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+    
+    .gift-card.sold-out { opacity: 0.4; pointer-events: none; }
+    
+    .limited-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      padding: 3px 7px;
+      background: var(--limited);
+      border-radius: 6px;
+      font-size: 8px;
+      font-weight: 800;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    
+    .sold-badge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 6px 12px;
+      background: rgba(0,0,0,0.85);
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--red);
+      z-index: 5;
+    }
+    
+    .gift-visual {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .gift-visual img, .gift-visual video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    
+    .gift-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+      color: var(--text2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+    
+    .gift-price {
+      display: flex;
       align-items: center;
       gap: 4px;
-      background: rgba(0,0,0,0.85); 
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    
+    .gift-price svg { width: 14px; height: 14px; }
+
+    /* === CASES === */
+    .case-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      background: var(--card);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+    }
+    
+    .case-tab {
+      flex: 1;
+      padding: 12px 14px;
+      background: transparent;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text3);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    
+    .case-tab:active { transform: scale(0.97); }
+    .case-tab.active { background: var(--accent); color: #fff; }
+    
+    .cases-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    
+    .case-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: transform 0.15s;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .case-card:active { transform: scale(0.96); }
+    
+    .case-card.cheap { border-top: 3px solid var(--green); }
+    .case-card.gifts { border-top: 3px solid var(--purple); }
+    .case-card.stars { 
+      border-top: 3px solid var(--gold);
+      background: linear-gradient(180deg, rgba(255,214,10,0.08) 0%, var(--card) 60%);
+    }
+    
+    .case-icon {
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+    
+    .case-name { font-size: 16px; font-weight: 700; text-align: center; }
+    
+    .case-price {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--gold);
+    }
+    
+    .case-price svg { width: 20px; height: 20px; }
+    
+    .pity-info {
+      width: 100%;
+      margin-top: 4px;
+    }
+    
+    .pity-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--bg);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .pity-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--cyan));
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+    
+    .pity-text {
+      font-size: 10px;
+      color: var(--text3);
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    /* === DONATE === */
+    .donate-hero {
+      text-align: center;
+      padding: 30px 0;
+    }
+    
+    .donate-icon { font-size: 72px; margin-bottom: 20px; }
+    .donate-title { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+    .donate-desc { font-size: 15px; color: var(--text2); line-height: 1.5; max-width: 280px; margin: 0 auto; }
+    
+    .donate-amounts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 28px 0;
+    }
+    
+    .donate-amount {
+      height: 54px;
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    
+    .donate-amount:active { transform: scale(0.95); }
+    .donate-amount.selected { border-color: var(--pink); background: rgba(244,114,182,0.12); }
+    .donate-amount svg { width: 20px; height: 20px; }
+    
+    .donate-custom {
+      display: flex;
+      align-items: center;
+      background: var(--card);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      border: 2px solid var(--border);
+      margin-bottom: 24px;
+      transition: border-color 0.2s;
+    }
+    
+    .donate-custom:focus-within { border-color: var(--accent); }
+    
+    .donate-custom input {
+      flex: 1;
+      height: 50px;
+      background: transparent;
+      border: none;
+      padding: 0 16px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      font-family: inherit;
+    }
+    
+    .donate-custom input:focus { outline: none; }
+    .donate-custom input::placeholder { color: var(--text3); font-weight: 500; }
+    .donate-custom span { padding-right: 16px; color: var(--text3); font-weight: 600; font-size: 16px; }
+    
+    .donate-send {
+      width: 100%;
+      height: 58px;
+      background: linear-gradient(135deg, var(--pink), #E879F9);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.1s, opacity 0.1s;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .donate-send:active { transform: scale(0.98); opacity: 0.9; }
+    .donate-send svg { width: 22px; height: 22px; }
+
+    /* === ADMIN === */
+    .admin-card {
+      background: linear-gradient(135deg, rgba(248,113,113,0.06), rgba(167,139,250,0.06));
+      border: 1px solid rgba(248,113,113,0.2);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    
+    .admin-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--red);
+    }
+    
+    .admin-header svg { width: 22px; height: 22px; }
+    
+    .admin-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .admin-row {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .admin-input, .admin-select {
+      flex: 1;
+      height: 50px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0 14px;
+      font-size: 14px;
+      color: var(--text);
+      font-family: inherit;
+    }
+    
+    .admin-input:focus, .admin-select:focus { outline: none; border-color: var(--accent); }
+    
+    .admin-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+    
+    .admin-btn {
+      height: 50px;
+      padding: 0 28px;
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.1s;
+    }
+    
+    .admin-btn:active { transform: scale(0.97); }
+    
+    .promo-list {
+      margin-top: 20px;
+    }
+    
+    .promo-list-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 12px;
+    }
+    
+    .promo-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: var(--card);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+    }
+    
+    .promo-item-info { flex: 1; }
+    .promo-item-code { font-weight: 700; font-size: 15px; margin-bottom: 4px; font-family: monospace; }
+    .promo-item-meta { font-size: 12px; color: var(--text3); }
+    
+    .promo-item-del {
+      width: 40px;
+      height: 40px;
+      background: rgba(248,113,113,0.12);
+      border: none;
+      border-radius: 10px;
+      color: var(--red);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s;
+      flex-shrink: 0;
+    }
+    
+    .promo-item-del:active { transform: scale(0.9); }
+    .promo-item-del svg { width: 20px; height: 20px; }
+
+    /* === MODALS === */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(20px);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.2s ease-out;
+      overscroll-behavior: none;
+    }
+    
+    .modal-box {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 24px;
+      width: 100%;
+      max-width: 360px;
+      max-height: 85vh;
+      overflow-y: auto;
+      position: relative;
+      border: 1px solid var(--border);
+      scrollbar-width: none;
+    }
+    
+    .modal-box::-webkit-scrollbar { display: none; }
+    
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      background: var(--card2);
+      border: none;
+      border-radius: 50%;
+      color: var(--text2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      z-index: 10;
+    }
+    
+    .modal-close:active { transform: scale(0.9); background: var(--card3); }
+    .modal-close svg { width: 20px; height: 20px; }
+
+    /* === GIFT DETAIL MODAL === */
+    .gift-detail-visual {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .gift-detail-visual img, .gift-detail-visual video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5));
+    }
+    
+    .gift-detail-title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    
+    .gift-detail-price {
+      text-align: center;
+      font-size: 18px;
+      color: var(--gold);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-weight: 700;
+    }
+    
+    .signature-section {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .signature-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    
+    .signature-label { font-size: 15px; font-weight: 600; }
+    .signature-hint { font-size: 12px; color: var(--text3); margin-top: 3px; }
+    
+    .toggle-switch {
+      width: 52px;
+      height: 32px;
+      background: var(--card3);
+      border-radius: 16px;
+      position: relative;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    
+    .toggle-switch.on { background: var(--green); }
+    
+    .toggle-switch::after {
+      content: "";
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      background: #fff;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .toggle-switch.on::after { transform: translateX(20px); }
+    
+    .sender-list {
+      margin-top: 14px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .sender-list.show { display: flex; }
+    
+    .sender-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: var(--card);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    
+    .sender-option:active { transform: scale(0.98); }
+    .sender-option.selected { border-color: var(--accent); background: rgba(91,127,255,0.1); }
+    
+    .sender-name { font-weight: 600; font-size: 14px; }
+    .sender-cost { font-size: 14px; color: var(--gold); font-weight: 700; }
+    
+    .gift-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px;
+      background: linear-gradient(135deg, rgba(255,214,10,0.1), rgba(255,159,10,0.06));
+      border-radius: var(--radius-sm);
+      margin-bottom: 20px;
+    }
+    
+    .gift-total-label { font-size: 15px; color: var(--text2); font-weight: 500; }
+    
+    .gift-total-value {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--gold);
+    }
+    
+    .gift-total-value svg { width: 26px; height: 26px; }
+    
+    .gift-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .gift-action-btn {
+      flex: 1;
+      height: 56px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      transition: transform 0.1s;
+    }
+    
+    .gift-action-btn:active { transform: scale(0.97); }
+    .gift-action-btn.primary { background: var(--accent); color: #fff; }
+    .gift-action-btn.balance { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #000; }
+    .gift-action-btn.disabled { opacity: 0.4; pointer-events: none; }
+    .gift-action-btn svg { width: 20px; height: 20px; }
+
+    /* === CASE CHOICE MODAL === */
+    .case-choice-icon {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+    }
+    
+    .case-choice-title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 28px;
+    }
+    
+    .choice-btn {
+      width: 100%;
+      height: 58px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-family: inherit;
+      transition: transform 0.1s;
+    }
+    
+    .choice-btn:active { transform: scale(0.98); }
+    .choice-btn.stars { background: var(--accent); color: #fff; }
+    .choice-btn.balance { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #000; }
+    .choice-btn.balance.disabled { opacity: 0.4; pointer-events: none; }
+    .choice-btn.cancel { background: var(--card2); color: var(--text); margin-top: 8px; }
+    .choice-btn svg { width: 22px; height: 22px; }
+
+    /* === ROULETTE === */
+    .roulette-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.96);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overscroll-behavior: none;
+    }
+    
+    .roulette-content {
+      width: 100%;
+      max-width: 400px;
+    }
+    
+    .roulette-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    
+    .roulette-title {
+      font-size: 26px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    
+    .roulette-window {
+      position: relative;
+      height: 170px;
+      overflow: hidden;
+      border-radius: var(--radius);
+      background: var(--card);
+      border: 1px solid var(--border);
+    }
+    
+    .roulette-pointer {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: #fff;
+      transform: translateX(-50%);
+      z-index: 10;
+      box-shadow: 0 0 24px rgba(255,255,255,0.7);
+    }
+    
+    .roulette-pointer::before, .roulette-pointer::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+    }
+    
+    .roulette-pointer::before { top: 0; border-top: 16px solid #fff; }
+    .roulette-pointer::after { bottom: 0; border-bottom: 16px solid #fff; }
+    
+    .roulette-strip {
+      display: flex;
+      height: 100%;
+      align-items: center;
+      gap: 10px;
+      padding: 0 5px;
+      will-change: transform;
+    }
+    
+    .roulette-item {
+      width: 115px;
+      height: 150px;
+      flex-shrink: 0;
+      background: var(--card2);
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 14px 10px;
+      border: 2px solid var(--border);
+    }
+    
+    .roulette-item.star-item {
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      border: none;
+      color: #000;
+    }
+    
+    .roulette-item-visual {
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    
+    .roulette-item-visual img, .roulette-item-visual video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    
+    .roulette-item-visual svg { width: 52px; height: 52px; }
+    
+    .roulette-item-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+    
+    .roulette-item-price {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0,0,0,0.2);
+      padding: 5px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: auto;
+    }
+    
+    .roulette-item.star-item .roulette-item-price { background: rgba(0,0,0,0.15); }
+    .roulette-item-price svg { width: 16px; height: 16px; }
+    
+    .roulette-result {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 22px;
+      font-weight: 800;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    
+    .roulette-result.win { color: var(--green); }
+    .roulette-result.lose { color: var(--text3); font-weight: 600; }
+    .roulette-result.stars { color: var(--gold); font-size: 28px; }
+    .roulette-result svg { width: 30px; height: 30px; }
+    
+    .roulette-close {
+      width: 100%;
+      height: 58px;
+      margin-top: 24px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: var(--card2);
+      color: var(--text);
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.1s;
+    }
+    
+    .roulette-close:active { transform: scale(0.98); }
+    .roulette-close.success { background: var(--green); color: #000; }
+    
+    .loading-state {
+      text-align: center;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    .loading-icon { font-size: 64px; margin-bottom: 20px; }
+    .loading-text { font-size: 20px; font-weight: 700; }
+
+    /* === BOTTOM NAV === */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background: rgba(13,13,15,0.94);
       backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      border-top: 0.5px solid rgba(255,255,255,0.1); 
-      padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); 
+      border-top: 1px solid var(--border);
+      padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
       z-index: 50;
     }
-    .bottom-tab { 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center;
-      gap: 3px; 
-      background: none; 
-      border: none; 
-      color: var(--text3); 
-      font-size: 10px; 
-      font-weight: 500; 
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 18px;
+      background: none;
+      border: none;
+      color: var(--text3);
+      font-size: 10px;
+      font-weight: 600;
       cursor: pointer;
-      padding: 6px 16px;
-      border-radius: 10px;
-      transition: all 0.2s ease;
+      transition: all 0.2s;
       font-family: inherit;
-      letter-spacing: -0.1px;
+      border-radius: 14px;
     }
-    .bottom-tab:active { transform: scale(0.9); }
-    .bottom-tab svg { 
-      width: 24px; 
-      height: 24px; 
-      transition: all 0.2s ease;
-      opacity: 0.6;
+    
+    .nav-item:active { transform: scale(0.88); }
+    
+    .nav-item svg {
+      width: 26px;
+      height: 26px;
+      transition: transform 0.2s;
     }
-    .bottom-tab span { 
-      transition: all 0.2s ease;
+    
+    .nav-item.active { color: var(--accent); }
+    .nav-item.active svg { transform: scale(1.1); }
+
+    /* === SUBSCRIBE MODAL === */
+    .subscribe-icon { font-size: 64px; margin-bottom: 20px; text-align: center; }
+    .subscribe-title { text-align: center; font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+    .subscribe-desc { text-align: center; font-size: 14px; color: var(--text2); margin-bottom: 28px; line-height: 1.5; }
+    
+    .channel-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
     }
-    .bottom-tab.active { 
-      color: var(--accent);
+    
+    .channel-item {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      background: var(--card2);
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      color: var(--text);
+      transition: transform 0.15s;
     }
-    .bottom-tab.active svg { 
-      opacity: 1;
-      transform: scale(1.05);
+    
+    .channel-item:active { transform: scale(0.98); }
+    
+    .channel-info { flex: 1; }
+    .channel-name { font-weight: 700; font-size: 15px; margin-bottom: 3px; }
+    .channel-status { font-size: 12px; font-weight: 500; }
+    .channel-status.missing { color: var(--text3); }
+    .channel-status.ok { color: var(--green); }
+    
+    .channel-arrow { color: var(--text3); font-size: 20px; font-weight: 700; }
+
+    /* === EMPTY STATE === */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text3);
     }
+    
+    .empty-state-icon { font-size: 56px; margin-bottom: 16px; opacity: 0.5; }
+    .empty-state-text { font-size: 16px; font-weight: 500; }
   </style>
 </head>
 
 <body>
 <div class="app">
-  <div class="balance-widget" id="balanceWidget">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-    <span id="balanceValue">0</span>
-  </div>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">🎁</div>
+      <span>Подарочница</span>
+    </div>
+    <div class="balance-chip" id="balanceChip">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+      <span id="balanceValue">0</span>
+    </div>
+  </header>
 
+  <!-- Sections -->
   <div class="section" id="sectionHome"></div>
   <div class="section hidden" id="sectionCases"></div>
   <div class="section hidden" id="sectionGifts"></div>
   <div class="section hidden" id="sectionDonate"></div>
   <div class="section hidden" id="sectionAdmin"></div>
 
-  <nav class="bottom-tabs">
-    <button class="bottom-tab active" id="tabHome">
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="Home">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
       <span>Главная</span>
     </button>
-    <button class="bottom-tab" id="tabCases">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 2v12h14V6H5zm2 3h10v2H7V9zm0 4h6v2H7v-2z"/></svg>
+    <button class="nav-item" data-tab="Cases">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l4.59-4.58L18 11l-6 6z"/></svg>
       <span>Кейсы</span>
     </button>
-    <button class="bottom-tab" id="tabGifts">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2z"/></svg>
+    <button class="nav-item" data-tab="Gifts">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.11-.31.18-.65.18-1a3 3 0 0 0-5.5-1.65l-.5.67-.5-.68A3 3 0 0 0 6 5c0 .35.07.69.18 1H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2z"/></svg>
       <span>Подарки</span>
     </button>
-    <button class="bottom-tab" id="tabDonate">
+    <button class="nav-item" data-tab="Donate">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
       <span>Донат</span>
     </button>
-    <button class="bottom-tab hidden" id="tabAdmin">
+    <button class="nav-item hidden" data-tab="Admin" id="adminTab">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
       <span>Админ</span>
     </button>
   </nav>
 </div>
 
-<div class="modal-overlay hidden" id="subscribeOverlay">
+<!-- Subscribe Modal -->
+<div class="modal-overlay hidden" id="subscribeModal">
   <div class="modal-box">
-    <div style="font-size: 48px; margin-bottom: 12px; text-align:center;">🔔</div>
-    <h2 style="margin-bottom:8px; text-align:center; font-weight:600; letter-spacing:-0.3px;">Подпишись на каналы</h2>
-    <p style="color:var(--text2); font-size:14px; margin-bottom:20px; text-align:center;">Для работы бота нужна подписка</p>
-    <div id="subscribeChannels" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;"></div>
-    <button class="choice-btn stars" id="subscribeCheck">Проверить подписку</button>
+    <div class="subscribe-icon">🔔</div>
+    <div class="subscribe-title">Подпишись на каналы</div>
+    <div class="subscribe-desc">Для использования бота нужна подписка на наши каналы</div>
+    <div class="channel-list" id="channelList"></div>
+    <button class="choice-btn stars" id="checkSubBtn">Проверить подписку</button>
   </div>
 </div>
 
-<div class="modal-overlay hidden" id="caseChoiceModal">
+<!-- Gift Detail Modal -->
+<div class="modal-overlay hidden" id="giftModal">
   <div class="modal-box">
-    <button class="modal-close-btn" onclick="document.getElementById('caseChoiceModal').classList.add('hidden')">
+    <button class="modal-close" id="closeGiftModal">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
-    <div class="case-choice-icon" id="choiceIcon" style="width:64px;height:64px;margin:0 auto 16px;"></div>
-    <div class="case-choice-title" id="choiceTitle" style="text-align:center;font-size:20px;font-weight:600;margin-bottom:20px;letter-spacing:-0.3px;"></div>
-    <button class="choice-btn stars" id="choiceStars"><svg viewBox="0 0 24 24" fill="#FFD700" width="20" height="20"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> <span id="choicePriceStars"></span> Stars</button>
-    <button class="choice-btn balance" id="choiceBalance"><svg viewBox="0 0 24 24" fill="#000" width="20" height="20"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> <span id="choicePriceBalance"></span> С баланса</button>
+    <div class="gift-detail-visual" id="giftModalVisual"></div>
+    <div class="gift-detail-title" id="giftModalTitle"></div>
+    <div class="gift-detail-price" id="giftModalPrice"></div>
+    
+    <div class="signature-section">
+      <div class="signature-toggle" id="signatureToggle">
+        <div>
+          <div class="signature-label">Добавить подпись</div>
+          <div class="signature-hint">от +2 Stars</div>
+        </div>
+        <div class="toggle-switch" id="signatureSwitch"></div>
+      </div>
+      <div class="sender-list" id="senderList"></div>
+    </div>
+    
+    <div class="gift-total-row">
+      <span class="gift-total-label">Итого</span>
+      <span class="gift-total-value">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+        <span id="giftTotal">0</span>
+      </span>
+    </div>
+    
+    <div class="gift-actions">
+      <button class="gift-action-btn primary" id="buyWithStars">
+        <svg viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+        <span id="starsPrice">0</span>
+      </button>
+      <button class="gift-action-btn balance" id="buyWithBalance">
+        Баланс <span id="balancePrice">0</span>
+      </button>
+    </div>
   </div>
 </div>
 
-<div class="modal-overlay hidden" id="giftDetailModal">
+<!-- Case Choice Modal -->
+<div class="modal-overlay hidden" id="caseModal">
   <div class="modal-box">
-    <button class="modal-close-btn" onclick="document.getElementById('giftDetailModal').classList.add('hidden')">
+    <button class="modal-close" id="closeCaseModal">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
-    <div class="gift-detail-preview"><img id="giftDetailImg" src="" alt="" /></div>
-    <div class="gift-detail-title" id="giftDetailTitle"></div>
-    <div class="signature-toggle" id="signatureToggle">
-      <div><div style="font-size:14px;font-weight:500;">Добавить подпись</div><div style="font-size:12px;color:var(--text3);">от +2 Stars</div></div>
-      <div class="toggle-switch" id="signatureSwitch"></div>
-    </div>
-    <div class="sender-options" id="senderOptions"></div>
-    <div class="gift-total">
-      <span style="font-size:14px;color:var(--text2);">Итого</span>
-      <span style="font-size:20px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" fill="#FFD700" width="20" height="20"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> <span id="giftTotalAmount">0</span></span>
-    </div>
-    <div class="gift-buy-btns">
-      <button class="gift-buy-btn primary" id="giftBuyStars"><svg viewBox="0 0 24 24" fill="#FFD700" width="18" height="18"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> <span id="giftBuyStarsAmount">0</span></button>
-      <button class="gift-buy-btn balance" id="giftBuyBalance">Баланс <span id="giftBuyBalanceAmount">0</span></button>
-    </div>
+    <div class="case-choice-icon" id="caseModalIcon"></div>
+    <div class="case-choice-title" id="caseModalTitle"></div>
+    <button class="choice-btn stars" id="caseStarsBtn">
+      <svg viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+      <span id="caseStarsPrice">0</span> Stars
+    </button>
+    <button class="choice-btn balance" id="caseBalanceBtn">
+      <svg viewBox="0 0 24 24" fill="#000"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+      <span id="caseBalancePrice">0</span> С баланса
+    </button>
   </div>
 </div>
 
-<div class="roulette-wrapper hidden" id="rouletteOverlay">
-  <div class="loading-container hidden" id="rouletteLoading">
-    <div class="loading-icon">⏳</div>
-    <div class="loading-text">Пожалуйста, подождите...</div>
+<!-- Roulette Overlay -->
+<div class="roulette-overlay hidden" id="rouletteOverlay">
+  <div class="loading-state hidden" id="rouletteLoading">
+    <div class="loading-icon">🎰</div>
+    <div class="loading-text">Открываем кейс...</div>
   </div>
-  <div class="roulette-box hidden" id="rouletteMain">
-    <div id="rouletteTitle" class="roulette-title"></div>
+  <div class="roulette-content hidden" id="rouletteContent">
+    <div class="roulette-header">
+      <div class="roulette-title" id="rouletteTitle"></div>
+    </div>
     <div class="roulette-window">
       <div class="roulette-pointer"></div>
       <div class="roulette-strip" id="rouletteStrip"></div>
     </div>
-    <div id="rouletteResult" class="roulette-result"></div>
-    <button class="choice-btn cancel hidden" id="rouletteClose" style="margin-top:20px;">Закрыть</button>
+    <div class="roulette-result" id="rouletteResult"></div>
+    <button class="roulette-close hidden" id="rouletteClose">Закрыть</button>
   </div>
 </div>
 
-<div class="modal-overlay hidden" id="maintenanceOverlay">
+<!-- Maintenance Modal -->
+<div class="modal-overlay hidden" id="maintenanceModal">
   <div class="modal-box" style="text-align:center;">
-    <div style="font-size:56px; margin-bottom:12px;">🛠</div>
-    <h2 style="margin-bottom:10px; font-weight:600;">Технический перерыв</h2>
-    <p id="maintenanceText" style="color:var(--text2); font-size:14px; line-height:1.45;">Идёт тех. перерыв, мы улучшаем Подарочницу. Попробуй позже.</p>
+    <div style="font-size:72px;margin-bottom:20px;">🛠</div>
+    <div style="font-size:24px;font-weight:800;margin-bottom:14px;">Технический перерыв</div>
+    <div id="maintenanceText" style="color:var(--text2);font-size:15px;line-height:1.6;"></div>
   </div>
 </div>
 
@@ -407,28 +1360,54 @@ const tg = window.Telegram?.WebApp;
 const API = "https://podarochnica-api.onrender.com";
 
 const state = {
-  balance: 0, pitySpent: 0, pityThreshold: 20, isAdmin: false, subscribed: true,
-  channels: [], gifts: [], cases: {}, news: [], sales: [],
-  maintenance: false, maintenanceMessage: "",
-  selectedGift: null, selectedCase: null, addSignature: false, sender: "@echoaxxs", currentCategory: "cheap"
+  balance: 0,
+  pitySpent: 0,
+  pityThreshold: 20,
+  isAdmin: false,
+  subscribed: true,
+  channels: [],
+  gifts: [],
+  adminGifts: [],
+  adminCases: [],
+  cases: {},
+  news: [],
+  sales: [],
+  promocodes: [],
+  selectedGift: null,
+  selectedCase: null,
+  addSignature: false,
+  sender: "@echoaxxs",
+  currentCategory: "cheap",
+  giftFilter: "all"
 };
 
-const SENDERS = [{ key: "@echoaxxs", label: "@echoaxxs", cost: 2 }, { key: "@bogclm", label: "@bogclm", cost: 2 }, { key: "@bogclm и @echoaxxs", label: "@bogclm и @echoaxxs", cost: 5 }];
+const SENDERS = [
+  { key: "@echoaxxs", label: "@echoaxxs", cost: 2 },
+  { key: "@bogclm", label: "@bogclm", cost: 2 },
+  { key: "@bogclm и @echoaxxs", label: "Оба", cost: 5 }
+];
+
 const DONATE_AMOUNTS = [10, 25, 50, 100, 250, 500];
 
 const ICONS = {
   star: `<svg viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>`,
-  nothing: `<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" stroke="#555" stroke-width="3" fill="none"/><line x1="14" y1="14" x2="34" y2="34" stroke="#555" stroke-width="3"/></svg>`,
-  box: `<svg viewBox="0 0 48 48"><path d="M6 18L24 8L42 18V34L24 44L6 34V18Z" fill="#4ECDC4"/><path d="M24 8L42 18L24 28L6 18L24 8Z" fill="#7DE8E1"/><path d="M24 28V44L6 34V18L24 28Z" fill="#3DB9B1"/></svg>`,
-  diamond: `<svg viewBox="0 0 48 48"><path d="M24 4L42 18L24 44L6 18L24 4Z" fill="#A78BFA"/><path d="M24 4L6 18H42L24 4Z" fill="#C4B5FD"/><path d="M6 18L24 44V28L6 18Z" fill="#8B5CF6"/></svg>`,
-  starCase: `<svg viewBox="0 0 48 48"><path d="M24 4L30 16L44 18L34 28L36 42L24 36L12 42L14 28L4 18L18 16L24 4Z" fill="#FFD60A"/><path d="M24 4L30 16L44 18L34 28L36 42L24 36" fill="#E5C000"/></svg>`,
   check: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>`,
-  close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>`
+  close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>`,
+  nothing: `<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" stroke="#666" stroke-width="3" fill="none"/><line x1="14" y1="14" x2="34" y2="34" stroke="#666" stroke-width="3"/></svg>`,
+  trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/></svg>`
 };
 
+// === API ===
 const api = async (endpoint, data = {}) => {
-  const res = await fetch(`${API}${endpoint}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ initData: tg?.initData || "", ...data }) });
-  if (!res.ok) throw new Error((await res.json().catch(()=>({}))).detail || `HTTP ${res.status}`);
+  const res = await fetch(`${API}${endpoint}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ initData: tg?.initData || "", ...data })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `HTTP ${res.status}`);
+  }
   return res.json();
 };
 
@@ -437,305 +1416,821 @@ const apiGet = async (endpoint) => {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 };
-  
-const showMaintenance = (message) => {
-  state.maintenance = true;
-  document.getElementById("maintenanceText").textContent = message || "Идёт тех. перерыв. Попробуй позже.";
-  document.getElementById("maintenanceOverlay").classList.remove("hidden");
-};
 
+// === HELPERS ===
+const $ = id => document.getElementById(id);
+const updateBalance = () => { $("balanceValue").textContent = state.balance.toLocaleString(); };
+const showModal = id => $(id).classList.remove("hidden");
+const hideModal = id => $(id).classList.add("hidden");
+
+// === INIT ===
 const init = async () => {
-  if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#000000'); tg.setBackgroundColor('#000000'); }
+  if (tg) {
+    tg.ready();
+    tg.expand();
+    tg.setHeaderColor('#0d0d0f');
+    tg.setBackgroundColor('#0d0d0f');
+  }
+
   try {
     const sub = await api("/api/check-subscription");
     state.subscribed = sub.subscribed;
     state.channels = sub.channels || [];
-    if (sub.maintenance) { showMaintenance(sub.message); return; }
-    if (!state.subscribed && state.channels.length > 0) { showSubscribeOverlay(); return; }
-  } catch (e) { alert("Ошибка: " + e.message); return; }
+    
+    if (sub.maintenance) {
+      $("maintenanceText").textContent = sub.message;
+      showModal("maintenanceModal");
+      return;
+    }
+    
+    if (!state.subscribed && state.channels.length > 0) {
+      renderChannels();
+      showModal("subscribeModal");
+      return;
+    }
+  } catch (e) {
+    console.error(e);
+    alert("Ошибка подключения: " + e.message);
+    return;
+  }
+  
   await loadApp();
 };
 
 const loadApp = async () => {
   try {
-    const [u, n, g, c] = await Promise.all([
+    const [userData, newsData, giftsData, casesData] = await Promise.all([
       api("/api/get-user-data"),
-      apiGet("/api/get-news").catch(()=>({news:[]})),
-      apiGet("/api/get-gifts").catch(()=>({gifts:[], sales:[]})),
-      apiGet("/api/get-cases").catch(()=>({categories:{}}))
+      apiGet("/api/get-news").catch(() => ({ news: [] })),
+      apiGet("/api/get-gifts").catch(() => ({ gifts: [], sales: [] })),
+      apiGet("/api/get-cases").catch(() => ({ categories: {} }))
     ]);
-    state.balance = u.starBalance || 0;
-    state.pitySpent = u.pitySpent || 0;
-    state.pityThreshold = u.pityThreshold || 20;
-    state.isAdmin = u.isAdmin || false;
-    state.news = n.news || [];
-    state.gifts = g.gifts || [];
-    state.sales = g.sales || [];
-    state.cases = c.categories || {};
-  } catch(e) {
-    if (String(e.message).includes("тех. перерыв")) { showMaintenance(e.message); return; }
-    alert("Ошибка: " + e.message); return;
+
+    state.balance = userData.starBalance || 0;
+    state.pitySpent = userData.pitySpent || 0;
+    state.pityThreshold = userData.pityThreshold || 20;
+    state.isAdmin = userData.isAdmin || false;
+    state.news = newsData.news || [];
+    state.gifts = giftsData.gifts || [];
+    state.sales = giftsData.sales || [];
+    state.cases = casesData.categories || {};
+    
+    // Если админ — загружаем список подарков/кейсов для промокодов
+    if (state.isAdmin) {
+      try {
+        const adminData = await apiGet("/api/admin/get-gifts-list");
+        state.adminGifts = adminData.gifts || [];
+        state.adminCases = adminData.cases || [];
+      } catch (e) {}
+    }
+  } catch (e) {
+    if (String(e.message).includes("тех. перерыв")) {
+      $("maintenanceText").textContent = e.message;
+      showModal("maintenanceModal");
+      return;
+    }
+    alert("Ошибка: " + e.message);
+    return;
   }
-  if (state.isAdmin) document.getElementById("tabAdmin").classList.remove("hidden");
-  renderHome(); renderCases(); renderGifts(); renderDonate(); renderAdmin(); setupTabs(); updateUI();
+
+  if (state.isAdmin) $("adminTab").classList.remove("hidden");
+
+  renderHome();
+  renderCases();
+  renderGifts();
+  renderDonate();
+  if (state.isAdmin) renderAdmin();
+  setupTabs();
+  updateBalance();
 };
 
-const updateUI = () => { document.getElementById("balanceValue").textContent = state.balance.toLocaleString(); };
-
-const showSubscribeOverlay = () => {
-  document.getElementById("subscribeChannels").innerHTML = state.channels.map(ch => `
-    <a href="${ch.username ? `https://t.me/${ch.username}` : `https://t.me/c/${ch.id.toString().replace('-100', '')}`}" target="_blank" style="display:flex;align-items:center;padding:12px 14px;background:var(--card2);border-radius:var(--radius-md);text-decoration:none;color:var(--text);">
-      <div style="flex:1"><div style="font-weight:600">${ch.title||ch.id}</div><div style="font-size:12px;color:var(${ch.missing?'--text3':'--green'})">${ch.missing?'Подпишись':'✓'}</div></div>
-    </a>`).join("");
-  document.getElementById("subscribeOverlay").classList.remove("hidden");
+// === CHANNELS ===
+const renderChannels = () => {
+  $("channelList").innerHTML = state.channels.map(ch => `
+    <a href="${ch.link || '#'}" target="_blank" class="channel-item">
+      <div class="channel-info">
+        <div class="channel-name">${ch.title || ch.id}</div>
+        <div class="channel-status ${ch.missing ? 'missing' : 'ok'}">${ch.missing ? 'Нужна подписка' : '✓ Подписан'}</div>
+      </div>
+      <span class="channel-arrow">→</span>
+    </a>
+  `).join("");
 };
 
-document.getElementById("subscribeCheck").onclick = async function() {
-  this.textContent = "...";
+$("checkSubBtn").onclick = async function() {
+  this.textContent = "Проверяем...";
+  this.disabled = true;
   try {
     const sub = await api("/api/check-subscription");
-    if (sub.maintenance) { document.getElementById("subscribeOverlay").classList.add("hidden"); showMaintenance(sub.message); return; }
-    if (sub.subscribed) { document.getElementById("subscribeOverlay").classList.add("hidden"); await loadApp(); }
-    else { state.channels = sub.channels || []; showSubscribeOverlay(); }
-  } catch(e) {}
-  this.textContent = "Проверить";
+    if (sub.maintenance) {
+      hideModal("subscribeModal");
+      $("maintenanceText").textContent = sub.message;
+      showModal("maintenanceModal");
+      return;
+    }
+    if (sub.subscribed) {
+      hideModal("subscribeModal");
+      await loadApp();
+    } else {
+      state.channels = sub.channels || [];
+      renderChannels();
+    }
+  } catch (e) {
+    console.error(e);
+  }
+  this.textContent = "Проверить подписку";
+  this.disabled = false;
 };
 
+// === TABS ===
 const setupTabs = () => {
-  const tabs = { Home: "sectionHome", Cases: "sectionCases", Gifts: "sectionGifts", Donate: "sectionDonate", Admin: "sectionAdmin" };
-  Object.keys(tabs).forEach(name => {
-    document.getElementById(`tab${name}`).onclick = () => {
-      Object.keys(tabs).forEach(n => {
-        document.getElementById(`tab${n}`)?.classList.toggle("active", n === name);
-        document.getElementById(tabs[n])?.classList.toggle("hidden", n !== name);
-      });
-      updateUI();
+  const sections = { Home: "sectionHome", Cases: "sectionCases", Gifts: "sectionGifts", Donate: "sectionDonate", Admin: "sectionAdmin" };
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.onclick = () => {
+      const tab = btn.dataset.tab;
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b === btn));
+      Object.entries(sections).forEach(([key, id]) => $(id)?.classList.toggle('hidden', key !== tab));
+      updateBalance();
     };
   });
 };
 
+// === RENDER GIFT VISUAL ===
+const renderGiftVisual = (gift, size = 60) => {
+  if (!gift) return `<div style="font-size:${size * 0.7}px;">🎁</div>`;
+  if (gift.sticker_type === 'video' && gift.sticker_url) {
+    return `<video src="${gift.sticker_url}" style="width:${size}px;height:${size}px;object-fit:contain;" autoplay loop muted playsinline></video>`;
+  }
+  if (gift.sticker_url) {
+    return `<img src="${gift.sticker_url}" style="width:${size}px;height:${size}px;object-fit:contain;" alt="" loading="lazy">`;
+  }
+  if (gift.thumbnail_url) {
+    return `<img src="${gift.thumbnail_url}" style="width:${size}px;height:${size}px;object-fit:contain;" alt="" loading="lazy">`;
+  }
+  return `<div style="font-size:${size * 0.7}px;">🎁</div>`;
+};
+
+// === HOME ===
 const renderHome = () => {
-  const s = document.getElementById("sectionHome");
   const newsHtml = state.news.length ? state.news.map(n => `
-    <div class="news-card"><div class="news-img">${n.image ? `<img src="${n.image}" loading="lazy">` : '📰'}</div>
-    <div class="news-content"><div class="news-date">${n.date}</div><div class="news-title">${n.title}</div><div class="news-text">${n.text}</div></div></div>
-  `).join("") : `<div class="news-card"><div class="news-content" style="text-align:center;color:var(--text3);padding:24px;">Пока нет новостей</div></div>`;
-  s.innerHTML = `<div class="section-header"><div class="section-title">🏠 Главная</div></div>
-    <div class="news-list">${newsHtml}</div>
-    <div class="promo-card"><div class="promo-title">🎟 Промокод</div><div class="promo-input-row"><input id="promoInput" class="promo-input" placeholder="Введите код"><button id="promoBtn" class="promo-btn">→</button></div><div id="promoResult" class="promo-result hidden"></div></div>`;
-  document.getElementById("promoBtn").onclick = async () => {
-    const btn = document.getElementById("promoBtn"), val = document.getElementById("promoInput").value.trim(), res = document.getElementById("promoResult");
-    if (!val || btn.disabled) return;
-    btn.disabled = true;
+    <div class="news-card">
+      <div class="news-img">${n.image ? `<img src="${n.image}" loading="lazy" alt="">` : '📰'}</div>
+      <div class="news-body">
+        <div class="news-date">${n.date}</div>
+        <div class="news-title">${n.title}</div>
+        <div class="news-text">${n.text}</div>
+      </div>
+    </div>
+  `).join("") : `<div class="news-card"><div class="news-body"><div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">Пока нет новостей</div></div></div></div>`;
+
+  $("sectionHome").innerHTML = `
+    <div class="section-header">
+      <div>
+        <div class="section-title">Главная</div>
+        <div class="section-subtitle">Новости и промокоды</div>
+      </div>
+    </div>
+    
+    <div class="news-scroll">${newsHtml}</div>
+    
+    <div class="card">
+      <div class="promo-header">
+        <span>🎟</span> Промокод
+      </div>
+      <div class="promo-input-group">
+        <input type="text" class="promo-input" id="promoInput" placeholder="Введите код">
+        <button class="promo-btn" id="promoBtn">→</button>
+      </div>
+      <div class="promo-result hidden" id="promoResult"></div>
+    </div>
+  `;
+
+  $("promoBtn").onclick = async () => {
+    const code = $("promoInput").value.trim();
+    const result = $("promoResult");
+    if (!code) return;
+
+    $("promoBtn").disabled = true;
     try {
-      const r = await api("/api/activate-promocode", { code: val });
-      res.innerHTML = `✅ ${r.reward}`; res.className = "promo-result success";
-      if (typeof r.newBalance !== "undefined") { state.balance = r.newBalance; updateUI(); }
-    } catch(e) { res.innerHTML = `❌ ${e.message}`; res.className = "promo-result error"; }
-    res.classList.remove("hidden"); btn.disabled = false;
-  };
-};
-
-const renderDonate = () => {
-  const s = document.getElementById("sectionDonate");
-  s.innerHTML = `
-    <div class="section-header"><div class="section-title">💝 Донат</div></div>
-    <div class="donate-card">
-      <div class="donate-icon">☕</div>
-      <div class="donate-text">Поддержите проект!</div>
-      <div class="donate-amounts" id="donateAmounts">${DONATE_AMOUNTS.map(a => `<button class="donate-btn" data-amount="${a}">${ICONS.star}${a}</button>`).join('')}</div>
-      <div class="donate-custom"><input type="number" id="donateCustom" placeholder="Своя сумма" min="1" max="10000"><span>Stars</span></div>
-      <button class="donate-send" id="donateSend">Отправить</button>
-    </div>`;
-  let sel = null;
-  s.querySelectorAll('.donate-btn').forEach(b => {
-    b.onclick = () => { s.querySelectorAll('.donate-btn').forEach(x => x.classList.remove('selected')); b.classList.add('selected'); sel = parseInt(b.dataset.amount); document.getElementById("donateCustom").value = ''; };
-  });
-  document.getElementById("donateCustom").oninput = () => { s.querySelectorAll('.donate-btn').forEach(x => x.classList.remove('selected')); sel = null; };
-  document.getElementById("donateSend").onclick = async () => {
-    const custom = document.getElementById("donateCustom").value, amount = custom ? parseInt(custom) : sel;
-    if (!amount || amount < 1 || amount > 10000) { alert("Сумма 1-10000"); return; }
-    try { const r = await api("/api/create-donate", { amount }); if (r.link && tg) tg.openInvoice(r.link, s => { if (s === "paid") tg.showAlert("Спасибо! 💝"); }); } catch(e) { alert(e.message); }
-  };
-};
-
-const renderAdmin = () => {
-  if (!state.isAdmin) return;
-  document.getElementById("sectionAdmin").innerHTML = `
-    <div class="section-header"><div class="section-title" style="color:var(--red)">🛡 Админ</div></div>
-    <div class="admin-form"><div class="admin-row"><input class="admin-input" id="admC" placeholder="Код"><select class="admin-select" id="admT"><option value="stars">Stars</option><option value="gift">Gift</option><option value="case">Case</option></select></div>
-    <div class="admin-row"><input class="admin-input" id="admR" placeholder="ID/Кол-во"><button class="admin-btn" onclick="createPromo()">Создать</button></div></div>
-    <div id="admList"></div>`;
-  loadPromos();
-};
-
-window.createPromo = async () => { try { await api("/api/admin/create-promocode", {code:document.getElementById("admC").value, rewardType:document.getElementById("admT").value, rewardId:document.getElementById("admR").value, maxUses:100}); loadPromos(); } catch(e){alert(e.message);} };
-const loadPromos = async () => { try { const r = await api("/api/admin/get-promocodes"); const list = document.getElementById("admList"); if(list) list.innerHTML = r.promocodes.map(p=>`<div class="admin-promo-item"><div><b>${p.code}</b><br><span style="font-size:11px;color:#888">${p.rewardType}:${p.rewardId}</span></div><button class="admin-promo-del" onclick="delPromo('${p.code}')">${ICONS.close}</button></div>`).join(""); } catch(e){} };
-window.delPromo = async (c) => { if(confirm('Удалить?')){ await api("/api/admin/delete-promocode",{code:c}); loadPromos(); } };
-
-const renderCases = () => {
-  const s = document.getElementById("sectionCases"), cats = Object.entries(state.cases);
-  if(!cats.length) return s.innerHTML = "<p style='text-align:center;padding:40px;color:var(--text3)'>Загрузка...</p>";
-  s.innerHTML = `<div class="section-header"><div class="section-title">🎰 Кейсы</div></div>
-    <div class="case-categories">${cats.map(([k,c])=>`<button class="cat-btn ${k===state.currentCategory?'active':''}" onclick="setCat('${k}')">${c.title}</button>`).join("")}</div>
-    <div class="case-grid" id="caseGrid"></div>`;
-  renderCaseGrid();
-};
-window.setCat = (k) => { state.currentCategory = k; renderCases(); };
-
-const renderCaseGrid = () => {
-  const grid = document.getElementById("caseGrid"), cat = state.cases[state.currentCategory];
-  if(!cat) return;
-  grid.innerHTML = cat.cases.map(c => `
-    <div class="case-card ${c.category}" onclick="openCase('${c.id}')">
-      <div class="case-icon">${c.type==='stars'?ICONS.starCase:(c.category==='cheap'?ICONS.box:ICONS.diamond)}</div>
-      <div class="case-name">${c.title}</div>
-      <div class="case-price-row">${ICONS.star}${c.price}</div>
-    </div>`).join("");
-};
-
-window.openCase = (id) => {
-  const cat = state.cases[state.currentCategory], c = cat.cases.find(x=>x.id===id); if(!c) return;
-  state.selectedCase = c;
-  document.getElementById("choiceIcon").innerHTML = c.type==='stars'?ICONS.starCase:(c.category==='cheap'?ICONS.box:ICONS.diamond);
-  document.getElementById("choiceTitle").textContent = c.title;
-  document.getElementById("choicePriceStars").textContent = c.price;
-  document.getElementById("choicePriceBalance").textContent = c.price;
-  document.getElementById("choiceBalance").classList.toggle("disabled", state.balance < c.price);
-  document.getElementById("caseChoiceModal").classList.remove("hidden");
-};
-
-const showRouletteLoading = () => {
-  document.getElementById("rouletteOverlay").classList.remove("hidden");
-  document.getElementById("rouletteLoading").classList.remove("hidden");
-  document.getElementById("rouletteMain").classList.add("hidden");
-};
-
-document.getElementById("choiceStars").onclick = async () => {
-  document.getElementById("caseChoiceModal").classList.add("hidden");
-  try {
-    const r = await api("/api/create-invoice", {caseId:state.selectedCase.id});
-    if(r.link && tg) tg.openInvoice(r.link, async (s) => {
-      if(s==='paid') {
-        showRouletteLoading(); 
-        setTimeout(async()=>{ try { const res = await api("/api/get-case-result",{paymentId:r.paymentId}); state.balance=res.newBalance; state.pitySpent=res.pitySpent||0; updateUI(); startRouletteSpin(state.selectedCase, res); } catch(e){ document.getElementById("rouletteOverlay").classList.add("hidden"); alert("Результат в боте!"); loadApp(); } }, 600);
+      const r = await api("/api/activate-promocode", { code });
+      result.innerHTML = `✅ ${r.reward}`;
+      result.className = "promo-result success";
+      if (typeof r.newBalance !== "undefined") {
+        state.balance = r.newBalance;
+        updateBalance();
       }
-    });
-  } catch(e){alert(e.message);}
+      $("promoInput").value = "";
+    } catch (e) {
+      result.innerHTML = `❌ ${e.message}`;
+      result.className = "promo-result error";
+    }
+    result.classList.remove("hidden");
+    $("promoBtn").disabled = false;
+  };
 };
 
-document.getElementById("choiceBalance").onclick = async () => {
-  document.getElementById("caseChoiceModal").classList.add("hidden");
-  showRouletteLoading();
-  try { const r = await api("/api/buy-with-balance", {caseId:state.selectedCase.id}); state.balance=r.newBalance; state.pitySpent=r.pitySpent||0; updateUI(); startRouletteSpin(state.selectedCase, r); } 
-  catch(e){ document.getElementById("rouletteOverlay").classList.add("hidden"); alert(e.message); }
-};
-
-const getActiveSignatureSale = () => (state.sales || []).find(s => s.only_with_signature);
-
+// === GIFTS ===
 const renderGifts = () => {
-  const sale = getActiveSignatureSale();
-  document.getElementById("sectionGifts").innerHTML = `
-    <div class="section-header"><div class="section-title">🎁 Подарки</div></div>
-    <div class="gift-grid">${state.gifts.map(g => `
-        <div class="gift-card" onclick="openGift('${g.id}')">
-          ${sale ? `<div class="gift-sale-corner">Скидка</div>` : ``}
-          <div class="gift-img"><img src="${g.gif_url}" loading="lazy"></div>
+  const filters = [
+    { key: "all", label: `Все (${state.gifts.length})` },
+    { key: "regular", label: "Обычные" },
+    { key: "limited", label: "Лимитированные" }
+  ];
+
+  const filteredGifts = state.gifts.filter(g => {
+    if (state.giftFilter === "regular") return !g.is_limited;
+    if (state.giftFilter === "limited") return g.is_limited;
+    return true;
+  });
+
+  $("sectionGifts").innerHTML = `
+    <div class="section-header">
+      <div>
+        <div class="section-title">Подарки</div>
+        <div class="section-subtitle">Выбери и отправь себе</div>
+      </div>
+    </div>
+    
+    <div class="gifts-filters">
+      ${filters.map(f => `
+        <button class="filter-chip ${state.giftFilter === f.key ? 'active' : ''}" onclick="setGiftFilter('${f.key}')">${f.label}</button>
+      `).join("")}
+    </div>
+    
+    <div class="gifts-grid">
+      ${filteredGifts.map(g => `
+        <div class="gift-card ${g.is_limited ? 'limited' : ''} ${g.sold_out ? 'sold-out' : ''}" onclick="openGift('${g.id}')">
+          ${g.is_limited ? '<div class="limited-badge">Limited</div>' : ''}
+          ${g.sold_out ? '<div class="sold-badge">Sold Out</div>' : ''}
+          <div class="gift-visual">${renderGiftVisual(g)}</div>
+          <div class="gift-title">${g.title}</div>
           <div class="gift-price">${ICONS.star}${g.price}</div>
-        </div>`).join("")}</div>`;
+        </div>
+      `).join("")}
+    </div>
+  `;
+};
+
+window.setGiftFilter = (filter) => {
+  state.giftFilter = filter;
+  renderGifts();
 };
 
 window.openGift = (id) => {
-  const g = state.gifts.find(x=>x.id===id); if(!g) return;
-  state.selectedGift = g; state.addSignature = false; state.sender = "@echoaxxs";
-  document.getElementById("giftDetailImg").src = g.gif_url;
-  document.getElementById("giftDetailTitle").textContent = g.title;
-  document.getElementById("signatureSwitch").classList.remove("on");
-  document.getElementById("senderOptions").innerHTML = SENDERS.map(s=>`<div class="sender-option ${s.key===state.sender?'selected':''}" onclick="setSender('${s.key}')" data-sender="${s.key}"><span style="font-weight:500;font-size:13px;">${s.label}</span><span style="color:var(--gold);font-weight:600;font-size:12px;">+${s.cost}⭐</span></div>`).join("");
-  document.getElementById("senderOptions").classList.remove("show"); 
+  const gift = state.gifts.find(g => g.id === id);
+  if (!gift || gift.sold_out) return;
+  
+  state.selectedGift = gift;
+  state.addSignature = false;
+  state.sender = "@echoaxxs";
+  
+  $("giftModalVisual").innerHTML = renderGiftVisual(gift, 140);
+  $("giftModalTitle").textContent = gift.title;
+  $("giftModalPrice").innerHTML = `${ICONS.star} ${gift.price} Stars`;
+  $("signatureSwitch").classList.remove("on");
+  
+  $("senderList").innerHTML = SENDERS.map(s => `
+    <div class="sender-option ${s.key === state.sender ? 'selected' : ''}" onclick="setSender('${s.key}')" data-sender="${s.key}">
+      <span class="sender-name">${s.label}</span>
+      <span class="sender-cost">+${s.cost}⭐</span>
+    </div>
+  `).join("");
+  $("senderList").classList.remove("show");
+  
   updateGiftTotal();
-  document.getElementById("giftDetailModal").classList.remove("hidden");
+  showModal("giftModal");
 };
 
-document.getElementById("signatureToggle").onclick = () => {
+$("closeGiftModal").onclick = () => hideModal("giftModal");
+
+$("signatureToggle").onclick = () => {
   state.addSignature = !state.addSignature;
-  document.getElementById("signatureSwitch").classList.toggle("on", state.addSignature);
-  document.getElementById("senderOptions").classList.toggle("show", state.addSignature);
+  $("signatureSwitch").classList.toggle("on", state.addSignature);
+  $("senderList").classList.toggle("show", state.addSignature);
   updateGiftTotal();
 };
 
-window.setSender = (k) => { state.sender = k; document.querySelectorAll(".sender-option").forEach(e => e.classList.toggle("selected", e.dataset.sender === k)); updateGiftTotal(); };
+window.setSender = (key) => {
+  state.sender = key;
+  document.querySelectorAll(".sender-option").forEach(el => {
+    el.classList.toggle("selected", el.dataset.sender === key);
+  });
+  updateGiftTotal();
+};
 
-const getGiftPriceInfo = (gift, addSignature, sender) => {
-  const basePrice = gift?.price || 0, senderObj = SENDERS.find(x => x.key === sender), signatureCost = addSignature ? (senderObj?.cost || 0) : 0;
-  let discount = 0; const sale = getActiveSignatureSale();
-  if (sale && addSignature) discount = Number(sale.discount || 0);
-  return { basePrice, signatureCost, discount, total: Math.max(0, basePrice - discount) + signatureCost, sale };
+const getGiftPrice = () => {
+  if (!state.selectedGift) return 0;
+  let price = state.selectedGift.price;
+  if (state.addSignature) {
+    const sender = SENDERS.find(s => s.key === state.sender);
+    price += sender?.cost || 0;
+    const sale = state.sales.find(s => s.only_with_signature);
+    if (sale) price -= sale.discount;
+  }
+  return Math.max(0, price);
 };
 
 const updateGiftTotal = () => {
+  const price = getGiftPrice();
+  $("giftTotal").textContent = price;
+  $("starsPrice").textContent = price;
+  $("balancePrice").textContent = price;
+  $("buyWithBalance").classList.toggle("disabled", state.balance < price);
+};
+
+$("buyWithStars").onclick = async () => {
   if (!state.selectedGift) return;
-  const info = getGiftPriceInfo(state.selectedGift, state.addSignature, state.sender), c = info.total;
-  document.getElementById("giftTotalAmount").textContent = c;
-  document.getElementById("giftBuyStarsAmount").textContent = c;
-  document.getElementById("giftBuyBalanceAmount").textContent = c;
-  document.getElementById("giftBuyBalance").classList.toggle("disabled", state.balance < c);
-  const titleEl = document.getElementById("giftDetailTitle");
-  titleEl.innerHTML = info.discount > 0 && state.addSignature ? `${state.selectedGift.title} <span style="color:var(--red);font-size:12px;font-weight:700;">−${info.discount}⭐</span>` : state.selectedGift.title;
-};
-
-document.getElementById("giftBuyStars").onclick = async () => {
-  try { const r = await api("/api/create-invoice", {giftId:state.selectedGift.id, sender:state.addSignature?state.sender:null}); if(r.link && tg) tg.openInvoice(r.link, s=>{ if(s==='paid'){ document.getElementById("giftDetailModal").classList.add("hidden"); tg.showAlert("Отправлено!"); }}); } catch(e){alert(e.message);}
-};
-document.getElementById("giftBuyBalance").onclick = async () => {
-  try { const r = await api("/api/buy-with-balance", {giftId:state.selectedGift.id, sender:state.addSignature?state.sender:null}); state.balance=r.newBalance; updateUI(); document.getElementById("giftDetailModal").classList.add("hidden"); tg ? tg.showAlert(`🎉 ${r.reward}!`) : alert(`🎉 ${r.reward}!`); } catch(e){alert(e.message);}
-};
-
-const startRouletteSpin = (c, r) => {
-  document.getElementById("rouletteLoading").classList.add("hidden");
-  document.getElementById("rouletteMain").classList.remove("hidden");
-  const strip = document.getElementById("rouletteStrip"), res = document.getElementById("rouletteResult"), btn = document.getElementById("rouletteClose");
-  res.textContent = ""; res.className = "roulette-result"; btn.classList.add("hidden"); btn.className="choice-btn cancel hidden";
-  document.getElementById("rouletteTitle").innerHTML = `${c.type==='stars'?ICONS.starCase:ICONS.box}<span>${c.title}</span>`;
-  let items = []; const winIndex = 35;
-  if(c.type==='stars') {
-    const d = r.allDrops || c.possible_drops || [], w = r.starsWon || 0;
-    for(let i=0;i<50;i++) items.push({type:"star", val: d[Math.floor(Math.random()*d.length)]?.stars||50});
-    items[winIndex] = {type:"star", val: w};
-  } else {
-    let visualGifts = state.gifts.filter(g => g.price <= 25);
-    if(visualGifts.length === 0) visualGifts = state.gifts;
-    for(let i=0;i<50;i++) { if(Math.random() < 0.3) items.push({type:"nothing"}); else items.push({type:"gift", val: visualGifts[Math.floor(Math.random()*visualGifts.length)]}); }
-    if(r.type==="nothing") { items[winIndex] = {type:"nothing"}; items[winIndex-1] = {type:"gift", val: visualGifts[Math.floor(Math.random()*visualGifts.length)]}; items[winIndex+1] = {type:"gift", val: visualGifts[Math.floor(Math.random()*visualGifts.length)]}; }
-    else if(r.pityTriggered) { items[winIndex] = {type:"gift", val: state.gifts.find(x=>x.id==="heart")||state.gifts[0]}; }
-    else if(r.won?.length) { items[winIndex] = {type:"gift", val: state.gifts.find(x=>x.title===r.won[0].title)}; }
+  try {
+    const r = await api("/api/create-invoice", {
+      giftId: state.selectedGift.id,
+      sender: state.addSignature ? state.sender : null
+    });
+    if (r.link && tg) {
+      tg.openInvoice(r.link, (status) => {
+        if (status === 'paid') {
+          hideModal("giftModal");
+          tg.showAlert("🎉 Подарок отправлен!");
+        }
+      });
+    }
+  } catch (e) {
+    alert(e.message);
   }
-  strip.innerHTML = items.map(i => {
-    if(i.type==="star") return `<div class="r-item star-theme"><div class="r-img-wrap"><svg viewBox="0 0 24 24" fill="#000"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg></div><div class="r-title">Stars</div><div class="r-price">${ICONS.star}${i.val}</div></div>`;
-    if(i.type==="nothing") return `<div class="r-item"><div class="r-img-wrap">${ICONS.nothing}</div><div class="r-title" style="color:var(--text2)">Пусто</div><div class="r-price" style="color:var(--text3)">---</div></div>`;
-    return `<div class="r-item"><div class="r-img-wrap"><img src="${i.val.gif_url}" loading="lazy"></div><div class="r-title">${i.val.title}</div><div class="r-price">${ICONS.star}${i.val.price}</div></div>`;
+};
+
+$("buyWithBalance").onclick = async () => {
+  if (!state.selectedGift) return;
+  try {
+    const r = await api("/api/buy-with-balance", {
+      giftId: state.selectedGift.id,
+      sender: state.addSignature ? state.sender : null
+    });
+    state.balance = r.newBalance;
+    updateBalance();
+    hideModal("giftModal");
+    tg ? tg.showAlert(`🎉 ${r.reward}!`) : alert(`🎉 ${r.reward}!`);
+  } catch (e) {
+    alert(e.message);
+  }
+};
+
+// === CASES ===
+const renderCases = () => {
+  const cats = Object.entries(state.cases);
+  if (!cats.length) {
+    $("sectionCases").innerHTML = `<div class="empty-state"><div class="empty-state-icon">📦</div><div class="empty-state-text">Загрузка кейсов...</div></div>`;
+    return;
+  }
+
+  $("sectionCases").innerHTML = `
+    <div class="section-header">
+      <div>
+        <div class="section-title">Кейсы</div>
+        <div class="section-subtitle">Испытай удачу!</div>
+      </div>
+    </div>
+    
+    <div class="case-tabs">
+      ${cats.map(([key, cat]) => `
+        <button class="case-tab ${key === state.currentCategory ? 'active' : ''}" onclick="setCaseCategory('${key}')">${cat.title}</button>
+      `).join("")}
+    </div>
+    
+    <div class="cases-grid" id="casesGrid"></div>
+  `;
+  
+  renderCasesGrid();
+};
+
+const renderCasesGrid = () => {
+  const cat = state.cases[state.currentCategory];
+  if (!cat) return;
+
+  const pityPercent = (state.pitySpent / state.pityThreshold) * 100;
+
+  $("casesGrid").innerHTML = cat.cases.map(c => `
+    <div class="case-card ${c.category}" onclick="openCase('${c.id}')">
+      <div class="case-icon">${c.type === 'stars' ? '⭐' : (c.category === 'cheap' ? '📦' : '💎')}</div>
+      <div class="case-name">${c.title}</div>
+      <div class="case-price">${ICONS.star}${c.price}</div>
+      ${c.pity_enabled ? `
+        <div class="pity-info">
+          <div class="pity-bar"><div class="pity-fill" style="width: ${pityPercent}%"></div></div>
+          <div class="pity-text">До гаранта: ${state.pityThreshold - state.pitySpent}⭐</div>
+        </div>
+      ` : ''}
+    </div>
+  `).join("");
+};
+
+window.setCaseCategory = (key) => {
+  state.currentCategory = key;
+  renderCases();
+};
+
+window.openCase = (id) => {
+  const cat = state.cases[state.currentCategory];
+  const c = cat?.cases.find(x => x.id === id);
+  if (!c) return;
+  
+  state.selectedCase = c;
+  
+  $("caseModalIcon").innerHTML = c.type === 'stars' ? '⭐' : (c.category === 'cheap' ? '📦' : '💎');
+  $("caseModalTitle").textContent = c.title;
+  $("caseStarsPrice").textContent = c.price;
+  $("caseBalancePrice").textContent = c.price;
+  $("caseBalanceBtn").classList.toggle("disabled", state.balance < c.price);
+  
+  showModal("caseModal");
+};
+
+$("closeCaseModal").onclick = () => hideModal("caseModal");
+
+$("caseStarsBtn").onclick = async () => {
+  hideModal("caseModal");
+  try {
+    const r = await api("/api/create-invoice", { caseId: state.selectedCase.id });
+    if (r.link && tg) {
+      tg.openInvoice(r.link, async (status) => {
+        if (status === 'paid') {
+          showRouletteLoading();
+          setTimeout(async () => {
+            try {
+              const result = await api("/api/get-case-result", { paymentId: r.paymentId });
+              state.balance = result.newBalance;
+              state.pitySpent = result.pitySpent || 0;
+              updateBalance();
+              startRoulette(state.selectedCase, result);
+            } catch (e) {
+              hideModal("rouletteOverlay");
+              alert("Результат в боте!");
+              await loadApp();
+            }
+          }, 600);
+        }
+      });
+    }
+  } catch (e) {
+    alert(e.message);
+  }
+};
+
+$("caseBalanceBtn").onclick = async () => {
+  hideModal("caseModal");
+  showRouletteLoading();
+  try {
+    const r = await api("/api/buy-with-balance", { caseId: state.selectedCase.id });
+    state.balance = r.newBalance;
+    state.pitySpent = r.pitySpent || 0;
+    updateBalance();
+    startRoulette(state.selectedCase, r);
+  } catch (e) {
+    hideModal("rouletteOverlay");
+    alert(e.message);
+  }
+};
+
+const showRouletteLoading = () => {
+  showModal("rouletteOverlay");
+  $("rouletteLoading").classList.remove("hidden");
+  $("rouletteContent").classList.add("hidden");
+};
+
+const startRoulette = (caseData, result) => {
+  $("rouletteLoading").classList.add("hidden");
+  $("rouletteContent").classList.remove("hidden");
+  
+  const strip = $("rouletteStrip");
+  const resultEl = $("rouletteResult");
+  const closeBtn = $("rouletteClose");
+  
+  resultEl.textContent = "";
+  resultEl.className = "roulette-result";
+  closeBtn.classList.add("hidden");
+  closeBtn.className = "roulette-close hidden";
+  
+  $("rouletteTitle").innerHTML = `${caseData.type === 'stars' ? '⭐' : '📦'} ${caseData.title}`;
+  
+  let items = [];
+  const winIndex = 35;
+  
+  if (caseData.type === 'stars') {
+    const drops = result.allDrops || result.all_drops || [];
+    for (let i = 0; i < 50; i++) {
+      items.push({ type: "star", value: drops.length ? drops[Math.floor(Math.random() * drops.length)]?.stars || 50 : 50 });
+    }
+    items[winIndex] = { type: "star", value: result.starsWon || result.stars_won || 100 };
+  } else {
+    const visualGifts = state.gifts.filter(g => g.price <= 50 && !g.sold_out).slice(0, 10);
+    const fallbackGifts = visualGifts.length ? visualGifts : state.gifts.slice(0, 5);
+    
+    for (let i = 0; i < 50; i++) {
+      if (Math.random() < 0.25) {
+        items.push({ type: "nothing" });
+      } else {
+        items.push({ type: "gift", value: fallbackGifts[Math.floor(Math.random() * fallbackGifts.length)] });
+      }
+    }
+    
+    if (result.type === "nothing") {
+      items[winIndex] = { type: "nothing" };
+    } else if (result.won?.length) {
+      const wonGift = state.gifts.find(g => g.id === result.won[0].id) || result.won[0];
+      items[winIndex] = { type: "gift", value: wonGift };
+    } else if (result.pityTriggered) {
+      items[winIndex] = { type: "gift", value: state.gifts.find(g => !g.sold_out) || state.gifts[0] };
+    }
+  }
+  
+  strip.innerHTML = items.map(item => {
+    if (item.type === "star") {
+      return `
+        <div class="roulette-item star-item">
+          <div class="roulette-item-visual">${ICONS.star.replace(/24/g, '52')}</div>
+          <div class="roulette-item-title">Stars</div>
+          <div class="roulette-item-price">${ICONS.star}${item.value}</div>
+        </div>
+      `;
+    }
+    if (item.type === "nothing") {
+      return `
+        <div class="roulette-item">
+          <div class="roulette-item-visual">${ICONS.nothing}</div>
+          <div class="roulette-item-title" style="color:var(--text3)">Пусто</div>
+          <div class="roulette-item-price" style="opacity:0.4">---</div>
+        </div>
+      `;
+    }
+    return `
+      <div class="roulette-item">
+        <div class="roulette-item-visual">${renderGiftVisual(item.value, 56)}</div>
+        <div class="roulette-item-title">${item.value?.title || 'Подарок'}</div>
+        <div class="roulette-item-price">${ICONS.star}${item.value?.price || '?'}</div>
+      </div>
+    `;
   }).join("");
-  strip.style.transition = "none"; strip.style.transform = "translateX(0)";
+  
+  strip.style.transition = "none";
+  strip.style.transform = "translateX(0)";
+  
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      const containerWidth = document.querySelector('.roulette-window').offsetWidth, itemWidth = 100, gap = 6, advance = itemWidth + gap;
-      const itemCenter = 3 + (winIndex * advance) + (itemWidth / 2), randomOffset = (Math.random() * 84) - 42;
-      strip.style.transition = "transform 4.5s cubic-bezier(0.12, 0.8, 0.28, 1)";
+      const containerWidth = document.querySelector('.roulette-window').offsetWidth;
+      const itemWidth = 115;
+      const gap = 10;
+      const advance = itemWidth + gap;
+      const itemCenter = 5 + (winIndex * advance) + (itemWidth / 2);
+      const randomOffset = (Math.random() * 90) - 45;
+      
+      strip.style.transition = "transform 5s cubic-bezier(0.12, 0.8, 0.28, 1)";
       strip.style.transform = `translateX(${(containerWidth / 2) - itemCenter + randomOffset}px)`;
     });
   });
+  
   setTimeout(() => {
-    if(c.type==='stars') { res.innerHTML = `${ICONS.star}<span>+${r.starsWon} Stars!</span>`; res.classList.add("stars"); btn.className="choice-btn stars"; btn.textContent="Забрать!"; }
-    else if(r.type==="nothing") { res.innerHTML = `${ICONS.close}<span>Пусто...</span>`; res.classList.add("lose"); btn.textContent="Закрыть"; }
-    else if(r.pityTriggered) { res.innerHTML = `🎁<span>Гарант!</span>`; res.classList.add("win"); btn.className="choice-btn"; btn.style.background="var(--green)"; btn.textContent="Круто!"; }
-    else { res.innerHTML = `${ICONS.check}<span>${items[winIndex].val?.title||'Подарок'}!</span>`; res.classList.add("win"); btn.className="choice-btn"; btn.style.background="var(--green)"; btn.textContent="Забрать!"; }
-    btn.classList.remove("hidden");
-  }, 4700);
+    if (caseData.type === 'stars') {
+      const won = result.starsWon || result.stars_won || 0;
+      resultEl.innerHTML = `${ICONS.star} +${won} Stars!`;
+      resultEl.classList.add("stars");
+      closeBtn.classList.add("success");
+      closeBtn.textContent = "Забрать!";
+    } else if (result.type === "nothing") {
+      resultEl.innerHTML = `${ICONS.close} Ничего...`;
+      resultEl.classList.add("lose");
+      closeBtn.textContent = "Закрыть";
+    } else {
+      const wonTitle = result.won?.[0]?.title || 'Подарок';
+      resultEl.innerHTML = `${ICONS.check} ${wonTitle}!`;
+      resultEl.classList.add("win");
+      closeBtn.classList.add("success");
+      closeBtn.textContent = result.pityTriggered ? "Гарант! 🎉" : "Круто!";
+    }
+    closeBtn.classList.remove("hidden");
+  }, 5200);
 };
 
-document.getElementById("rouletteClose").onclick = () => { document.getElementById("rouletteOverlay").classList.add("hidden"); renderCases(); };
+$("rouletteClose").onclick = () => {
+  hideModal("rouletteOverlay");
+  renderCases();
+};
 
-if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
+// === DONATE ===
+const renderDonate = () => {
+  $("sectionDonate").innerHTML = `
+    <div class="section-header">
+      <div>
+        <div class="section-title">Донат</div>
+        <div class="section-subtitle">Поддержи проект</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="donate-hero">
+        <div class="donate-icon">💝</div>
+        <div class="donate-title">Поддержите нас!</div>
+        <div class="donate-desc">Ваши донаты помогают развивать проект и добавлять новые функции</div>
+      </div>
+      
+      <div class="donate-amounts" id="donateAmounts">
+        ${DONATE_AMOUNTS.map(a => `
+          <button class="donate-amount" data-amount="${a}">${ICONS.star}${a}</button>
+        `).join("")}
+      </div>
+      
+      <div class="donate-custom">
+        <input type="number" id="donateCustom" placeholder="Другая сумма" min="1" max="10000">
+        <span>Stars</span>
+      </div>
+      
+      <button class="donate-send" id="donateSend">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        Отправить донат
+      </button>
+    </div>
+  `;
+
+  let selectedAmount = null;
+  
+  document.querySelectorAll('.donate-amount').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.donate-amount').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedAmount = parseInt(btn.dataset.amount);
+      $("donateCustom").value = '';
+    };
+  });
+
+  $("donateCustom").oninput = () => {
+    document.querySelectorAll('.donate-amount').forEach(b => b.classList.remove('selected'));
+    selectedAmount = null;
+  };
+
+  $("donateSend").onclick = async () => {
+    const customVal = $("donateCustom").value;
+    const amount = customVal ? parseInt(customVal) : selectedAmount;
+    
+    if (!amount || amount < 1 || amount > 10000) {
+      alert("Укажите сумму от 1 до 10000");
+      return;
+    }
+    
+    try {
+      const r = await api("/api/create-donate", { amount });
+      if (r.link && tg) {
+        tg.openInvoice(r.link, (status) => {
+          if (status === 'paid') {
+            tg.showAlert("💝 Спасибо за донат!");
+          }
+        });
+      }
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+};
+
+// === ADMIN ===
+const renderAdmin = () => {
+  if (!state.isAdmin) return;
+  
+  $("sectionAdmin").innerHTML = `
+    <div class="section-header">
+      <div>
+        <div class="section-title" style="color:var(--red)">🛡 Админ</div>
+        <div class="section-subtitle">Управление промокодами</div>
+      </div>
+    </div>
+    
+    <div class="admin-card">
+      <div class="admin-header">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        Создать промокод
+      </div>
+      
+      <div class="admin-form">
+        <div class="admin-row">
+          <input class="admin-input" id="admCode" placeholder="Код (напр. GIFT2024)" style="text-transform:uppercase;">
+        </div>
+        
+        <div class="admin-row">
+          <select class="admin-select" id="admType">
+            <option value="stars">⭐ Stars</option>
+            <option value="gift">🎁 Подарок</option>
+            <option value="case">📦 Кейс</option>
+          </select>
+        </div>
+        
+        <div class="admin-row">
+          <select class="admin-select" id="admReward"></select>
+        </div>
+        
+        <div class="admin-row">
+          <input class="admin-input" id="admMaxUses" type="number" placeholder="Макс. использований" value="100">
+          <button class="admin-btn" id="admCreate">Создать</button>
+        </div>
+      </div>
+      
+      <div class="promo-list">
+        <div class="promo-list-title">Активные промокоды</div>
+        <div id="promoList"></div>
+      </div>
+    </div>
+  `;
+  
+  const updateRewardOptions = () => {
+    const type = $("admType").value;
+    const select = $("admReward");
+    
+    if (type === "stars") {
+      select.innerHTML = [10, 25, 50, 100, 250, 500, 1000].map(v => 
+        `<option value="${v}">${v} Stars</option>`
+      ).join("");
+    } else if (type === "gift") {
+      select.innerHTML = state.adminGifts.map(g => 
+        `<option value="${g.id}">${g.title} (${g.price}⭐)${g.is_limited ? ' 🔥' : ''}</option>`
+      ).join("");
+    } else if (type === "case") {
+      select.innerHTML = state.adminCases.map(c => 
+        `<option value="${c.id}">${c.title} (${c.price}⭐)</option>`
+      ).join("");
+    }
+  };
+  
+  $("admType").onchange = updateRewardOptions;
+  updateRewardOptions();
+  
+  $("admCreate").onclick = async () => {
+    const code = $("admCode").value.trim().toUpperCase();
+    const type = $("admType").value;
+    const reward = $("admReward").value;
+    const maxUses = parseInt($("admMaxUses").value) || 100;
+    
+    if (!code) {
+      alert("Введите код");
+      return;
+    }
+    
+    try {
+      await api("/api/admin/create-promocode", {
+        code,
+        rewardType: type,
+        rewardId: reward,
+        maxUses
+      });
+      $("admCode").value = "";
+      await loadPromocodes();
+      alert("✅ Промокод создан!");
+    } catch (e) {
+      alert("Ошибка: " + e.message);
+    }
+  };
+  
+  loadPromocodes();
+};
+
+const loadPromocodes = async () => {
+  try {
+    const r = await api("/api/admin/get-promocodes");
+    state.promocodes = r.promocodes || [];
+    
+    const list = $("promoList");
+    if (!list) return;
+    
+    if (state.promocodes.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);">Нет промокодов</div>';
+      return;
+    }
+    
+    list.innerHTML = state.promocodes.map(p => `
+      <div class="promo-item">
+        <div class="promo-item-info">
+          <div class="promo-item-code">${p.code}</div>
+          <div class="promo-item-meta">${p.rewardType}: ${p.rewardId} • ${p.uses}/${p.maxUses} исп.</div>
+        </div>
+        <button class="promo-item-del" onclick="deletePromo('${p.code}')">${ICONS.trash}</button>
+      </div>
+    `).join("");
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+window.deletePromo = async (code) => {
+  if (!confirm(`Удалить промокод ${code}?`)) return;
+  try {
+    await api("/api/admin/delete-promocode", { code });
+    await loadPromocodes();
+  } catch (e) {
+    alert("Ошибка: " + e.message);
+  }
+};
+
+// === START ===
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 </script>
 </body>
 </html>
