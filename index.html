@@ -7,11 +7,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <!-- Lottie Player для TGS анимаций -->
-  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-  <!-- Pako для распаковки gzip (TGS = gzipped Lottie JSON) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
   
   <style>
     :root {
@@ -50,7 +46,6 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.95); } }
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-    @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
     .bg-effects { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
@@ -61,7 +56,6 @@
     .app { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; padding-bottom: calc(75px + env(safe-area-inset-bottom)); }
     .hidden { display: none !important; }
 
-    /* HEADER & NAV */
     .header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; padding-top: env(safe-area-inset-top); background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
     .logo { display: flex; align-items: center; gap: 12px; }
     .logo-icon { width: 42px; height: 42px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #000; box-shadow: 0 0 25px var(--primary-glow); }
@@ -76,7 +70,6 @@
     .nav-btn.active { color: var(--primary); }
     .nav-btn.active i { transform: scale(1.1); filter: drop-shadow(0 0 8px var(--primary-glow)); }
 
-    /* SECTIONS & CARDS */
     .section { width: 100%; padding: 20px; padding-top: calc(90px + env(safe-area-inset-top)); animation: fadeIn 0.4s ease-out; }
     .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
     .section-head h2 { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; }
@@ -88,210 +81,114 @@
     .card-head i { width: 42px; height: 42px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #000; }
     .card-head h3 { font-size: 16px; font-weight: 700; }
     .card-head p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-
     .empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); }
     .empty-state i { font-size: 48px; margin-bottom: 14px; opacity: 0.3; }
-    .empty-state p { font-size: 15px; }
 
-    /* HOME */
-    .news-scroll { display: flex; gap: 14px; overflow-x: auto; padding: 4px 0 16px; margin: 0 -20px; padding-left: 20px; padding-right: 20px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .news-scroll { display: flex; gap: 14px; overflow-x: auto; padding: 4px 0 16px; margin: 0 -20px; padding-left: 20px; padding-right: 20px; scrollbar-width: none; }
     .news-scroll::-webkit-scrollbar { display: none; }
     .news-card { flex-shrink: 0; width: 280px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: var(--transition); }
-    .news-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
-    .news-img { width: 100%; height: 140px; background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(178, 75, 243, 0.1)); display: flex; align-items: center; justify-content: center; font-size: 40px; color: var(--text-muted); }
+    .news-img { width: 100%; height: 140px; background: linear-gradient(135deg, rgba(0,240,255,0.1), rgba(178,75,243,0.1)); display: flex; align-items: center; justify-content: center; font-size: 40px; color: var(--text-muted); }
     .news-img img { width: 100%; height: 100%; object-fit: cover; }
     .news-body { padding: 16px; }
     .news-date { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
     .news-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
     .news-text { font-size: 13px; color: var(--text-dim); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-    .promo-row { display: flex; gap: 10px; align-items: center; width: 100%; }
+    .promo-row { display: flex; gap: 10px; align-items: center; }
     .promo-input { flex: 1; height: 56px; background: #141414; border: 2px solid var(--border); border-radius: var(--radius-sm); padding: 0 16px; font-size: 16px; font-family: inherit; font-weight: 600; color: var(--text); text-transform: uppercase; transition: var(--transition); }
-    .promo-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(0, 240, 255, 0.15); }
+    .promo-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(0,240,255,0.15); }
     .promo-input::placeholder { text-transform: none; color: var(--text-muted); font-weight: 400; }
     .promo-btn { width: 56px; height: 56px; flex-shrink: 0; background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; border-radius: var(--radius-sm); color: #000; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); box-shadow: 0 4px 20px var(--primary-glow); }
-    .promo-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--primary-glow); }
     .promo-btn:active { transform: scale(0.95); }
     .promo-result { margin-top: 14px; padding: 14px 16px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-    .promo-result.success { background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.25); color: var(--accent-green); }
-    .promo-result.error { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: var(--accent-red); }
+    .promo-result.success { background: rgba(0,255,136,0.1); border: 1px solid rgba(0,255,136,0.25); color: var(--accent-green); }
+    .promo-result.error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: var(--accent-red); }
 
-    /* GIFTS - НОВЫЙ ДИЗАЙН БЕЗ НАЗВАНИЙ */
     .filters-row { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding: 4px 0; scrollbar-width: none; }
     .filters-row::-webkit-scrollbar { display: none; }
     .filter-btn { flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: #141414; border: 1px solid var(--border); border-radius: 20px; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--text-dim); cursor: pointer; transition: var(--transition); }
-    .filter-btn:hover { color: var(--text); border-color: var(--border-hover); }
     .filter-btn.active { background: linear-gradient(135deg, var(--primary), var(--secondary)); border-color: transparent; color: #000; }
 
     .gifts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    
-    .gift-card { 
-      background: var(--bg-card); 
-      border: 1px solid var(--border); 
-      border-radius: var(--radius); 
-      padding: 12px 8px 10px; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      gap: 8px; 
-      cursor: pointer; 
-      transition: var(--transition); 
-      position: relative; 
-      overflow: hidden;
-      aspect-ratio: 1;
-    }
-    .gift-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+    .gift-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 8px 10px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: var(--transition); position: relative; overflow: hidden; }
     .gift-card:active { transform: scale(0.96); }
-    .gift-card.limited { background: linear-gradient(135deg, rgba(236, 72, 153, 0.08), rgba(178, 75, 243, 0.08)); }
+    .gift-card.limited { background: linear-gradient(135deg, rgba(236,72,153,0.08), rgba(178,75,243,0.08)); }
     .gift-card.limited::before { content: ""; position: absolute; inset: 0; border-radius: var(--radius); padding: 1.5px; background: linear-gradient(135deg, var(--accent-pink), var(--secondary)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
     .gift-card.sold-out { opacity: 0.4; pointer-events: none; }
     .gift-card.unavailable { opacity: 0.5; }
-
     .limited-tag { position: absolute; top: 6px; right: 6px; padding: 3px 6px; background: linear-gradient(135deg, var(--accent-pink), var(--secondary)); border-radius: 4px; font-size: 8px; font-weight: 800; color: #fff; text-transform: uppercase; z-index: 5; }
-    .sold-tag { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 6px 10px; background: rgba(0,0,0,0.9); border-radius: 6px; font-size: 9px; font-weight: 700; color: var(--accent-red); z-index: 5; }
+    .sold-tag { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); padding: 6px 10px; background: rgba(0,0,0,0.9); border-radius: 6px; font-size: 9px; font-weight: 700; color: var(--accent-red); z-index: 5; }
 
-    /* Контейнер для TGS анимации */
-    .gift-visual { 
-      width: 70px; 
-      height: 70px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      border-radius: var(--radius-sm); 
-      overflow: hidden;
-      flex: 1;
-    }
-    .gift-visual lottie-player {
-      width: 100%;
-      height: 100%;
-    }
-    .gift-visual .emoji { font-size: 42px; }
-    .gift-visual .placeholder { font-size: 32px; color: var(--text-muted); }
-    
-    /* Загрузка анимации */
-    .gift-visual .loading {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(90deg, #222 25%, #333 50%, #222 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: 8px;
-    }
+    .gift-visual { width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .gift-visual .lottie-container { width: 100%; height: 100%; }
+    .gift-visual .emoji { font-size: 48px; }
+    .gift-visual .sticker-loading { width: 50px; height: 50px; background: linear-gradient(90deg, #222 25%, #333 50%, #222 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 10px; }
 
-    /* Только цена, без названия */
-    .gift-price { 
-      display: flex; 
-      align-items: center; 
-      gap: 4px; 
-      font-size: 14px; 
-      font-weight: 700; 
-      color: var(--accent-gold);
-      padding: 4px 10px;
-      background: rgba(251, 191, 36, 0.1);
-      border-radius: 8px;
-    }
+    .gift-price { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700; color: var(--accent-gold); padding: 4px 10px; background: rgba(251,191,36,0.1); border-radius: 8px; }
     .gift-price i { font-size: 12px; }
 
-    /* CASES */
     .case-tabs { display: flex; gap: 4px; margin-bottom: 16px; background: #0a0a0a; border-radius: var(--radius-sm); padding: 4px; border: 1px solid var(--border); }
     .case-tab { flex: 1; padding: 12px 14px; background: transparent; border: none; border-radius: var(--radius-xs); font-family: inherit; font-size: 13px; font-weight: 600; color: var(--text-dim); cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .case-tab:hover { color: var(--text); background: var(--bg-hover); }
     .case-tab.active { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #000; }
 
     .cases-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .case-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 14px; display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer; transition: var(--transition); position: relative; }
-    .case-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
+    .case-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 14px; display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer; transition: var(--transition); }
     .case-card:active { transform: scale(0.97); }
     .case-card.cheap { border-top: 3px solid var(--accent-green); }
     .case-card.gifts { border-top: 3px solid var(--secondary); }
-    .case-card.stars { border-top: 3px solid var(--accent-gold); background: linear-gradient(180deg, rgba(251, 191, 36, 0.06) 0%, var(--bg-card) 50%); }
-
+    .case-card.stars { border-top: 3px solid var(--accent-gold); background: linear-gradient(180deg, rgba(251,191,36,0.06) 0%, var(--bg-card) 50%); }
     .case-icon { width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 26px; color: #000; box-shadow: 0 6px 25px var(--primary-glow); }
-    .case-card.cheap .case-icon { background: linear-gradient(135deg, var(--accent-green), #00cc6a); box-shadow: 0 6px 25px rgba(0, 255, 136, 0.4); }
-    .case-card.stars .case-icon { background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange)); box-shadow: 0 6px 25px rgba(251, 191, 36, 0.4); }
-
+    .case-card.cheap .case-icon { background: linear-gradient(135deg, var(--accent-green), #00cc6a); box-shadow: 0 6px 25px rgba(0,255,136,0.4); }
+    .case-card.stars .case-icon { background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange)); box-shadow: 0 6px 25px rgba(251,191,36,0.4); }
     .case-name { font-size: 15px; font-weight: 700; text-align: center; }
     .case-price { display: flex; align-items: center; gap: 5px; font-size: 18px; font-weight: 800; color: var(--accent-gold); }
 
-    /* DONATE */
     .donate-hero { text-align: center; padding: 20px 0 10px; }
-    .donate-visual { width: 90px; height: 90px; margin: 0 auto 20px; background: linear-gradient(135deg, var(--accent-pink), var(--secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #fff; box-shadow: 0 0 40px rgba(236, 72, 153, 0.4); animation: float 4s ease-in-out infinite; }
+    .donate-visual { width: 90px; height: 90px; margin: 0 auto 20px; background: linear-gradient(135deg, var(--accent-pink), var(--secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #fff; box-shadow: 0 0 40px rgba(236,72,153,0.4); animation: float 4s ease-in-out infinite; }
     .donate-title { font-size: 24px; font-weight: 800; margin-bottom: 10px; background: linear-gradient(135deg, var(--accent-pink), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .donate-desc { font-size: 14px; color: var(--text-dim); max-width: 300px; margin: 0 auto; line-height: 1.5; }
-    
     .donate-amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 24px 0; }
     .donate-amt { height: 52px; background: #141414; border: 2px solid var(--border); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; font-size: 15px; font-weight: 700; color: var(--text); cursor: pointer; transition: var(--transition); }
-    .donate-amt:hover { border-color: var(--accent-pink); background: rgba(236, 72, 153, 0.08); }
-    .donate-amt.selected { border-color: var(--accent-pink); background: rgba(236, 72, 153, 0.15); color: var(--accent-pink); }
-    
-    .donate-custom { display: flex; align-items: center; background: #141414; border: 2px solid var(--border); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 20px; transition: var(--transition); }
+    .donate-amt.selected { border-color: var(--accent-pink); background: rgba(236,72,153,0.15); color: var(--accent-pink); }
+    .donate-custom { display: flex; align-items: center; background: #141414; border: 2px solid var(--border); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 20px; }
     .donate-custom:focus-within { border-color: var(--primary); }
     .donate-custom input { flex: 1; height: 48px; background: transparent; border: none; padding: 0 16px; font-family: inherit; font-size: 18px; font-weight: 700; color: var(--text); }
     .donate-custom input:focus { outline: none; }
     .donate-custom input::placeholder { color: var(--text-muted); font-weight: 500; }
     .donate-custom span { padding: 0 16px; font-size: 15px; font-weight: 600; color: var(--text-muted); }
-    
-    .donate-send { width: 100%; height: 56px; background: linear-gradient(135deg, var(--accent-pink), var(--secondary)); border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 16px; font-weight: 700; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: var(--transition); box-shadow: 0 6px 25px rgba(236, 72, 153, 0.4); }
+    .donate-send { width: 100%; height: 56px; background: linear-gradient(135deg, var(--accent-pink), var(--secondary)); border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 16px; font-weight: 700; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 6px 25px rgba(236,72,153,0.4); }
     .donate-send:active { transform: scale(0.98); }
 
-    /* ADMIN */
-    .admin-card { background: var(--bg-card); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
-    .admin-head { display: flex; align-items: center; gap: 14px; padding: 18px 20px; background: rgba(239, 68, 68, 0.06); border-bottom: 1px solid rgba(239, 68, 68, 0.15); }
+    .admin-card { background: var(--bg-card); border: 1px solid rgba(239,68,68,0.2); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+    .admin-head { display: flex; align-items: center; gap: 14px; padding: 18px 20px; background: rgba(239,68,68,0.06); border-bottom: 1px solid rgba(239,68,68,0.15); }
     .admin-head i { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent-red), var(--accent-orange)); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff; }
     .admin-body { padding: 20px; }
     .admin-field { margin-bottom: 16px; }
     .admin-field label { display: block; font-size: 12px; font-weight: 600; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .admin-input, .admin-select { width: 100%; height: 50px; background: #141414; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 14px; font-family: inherit; font-size: 14px; color: var(--text); transition: var(--transition); }
+    .admin-input, .admin-select { width: 100%; height: 50px; background: #141414; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 14px; font-family: inherit; font-size: 14px; color: var(--text); }
     .admin-input:focus, .admin-select:focus { outline: none; border-color: var(--primary); }
-    .admin-btn { height: 50px; width: 100%; padding: 0 24px; background: linear-gradient(135deg, var(--accent-red), var(--accent-orange)); border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 14px; font-weight: 700; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; transition: var(--transition); }
+    .admin-btn { height: 50px; width: 100%; padding: 0 24px; background: linear-gradient(135deg, var(--accent-red), var(--accent-orange)); border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 14px; font-weight: 700; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
     .promo-list { margin-top: 20px; }
     .promo-item { display: flex; align-items: center; justify-content: space-between; padding: 14px; background: #141414; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 8px; }
     .promo-item-code { font-family: monospace; font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 3px; }
     .promo-item-meta { font-size: 11px; color: var(--text-muted); }
-    .promo-item-del { width: 38px; height: 38px; background: rgba(239, 68, 68, 0.12); border: none; border-radius: var(--radius-xs); color: var(--accent-red); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: var(--transition); }
+    .promo-item-del { width: 38px; height: 38px; background: rgba(239,68,68,0.12); border: none; border-radius: var(--radius-xs); color: var(--accent-red); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
 
-    /* MODALS */
-    .modal-overlay { position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.92); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.25s ease-out; overscroll-behavior: none; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.92); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.25s ease-out; }
     .modal-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 380px; max-height: 85vh; overflow-y: auto; position: relative; scrollbar-width: none; }
     .modal-box::-webkit-scrollbar { display: none; }
-    .modal-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border); border-radius: var(--radius-xs); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: var(--transition); z-index: 10; }
+    .modal-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: var(--radius-xs); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; z-index: 10; }
     .modal-body { padding: 28px 24px; }
 
-    /* Subscribe Modal */
     .subscribe-visual { width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; color: #000; box-shadow: 0 0 35px var(--primary-glow); }
     .subscribe-title { text-align: center; font-size: 22px; font-weight: 800; margin-bottom: 8px; }
     .subscribe-desc { text-align: center; font-size: 14px; color: var(--text-dim); margin-bottom: 24px; line-height: 1.5; }
-    .channel-item { display: flex; align-items: center; padding: 14px; background: #141414; border: 1px solid var(--border); border-radius: var(--radius-sm); text-decoration: none; color: var(--text); transition: var(--transition); margin-bottom: 10px; }
+    .channel-item { display: flex; align-items: center; padding: 14px; background: #141414; border: 1px solid var(--border); border-radius: var(--radius-sm); text-decoration: none; color: var(--text); margin-bottom: 10px; }
 
-    /* Gift Detail Modal - БЕЗ НАЗВАНИЯ */
-    .gift-detail-visual { 
-      width: 160px; 
-      height: 160px; 
-      margin: 0 auto 20px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      background: rgba(255, 255, 255, 0.03); 
-      border-radius: var(--radius); 
-      overflow: hidden; 
-    }
-    .gift-detail-visual lottie-player {
-      width: 140px;
-      height: 140px;
-    }
+    .gift-detail-visual { width: 160px; height: 160px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .gift-detail-visual .lottie-container { width: 100%; height: 100%; }
     .gift-detail-visual .emoji { font-size: 80px; }
-    
-    .gift-detail-price { 
-      text-align: center; 
-      font-size: 28px; 
-      font-weight: 800; 
-      color: var(--accent-gold); 
-      margin-bottom: 24px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      gap: 8px; 
-    }
+    .gift-detail-price { text-align: center; font-size: 28px; font-weight: 800; color: var(--accent-gold); margin-bottom: 24px; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
     .signature-box { background: #141414; border-radius: var(--radius-sm); padding: 16px; margin-bottom: 18px; }
     .signature-toggle { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
@@ -301,15 +198,14 @@
     .toggle-switch.on { background: var(--accent-green); }
     .toggle-switch::after { content: ""; position: absolute; width: 26px; height: 26px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: var(--transition); box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
     .toggle-switch.on::after { transform: translateX(20px); }
-
     .sender-list { margin-top: 14px; display: none; flex-direction: column; gap: 8px; }
     .sender-list.show { display: flex; }
-    .sender-opt { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); }
-    .sender-opt.selected { border-color: var(--primary); background: rgba(0, 240, 255, 0.08); }
+    .sender-opt { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; }
+    .sender-opt.selected { border-color: var(--primary); background: rgba(0,240,255,0.08); }
     .sender-name { font-weight: 600; font-size: 13px; }
     .sender-cost { font-size: 13px; font-weight: 700; color: var(--accent-gold); }
 
-    .total-row { display: flex; justify-content: space-between; align-items: center; padding: 18px; background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(251, 191, 36, 0.05)); border-radius: var(--radius-sm); margin-bottom: 20px; }
+    .total-row { display: flex; justify-content: space-between; align-items: center; padding: 18px; background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(251,191,36,0.05)); border-radius: var(--radius-sm); margin-bottom: 20px; }
     .total-label { font-size: 14px; color: var(--text-dim); }
     .total-value { display: flex; align-items: center; gap: 6px; font-size: 26px; font-weight: 800; color: var(--accent-gold); }
 
@@ -320,41 +216,34 @@
     .action-btn.balance { background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange)); color: #000; }
     .action-btn.disabled { opacity: 0.4; pointer-events: none; }
 
-    /* Case Modal */
     .case-modal-icon { width: 90px; height: 90px; margin: 0 auto 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 44px; color: #000; box-shadow: 0 0 40px var(--primary-glow); }
     .case-modal-title { text-align: center; font-size: 24px; font-weight: 800; margin-bottom: 28px; }
     .choice-btn { width: 100%; height: 54px; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; transition: var(--transition); }
     .choice-btn.stars { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #000; }
     .choice-btn.balance { background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange)); color: #000; }
     .choice-btn.balance.disabled { opacity: 0.4; pointer-events: none; }
-    .choice-btn.cancel { background: #141414; color: var(--text); margin-top: 6px; }
 
-    /* ROULETTE */
-    .roulette-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(0, 0, 0, 0.96); display: flex; align-items: center; justify-content: center; padding: 20px; overscroll-behavior: none; }
+    .roulette-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.96); display: flex; align-items: center; justify-content: center; padding: 20px; }
     .roulette-box { width: 100%; max-width: 400px; }
     .roulette-title { text-align: center; font-size: 24px; font-weight: 800; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; gap: 12px; }
     .roulette-window { position: relative; height: 170px; overflow: hidden; border-radius: var(--radius); background: var(--bg-card); border: 1px solid var(--border); }
-    .roulette-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: #fff; transform: translateX(-50%); z-index: 10; box-shadow: 0 0 25px rgba(255, 255, 255, 0.7); }
+    .roulette-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: #fff; transform: translateX(-50%); z-index: 10; box-shadow: 0 0 25px rgba(255,255,255,0.7); }
     .roulette-pointer::before, .roulette-pointer::after { content: ''; position: absolute; left: 50%; transform: translateX(-50%); border-left: 10px solid transparent; border-right: 10px solid transparent; }
     .roulette-pointer::before { top: 0; border-top: 14px solid #fff; }
     .roulette-pointer::after { bottom: 0; border-bottom: 14px solid #fff; }
     .roulette-strip { display: flex; height: 100%; align-items: center; gap: 10px; padding: 0 5px; will-change: transform; }
-    
     .r-item { width: 110px; height: 150px; flex-shrink: 0; background: #141414; border-radius: var(--radius-sm); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 14px 10px; border: 2px solid var(--border); }
     .r-item.star-item { background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange)); border: none; color: #000; }
-    .r-visual { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; border-radius: var(--radius-xs); overflow: hidden; }
-    .r-visual lottie-player { width: 100%; height: 100%; }
+    .r-visual { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; overflow: hidden; }
     .r-visual .emoji { font-size: 40px; }
-    .r-price { display: flex; align-items: center; gap: 4px; background: rgba(0, 0, 0, 0.2); padding: 5px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; }
-    .r-item.star-item .r-price { background: rgba(0, 0, 0, 0.15); }
-    
+    .r-price { display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.2); padding: 5px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; }
     .roulette-result { text-align: center; margin-top: 24px; font-size: 22px; font-weight: 800; min-height: 36px; display: flex; align-items: center; justify-content: center; gap: 12px; }
     .roulette-result.win { color: var(--accent-green); }
     .roulette-result.lose { color: var(--text-muted); font-weight: 600; }
     .roulette-result.stars { color: var(--accent-gold); font-size: 28px; }
-    .roulette-close { width: 100%; height: 54px; margin-top: 20px; border-radius: var(--radius-sm); border: none; background: #141414; color: var(--text); font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; transition: var(--transition); }
+    .roulette-close { width: 100%; height: 54px; margin-top: 20px; border-radius: var(--radius-sm); border: none; background: #141414; color: var(--text); font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
     .roulette-close.success { background: var(--accent-green); color: #000; }
-    
+
     .loading-state { text-align: center; animation: pulse 1.5s ease-in-out infinite; }
     .loading-icon { width: 70px; height: 70px; margin: 0 auto 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #000; box-shadow: 0 0 35px var(--primary-glow); }
     .loading-text { font-size: 18px; font-weight: 700; }
@@ -373,10 +262,7 @@
       <div class="logo-icon"><i class="fas fa-gift"></i></div>
       <span class="logo-text">Подарочница</span>
     </div>
-    <div class="balance-pill">
-      <i class="fas fa-star"></i>
-      <span id="balanceValue">0</span>
-    </div>
+    <div class="balance-pill"><i class="fas fa-star"></i><span id="balanceValue">0</span></div>
   </header>
 
   <div class="section" id="sectionHome"></div>
@@ -394,17 +280,14 @@
   </nav>
 </div>
 
-<!-- Modals -->
 <div class="modal-overlay hidden" id="subscribeModal">
-  <div class="modal-box">
-    <div class="modal-body">
-      <div class="subscribe-visual"><i class="fas fa-bell"></i></div>
-      <div class="subscribe-title">Подпишись на каналы</div>
-      <div class="subscribe-desc">Для использования бота нужна подписка</div>
-      <div class="channel-list" id="channelList"></div>
-      <button class="choice-btn stars" id="checkSubBtn"><i class="fas fa-check-circle"></i> Проверить</button>
-    </div>
-  </div>
+  <div class="modal-box"><div class="modal-body">
+    <div class="subscribe-visual"><i class="fas fa-bell"></i></div>
+    <div class="subscribe-title">Подпишись на каналы</div>
+    <div class="subscribe-desc">Для использования бота нужна подписка</div>
+    <div id="channelList"></div>
+    <button class="choice-btn stars" id="checkSubBtn"><i class="fas fa-check-circle"></i> Проверить</button>
+  </div></div>
 </div>
 
 <div class="modal-overlay hidden" id="giftModal">
@@ -461,13 +344,11 @@
 </div>
 
 <div class="modal-overlay hidden" id="maintenanceModal">
-  <div class="modal-box">
-    <div class="modal-body" style="text-align:center;">
-      <div class="subscribe-visual" style="background:linear-gradient(135deg, var(--accent-orange), var(--accent-red));"><i class="fas fa-tools"></i></div>
-      <div class="subscribe-title">Технический перерыв</div>
-      <div id="maintenanceText" style="color:var(--text-dim);font-size:14px;line-height:1.6;"></div>
-    </div>
-  </div>
+  <div class="modal-box"><div class="modal-body" style="text-align:center;">
+    <div class="subscribe-visual" style="background:linear-gradient(135deg,var(--accent-orange),var(--accent-red));"><i class="fas fa-tools"></i></div>
+    <div class="subscribe-title">Технический перерыв</div>
+    <div id="maintenanceText" style="color:var(--text-dim);font-size:14px;line-height:1.6;"></div>
+  </div></div>
 </div>
 
 <script>
@@ -479,7 +360,8 @@ const state = {
   channels: [], gifts: [], adminGifts: [], adminCases: [], cases: {}, news: [], sales: [], promocodes: [],
   selectedGift: null, selectedCase: null, addSignature: false, sender: "@echoaxxs",
   currentCategory: "cheap", giftFilter: "all",
-  tgsCache: {} // Кэш распакованных TGS
+  lottieCache: {},
+  lottieInstances: []
 };
 
 const SENDERS = [
@@ -489,101 +371,84 @@ const SENDERS = [
 ];
 const DONATE_AMOUNTS = [10, 25, 50, 100, 250, 500];
 
-const api = async (endpoint, data = {}) => {
-  const res = await fetch(`${API}${endpoint}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ initData: tg?.initData || "", ...data }) });
+const api = async (ep, data = {}) => {
+  const res = await fetch(`${API}${ep}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ initData: tg?.initData || "", ...data }) });
   if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.detail || `HTTP ${res.status}`); }
   return res.json();
 };
-
-const apiGet = async (endpoint) => {
-  const res = await fetch(`${API}${endpoint}`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-};
-
+const apiGet = async (ep) => { const res = await fetch(`${API}${ep}`); if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); };
 const $ = id => document.getElementById(id);
 const updateBalance = () => { $("balanceValue").textContent = state.balance.toLocaleString(); };
 const showModal = id => $(id).classList.remove("hidden");
 const hideModal = id => $(id).classList.add("hidden");
 
-// ===== TGS LOADER (распаковка gzip -> Lottie JSON) =====
-const loadTGS = async (url) => {
-  if (state.tgsCache[url]) return state.tgsCache[url];
-  
+// ===== LOTTIE TGS SYSTEM =====
+const loadLottieJSON = async (giftId) => {
+  if (state.lottieCache[giftId]) return state.lottieCache[giftId];
   try {
-    const response = await fetch(url);
-    const arrayBuffer = await response.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
-    
-    // Распаковываем gzip с помощью pako
-    const decompressed = pako.inflate(uint8Array, { to: 'string' });
-    const json = JSON.parse(decompressed);
-    
-    // Кэшируем
-    state.tgsCache[url] = json;
+    const res = await fetch(`${API}/api/sticker/${giftId}`);
+    if (!res.ok) return null;
+    const json = await res.json();
+    state.lottieCache[giftId] = json;
     return json;
   } catch (e) {
-    console.error('TGS load error:', e);
+    console.error('Lottie load error:', giftId, e);
     return null;
   }
 };
 
-// ===== Рендер TGS анимации =====
-const renderTGSPlayer = (url, size = 70, id = null) => {
-  const playerId = id || `tgs-${Math.random().toString(36).substr(2, 9)}`;
+const destroyAllLotties = () => {
+  state.lottieInstances.forEach(inst => { try { inst.destroy(); } catch(e) {} });
+  state.lottieInstances = [];
+};
+
+const initLottie = (containerId, animData) => {
+  const container = document.getElementById(containerId);
+  if (!container || !animData) return;
+  try {
+    const inst = lottie.loadAnimation({
+      container: container,
+      renderer: 'svg',
+      loop: true,
+      autoplay: true,
+      animationData: animData
+    });
+    state.lottieInstances.push(inst);
+  } catch (e) {
+    console.error('Lottie init error:', e);
+    container.innerHTML = '<span class="emoji">🎁</span>';
+  }
+};
+
+const renderGiftVisual = (gift, size = 80) => {
+  if (!gift) return '<span class="emoji">🎁</span>';
   
-  // Создаём placeholder, потом загружаем
-  setTimeout(async () => {
-    const player = document.getElementById(playerId);
-    if (!player) return;
+  if (gift.sticker_type === 'tgs' && gift.id) {
+    const cid = `lottie-${gift.id}-${Math.random().toString(36).substr(2,6)}`;
     
-    const json = await loadTGS(url);
-    if (json && player) {
-      // Используем lottie-player
-      player.innerHTML = '';
-      const lottiePlayer = document.createElement('lottie-player');
-      lottiePlayer.setAttribute('autoplay', '');
-      lottiePlayer.setAttribute('loop', '');
-      lottiePlayer.setAttribute('mode', 'normal');
-      lottiePlayer.style.width = `${size}px`;
-      lottiePlayer.style.height = `${size}px`;
-      
-      // Загружаем JSON напрямую
-      lottiePlayer.load(json);
-      player.appendChild(lottiePlayer);
-    }
-  }, 10);
+    setTimeout(async () => {
+      const json = await loadLottieJSON(gift.id);
+      if (json) {
+        initLottie(cid, json);
+      } else {
+        const el = document.getElementById(cid);
+        if (el) el.innerHTML = `<span class="emoji">${gift.emoji || '🎁'}</span>`;
+      }
+    }, 50);
+    
+    return `<div id="${cid}" class="lottie-container" style="width:${size}px;height:${size}px;"><div class="sticker-loading"></div></div>`;
+  }
   
-  return `<div id="${playerId}" style="width:${size}px;height:${size}px;display:flex;align-items:center;justify-content:center;"><div class="loading"></div></div>`;
+  return `<span class="emoji" style="font-size:${size*0.6}px;">${gift.emoji || '🎁'}</span>`;
 };
 
-// ===== Рендер визуала подарка =====
-const renderGiftVisual = (gift, size = 70) => {
-  if (!gift) return `<i class="fas fa-gift placeholder" style="font-size:${size*0.5}px;"></i>`;
-  
-  // Приоритет: TGS стикер -> emoji -> placeholder
-  if (gift.sticker_url && gift.sticker_type === 'tgs') {
-    return renderTGSPlayer(gift.sticker_url, size);
-  }
-  
-  // WebM видео стикер
-  if (gift.sticker_url && (gift.sticker_type === 'webm' || gift.sticker_url.endsWith('.webm'))) {
-    return `<video src="${gift.sticker_url}" style="width:${size}px;height:${size}px;object-fit:contain;" autoplay loop muted playsinline></video>`;
-  }
-  
-  // WebP статичный стикер
-  if (gift.sticker_url && (gift.sticker_type === 'webp' || gift.sticker_url.endsWith('.webp'))) {
-    return `<img src="${gift.sticker_url}" style="width:${size}px;height:${size}px;object-fit:contain;" loading="lazy">`;
-  }
-  
-  // Emoji fallback
-  if (gift.emoji) {
-    return `<span class="emoji" style="font-size:${size*0.6}px;">${gift.emoji}</span>`;
-  }
-  
-  return `<i class="fas fa-gift placeholder" style="font-size:${size*0.5}px;"></i>`;
+const preloadStickers = () => {
+  state.gifts.forEach(g => {
+    if (g.sticker_type === 'tgs' && g.id) loadLottieJSON(g.id);
+  });
 };
 
+// ===== INIT =====
 const init = async () => {
   if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#000000'); tg.setBackgroundColor('#000000'); }
   try {
@@ -613,59 +478,46 @@ const loadApp = async () => {
     state.sales = g.sales || [];
     state.cases = c.categories || {};
     if (state.isAdmin) {
-      try { const ad = await apiGet("/api/admin/get-gifts-list"); state.adminGifts = ad.gifts || []; state.adminCases = ad.cases || []; } catch (e) {}
+      try { const ad = await apiGet("/api/admin/get-gifts-list"); state.adminGifts = ad.gifts || []; state.adminCases = ad.cases || []; } catch(e) {}
     }
   } catch (e) {
-    if (String(e.message).includes("тех. перерыв")) { $("maintenanceText").textContent = e.message; showModal("maintenanceModal"); return; }
+    if (String(e.message).includes("перерыв")) { $("maintenanceText").textContent = e.message; showModal("maintenanceModal"); return; }
     alert("Ошибка: " + e.message); return;
   }
   if (state.isAdmin) $("adminTab").classList.remove("hidden");
-  renderHome(); renderCases(); renderGifts(); renderDonate(); if (state.isAdmin) renderAdmin(); setupTabs(); updateBalance();
-  
-  // Предзагружаем TGS для быстрого отображения
-  preloadTGS();
-};
-
-const preloadTGS = () => {
-  state.gifts.forEach(g => {
-    if (g.sticker_url && g.sticker_type === 'tgs') {
-      loadTGS(g.sticker_url); // Загружаем в кэш
-    }
-  });
+  renderHome(); renderCases(); renderGifts(); renderDonate();
+  if (state.isAdmin) renderAdmin();
+  setupTabs(); updateBalance();
+  preloadStickers();
 };
 
 const renderChannels = () => {
   $("channelList").innerHTML = state.channels.map(ch => `
     <a href="${ch.link || '#'}" target="_blank" class="channel-item">
-      <div class="channel-info">
-        <div class="channel-name">${ch.title || ch.id}</div>
-        <div class="channel-status ${ch.missing ? 'missing' : 'ok'}">${ch.missing ? 'Нужна подписка' : '✓ Подписан'}</div>
-      </div>
-      <i class="fas fa-chevron-right channel-arrow"></i>
+      <div><div style="font-weight:600;">${ch.title || ch.id}</div>
+      <div style="font-size:12px;color:${ch.missing ? 'var(--accent-red)' : 'var(--accent-green)'};">${ch.missing ? 'Нужна подписка' : '✓ Подписан'}</div></div>
     </a>
   `).join("");
 };
 
 $("checkSubBtn").onclick = async function() {
-  this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Проверяем...';
-  this.disabled = true;
+  this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Проверяем...'; this.disabled = true;
   try {
     const sub = await api("/api/check-subscription");
     if (sub.maintenance) { hideModal("subscribeModal"); $("maintenanceText").textContent = sub.message; showModal("maintenanceModal"); return; }
     if (sub.subscribed) { hideModal("subscribeModal"); await loadApp(); }
     else { state.channels = sub.channels || []; renderChannels(); }
-  } catch (e) {}
-  this.innerHTML = '<i class="fas fa-check-circle"></i> Проверить';
-  this.disabled = false;
+  } catch(e) {}
+  this.innerHTML = '<i class="fas fa-check-circle"></i> Проверить'; this.disabled = false;
 };
 
 const setupTabs = () => {
-  const sections = { Home: "sectionHome", Cases: "sectionCases", Gifts: "sectionGifts", Donate: "sectionDonate", Admin: "sectionAdmin" };
+  const s = { Home: "sectionHome", Cases: "sectionCases", Gifts: "sectionGifts", Donate: "sectionDonate", Admin: "sectionAdmin" };
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.onclick = () => {
-      const tab = btn.dataset.tab;
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b === btn));
-      Object.entries(sections).forEach(([k, id]) => $(id)?.classList.toggle('hidden', k !== tab));
+      Object.entries(s).forEach(([k, id]) => $(id)?.classList.toggle('hidden', k !== btn.dataset.tab));
+      if (btn.dataset.tab === 'Gifts') { destroyAllLotties(); renderGifts(); }
       updateBalance();
     };
   });
@@ -676,116 +528,83 @@ const renderHome = () => {
   const newsHtml = state.news.length ? state.news.map(n => `
     <div class="news-card">
       <div class="news-img">${n.image ? `<img src="${n.image}" loading="lazy">` : '<i class="fas fa-newspaper"></i>'}</div>
-      <div class="news-body">
-        <div class="news-date">${n.date}</div>
-        <div class="news-title">${n.title}</div>
-        <div class="news-text">${n.text}</div>
-      </div>
+      <div class="news-body"><div class="news-date">${n.date}</div><div class="news-title">${n.title}</div><div class="news-text">${n.text}</div></div>
     </div>
-  `).join("") : `<div class="news-card"><div class="news-body"><div class="empty-state"><i class="fas fa-inbox"></i><p>Пока нет новостей</p></div></div></div>`;
+  `).join("") : '<div class="news-card"><div class="news-body"><div class="empty-state"><i class="fas fa-inbox"></i><p>Пока нет новостей</p></div></div></div>';
 
   $("sectionHome").innerHTML = `
     <div class="section-head"><div><h2><i class="fas fa-home"></i> Главная</h2><div class="section-subtitle">Новости и промокоды</div></div></div>
     <div class="news-scroll">${newsHtml}</div>
     <div class="card">
       <div class="card-head"><i class="fas fa-ticket-alt"></i><div><h3>Промокод</h3><p>Введите код для получения награды</p></div></div>
-      <div class="promo-row">
-        <input type="text" class="promo-input" id="promoInput" placeholder="Введите код">
-        <button class="promo-btn" id="promoBtn"><i class="fas fa-arrow-right"></i></button>
-      </div>
+      <div class="promo-row"><input type="text" class="promo-input" id="promoInput" placeholder="Введите код"><button class="promo-btn" id="promoBtn"><i class="fas fa-arrow-right"></i></button></div>
       <div class="promo-result hidden" id="promoResult"></div>
-    </div>
-  `;
+    </div>`;
 
   $("promoBtn").onclick = async () => {
-    const code = $("promoInput").value.trim();
-    const result = $("promoResult");
-    if (!code) return;
-    $("promoBtn").disabled = true;
-    $("promoBtn").innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    const code = $("promoInput").value.trim(); if (!code) return;
+    $("promoBtn").disabled = true; $("promoBtn").innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     try {
       const r = await api("/api/activate-promocode", { code });
-      result.innerHTML = `<i class="fas fa-check-circle"></i> ${r.reward}`;
-      result.className = "promo-result success";
+      $("promoResult").innerHTML = `<i class="fas fa-check-circle"></i> ${r.reward}`;
+      $("promoResult").className = "promo-result success";
       if (typeof r.newBalance !== "undefined") { state.balance = r.newBalance; updateBalance(); }
       $("promoInput").value = "";
-    } catch (e) {
-      result.innerHTML = `<i class="fas fa-times-circle"></i> ${e.message}`;
-      result.className = "promo-result error";
-    }
-    result.classList.remove("hidden");
-    $("promoBtn").disabled = false;
-    $("promoBtn").innerHTML = '<i class="fas fa-arrow-right"></i>';
+    } catch (e) { $("promoResult").innerHTML = `<i class="fas fa-times-circle"></i> ${e.message}`; $("promoResult").className = "promo-result error"; }
+    $("promoResult").classList.remove("hidden");
+    $("promoBtn").disabled = false; $("promoBtn").innerHTML = '<i class="fas fa-arrow-right"></i>';
   };
 };
 
-// === GIFTS (БЕЗ НАЗВАНИЙ - только анимации и цена) ===
+// === GIFTS ===
 const renderGifts = () => {
+  destroyAllLotties();
   const filters = [
     { key: "all", label: "Все", icon: "fa-th" },
     { key: "available", label: "Доступные", icon: "fa-check-circle" },
     { key: "limited", label: "Лимитированные", icon: "fa-fire" }
   ];
-
-  const filteredGifts = state.gifts.filter(g => {
+  const filtered = state.gifts.filter(g => {
     if (state.giftFilter === "available") return g.available && !g.sold_out;
     if (state.giftFilter === "limited") return g.is_limited || g.is_unknown;
     return true;
   });
 
   $("sectionGifts").innerHTML = `
-    <div class="section-head"><div><h2><i class="fas fa-gift"></i> Подарки</h2><div class="section-subtitle">${state.gifts.filter(g => g.available).length} доступно</div></div></div>
-    <div class="filters-row">
-      ${filters.map(f => `<button class="filter-btn ${state.giftFilter === f.key ? 'active' : ''}" onclick="setGiftFilter('${f.key}')"><i class="fas ${f.icon}"></i> ${f.label}</button>`).join("")}
-    </div>
-    <div class="gifts-grid">
-      ${filteredGifts.map(g => `
-        <div class="gift-card ${g.is_limited || g.is_unknown ? 'limited' : ''} ${g.sold_out ? 'sold-out' : ''} ${!g.available ? 'unavailable' : ''}" onclick="${g.available ? `openGift('${g.id}')` : ''}">
-          ${g.is_limited || g.is_unknown ? '<div class="limited-tag">Limited</div>' : ''}
-          ${g.sold_out ? '<div class="sold-tag">Sold Out</div>' : ''}
-          <div class="gift-visual">${renderGiftVisual(g)}</div>
-          <div class="gift-price"><i class="fas fa-star"></i> ${g.price}</div>
-        </div>
-      `).join("")}
-    </div>
-  `;
+    <div class="section-head"><div><h2><i class="fas fa-gift"></i> Подарки</h2><div class="section-subtitle">${state.gifts.filter(g=>g.available).length} доступно</div></div></div>
+    <div class="filters-row">${filters.map(f => `<button class="filter-btn ${state.giftFilter === f.key ? 'active' : ''}" onclick="setGiftFilter('${f.key}')"><i class="fas ${f.icon}"></i> ${f.label}</button>`).join("")}</div>
+    <div class="gifts-grid">${filtered.map(g => `
+      <div class="gift-card ${g.is_limited||g.is_unknown?'limited':''} ${g.sold_out?'sold-out':''} ${!g.available?'unavailable':''}" onclick="${g.available?`openGift('${g.id}')`:''}">
+        ${g.is_limited||g.is_unknown?'<div class="limited-tag">Limited</div>':''}
+        ${g.sold_out?'<div class="sold-tag">Sold Out</div>':''}
+        <div class="gift-visual">${renderGiftVisual(g)}</div>
+        <div class="gift-price"><i class="fas fa-star"></i> ${g.price}</div>
+      </div>
+    `).join("")}</div>`;
 };
 
-window.setGiftFilter = (f) => { state.giftFilter = f; renderGifts(); };
+window.setGiftFilter = f => { state.giftFilter = f; renderGifts(); };
 
-window.openGift = (id) => {
+window.openGift = id => {
   const g = state.gifts.find(x => x.id === id);
   if (!g || g.sold_out || !g.available) return;
-  state.selectedGift = g;
-  state.addSignature = false;
-  state.sender = "@echoaxxs";
-  
+  state.selectedGift = g; state.addSignature = false; state.sender = "@echoaxxs";
   $("giftModalVisual").innerHTML = renderGiftVisual(g, 140);
   $("giftModalPrice").innerHTML = `<i class="fas fa-star"></i> ${g.price} Stars`;
   $("signatureSwitch").classList.remove("on");
-  
-  $("senderList").innerHTML = SENDERS.map(s => `
-    <div class="sender-opt ${s.key === state.sender ? 'selected' : ''}" onclick="setSender('${s.key}')" data-sender="${s.key}">
-      <span class="sender-name">${s.label}</span>
-      <span class="sender-cost">+${s.cost} ⭐</span>
-    </div>
-  `).join("");
+  $("senderList").innerHTML = SENDERS.map(s => `<div class="sender-opt ${s.key===state.sender?'selected':''}" onclick="setSender('${s.key}')" data-sender="${s.key}"><span class="sender-name">${s.label}</span><span class="sender-cost">+${s.cost} ⭐</span></div>`).join("");
   $("senderList").classList.remove("show");
-  
-  updateGiftTotal();
-  showModal("giftModal");
+  updateGiftTotal(); showModal("giftModal");
 };
 
 $("closeGiftModal").onclick = () => hideModal("giftModal");
-
 $("signatureToggle").onclick = () => {
   state.addSignature = !state.addSignature;
   $("signatureSwitch").classList.toggle("on", state.addSignature);
   $("senderList").classList.toggle("show", state.addSignature);
   updateGiftTotal();
 };
-
-window.setSender = (k) => {
+window.setSender = k => {
   state.sender = k;
   document.querySelectorAll(".sender-opt").forEach(el => el.classList.toggle("selected", el.dataset.sender === k));
   updateGiftTotal();
@@ -793,85 +612,64 @@ window.setSender = (k) => {
 
 const getGiftPrice = () => {
   if (!state.selectedGift) return 0;
-  let price = state.selectedGift.price;
-  if (state.addSignature) {
-    const s = SENDERS.find(x => x.key === state.sender);
-    price += s?.cost || 0;
-    const sale = state.sales.find(x => x.only_with_signature);
-    if (sale) price -= sale.discount;
-  }
-  return Math.max(0, price);
+  let p = state.selectedGift.price;
+  if (state.addSignature) { const s = SENDERS.find(x => x.key === state.sender); p += s?.cost || 0; const sale = state.sales.find(x => x.only_with_signature); if (sale) p -= sale.discount; }
+  return Math.max(0, p);
 };
-
 const updateGiftTotal = () => {
-  const price = getGiftPrice();
-  $("giftTotal").textContent = price;
-  $("starsPrice").textContent = price;
-  $("balancePrice").textContent = price;
-  $("buyWithBalance").classList.toggle("disabled", state.balance < price);
+  const p = getGiftPrice();
+  $("giftTotal").textContent = p; $("starsPrice").textContent = p; $("balancePrice").textContent = p;
+  $("buyWithBalance").classList.toggle("disabled", state.balance < p);
 };
 
 $("buyWithStars").onclick = async () => {
   if (!state.selectedGift) return;
   try {
     const r = await api("/api/create-invoice", { giftId: state.selectedGift.id, sender: state.addSignature ? state.sender : null });
-    if (r.link && tg) tg.openInvoice(r.link, s => { if (s === 'paid') { hideModal("giftModal"); tg.showAlert("🎉 Подарок отправлен!"); } });
-  } catch (e) { alert(e.message); }
+    if (r.link && tg) tg.openInvoice(r.link, s => { if (s==='paid') { hideModal("giftModal"); tg.showAlert("🎉 Подарок отправлен!"); }});
+  } catch(e) { alert(e.message); }
 };
-
 $("buyWithBalance").onclick = async () => {
   if (!state.selectedGift) return;
   try {
     const r = await api("/api/buy-with-balance", { giftId: state.selectedGift.id, sender: state.addSignature ? state.sender : null });
-    state.balance = r.newBalance;
-    updateBalance();
-    hideModal("giftModal");
+    state.balance = r.newBalance; updateBalance(); hideModal("giftModal");
     tg ? tg.showAlert(`🎉 ${r.reward}!`) : alert(`🎉 ${r.reward}!`);
-  } catch (e) { alert(e.message); }
+  } catch(e) { alert(e.message); }
 };
 
 // === CASES ===
 const renderCases = () => {
   const cats = Object.entries(state.cases);
-  if (!cats.length) { $("sectionCases").innerHTML = `<div class="empty-state"><i class="fas fa-box-open"></i><p>Загрузка...</p></div>`; return; }
-  const icons = { cheap: 'fa-coins', gifts: 'fa-gem', stars: 'fa-star' };
+  if (!cats.length) { $("sectionCases").innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>Загрузка...</p></div>'; return; }
+  const icons = { cheap:'fa-coins', gifts:'fa-gem', stars:'fa-star' };
   $("sectionCases").innerHTML = `
     <div class="section-head"><div><h2><i class="fas fa-dice"></i> Кейсы</h2><div class="section-subtitle">Испытай удачу!</div></div></div>
-    <div class="case-tabs">${cats.map(([k, c]) => `<button class="case-tab ${k === state.currentCategory ? 'active' : ''}" onclick="setCaseCategory('${k}')"><i class="fas ${icons[k] || 'fa-box'}"></i> ${c.title}</button>`).join("")}</div>
-    <div class="cases-grid" id="casesGrid"></div>
-  `;
+    <div class="case-tabs">${cats.map(([k,c])=>`<button class="case-tab ${k===state.currentCategory?'active':''}" onclick="setCaseCategory('${k}')"><i class="fas ${icons[k]||'fa-box'}"></i> ${c.title}</button>`).join("")}</div>
+    <div class="cases-grid" id="casesGrid"></div>`;
   renderCasesGrid();
 };
-
 const renderCasesGrid = () => {
-  const cat = state.cases[state.currentCategory];
-  if (!cat) return;
-  const icons = { cheap: 'fa-box', gifts: 'fa-gem', stars: 'fa-star' };
+  const cat = state.cases[state.currentCategory]; if (!cat) return;
+  const icons = { cheap:'fa-box', gifts:'fa-gem', stars:'fa-star' };
   $("casesGrid").innerHTML = cat.cases.map(c => `
     <div class="case-card ${c.category}" onclick="openCase('${c.id}')">
-      <div class="case-icon"><i class="fas ${icons[c.category] || 'fa-box-open'}"></i></div>
+      <div class="case-icon"><i class="fas ${icons[c.category]||'fa-box-open'}"></i></div>
       <div class="case-name">${c.title}</div>
       <div class="case-price"><i class="fas fa-star"></i> ${c.price}</div>
-    </div>
-  `).join("");
+    </div>`).join("");
 };
-
 window.setCaseCategory = k => { state.currentCategory = k; renderCases(); };
-
 window.openCase = id => {
-  const cat = state.cases[state.currentCategory];
-  const c = cat?.cases.find(x => x.id === id);
-  if (!c) return;
+  const cat = state.cases[state.currentCategory]; const c = cat?.cases.find(x=>x.id===id); if(!c) return;
   state.selectedCase = c;
-  const icons = { cheap: 'fa-box', gifts: 'fa-gem', stars: 'fa-star' };
-  $("caseModalIcon").innerHTML = `<i class="fas ${icons[c.category] || 'fa-box-open'}"></i>`;
+  const icons = { cheap:'fa-box', gifts:'fa-gem', stars:'fa-star' };
+  $("caseModalIcon").innerHTML = `<i class="fas ${icons[c.category]||'fa-box-open'}"></i>`;
   $("caseModalTitle").textContent = c.title;
-  $("caseStarsPrice").textContent = c.price;
-  $("caseBalancePrice").textContent = c.price;
+  $("caseStarsPrice").textContent = c.price; $("caseBalancePrice").textContent = c.price;
   $("caseBalanceBtn").classList.toggle("disabled", state.balance < c.price);
   showModal("caseModal");
 };
-
 $("closeCaseModal").onclick = () => hideModal("caseModal");
 
 $("caseStarsBtn").onclick = async () => {
@@ -879,125 +677,64 @@ $("caseStarsBtn").onclick = async () => {
   try {
     const r = await api("/api/create-invoice", { caseId: state.selectedCase.id });
     if (r.link && tg) tg.openInvoice(r.link, async s => {
-      if (s === 'paid') {
-        showRouletteLoading();
-        setTimeout(async () => {
-          try {
-            const res = await api("/api/get-case-result", { paymentId: r.paymentId });
-            state.balance = res.newBalance; state.pitySpent = res.pitySpent || 0; updateBalance();
-            startRoulette(state.selectedCase, res);
-          } catch (e) { hideModal("rouletteOverlay"); alert("Результат в боте!"); await loadApp(); }
-        }, 600);
-      }
+      if (s==='paid') { showRouletteLoading(); setTimeout(async()=>{
+        try { const res = await api("/api/get-case-result",{paymentId:r.paymentId}); state.balance=res.newBalance; state.pitySpent=res.pitySpent||0; updateBalance(); startRoulette(state.selectedCase,res); }
+        catch(e) { hideModal("rouletteOverlay"); alert("Результат в боте!"); await loadApp(); }
+      },600);}
     });
-  } catch (e) { alert(e.message); }
+  } catch(e) { alert(e.message); }
 };
-
 $("caseBalanceBtn").onclick = async () => {
-  hideModal("caseModal");
-  showRouletteLoading();
-  try {
-    const r = await api("/api/buy-with-balance", { caseId: state.selectedCase.id });
-    state.balance = r.newBalance; state.pitySpent = r.pitySpent || 0; updateBalance();
-    startRoulette(state.selectedCase, r);
-  } catch (e) { hideModal("rouletteOverlay"); alert(e.message); }
+  hideModal("caseModal"); showRouletteLoading();
+  try { const r = await api("/api/buy-with-balance",{caseId:state.selectedCase.id}); state.balance=r.newBalance; state.pitySpent=r.pitySpent||0; updateBalance(); startRoulette(state.selectedCase,r); }
+  catch(e) { hideModal("rouletteOverlay"); alert(e.message); }
 };
 
-const showRouletteLoading = () => {
-  showModal("rouletteOverlay");
-  $("rouletteLoading").classList.remove("hidden");
-  $("rouletteContent").classList.add("hidden");
-};
+const showRouletteLoading = () => { showModal("rouletteOverlay"); $("rouletteLoading").classList.remove("hidden"); $("rouletteContent").classList.add("hidden"); };
 
 const startRoulette = (caseData, result) => {
-  $("rouletteLoading").classList.add("hidden");
-  $("rouletteContent").classList.remove("hidden");
+  $("rouletteLoading").classList.add("hidden"); $("rouletteContent").classList.remove("hidden");
+  const strip=$("rouletteStrip"), resultEl=$("rouletteResult"), closeBtn=$("rouletteClose");
+  resultEl.textContent=""; resultEl.className="roulette-result"; closeBtn.classList.add("hidden"); closeBtn.className="roulette-close hidden";
+  const icons={cheap:'fa-box',gifts:'fa-gem',stars:'fa-star'};
+  $("rouletteTitle").innerHTML=`<i class="fas ${icons[caseData.category]||'fa-box-open'}"></i> ${caseData.title}`;
   
-  const strip = $("rouletteStrip");
-  const resultEl = $("rouletteResult");
-  const closeBtn = $("rouletteClose");
-  
-  resultEl.textContent = "";
-  resultEl.className = "roulette-result";
-  closeBtn.classList.add("hidden");
-  closeBtn.className = "roulette-close hidden";
-  
-  const icons = { cheap: 'fa-box', gifts: 'fa-gem', stars: 'fa-star' };
-  $("rouletteTitle").innerHTML = `<i class="fas ${icons[caseData.category] || 'fa-box-open'}"></i> ${caseData.title}`;
-  
-  let items = [];
-  const winIndex = 35;
-  
-  if (caseData.type === 'stars') {
-    const drops = result.allDrops || result.all_drops || [];
-    for (let i = 0; i < 50; i++) {
-      items.push({ type: "star", value: drops.length ? drops[Math.floor(Math.random() * drops.length)]?.stars || 50 : 50 });
-    }
-    items[winIndex] = { type: "star", value: result.starsWon || result.stars_won || 100 };
+  let items=[]; const winIndex=35;
+  if (caseData.type==='stars') {
+    const drops=result.allDrops||result.all_drops||[];
+    for(let i=0;i<50;i++) items.push({type:"star",value:drops.length?drops[Math.floor(Math.random()*drops.length)]?.stars||50:50});
+    items[winIndex]={type:"star",value:result.starsWon||result.stars_won||100};
   } else {
-    const visualGifts = state.gifts.filter(g => g.available && !g.sold_out).slice(0, 10);
-    const fallbackGifts = visualGifts.length ? visualGifts : state.gifts.slice(0, 5);
-    for (let i = 0; i < 50; i++) {
-      if (Math.random() < 0.25) items.push({ type: "nothing" });
-      else items.push({ type: "gift", value: fallbackGifts[Math.floor(Math.random() * fallbackGifts.length)] });
-    }
-    if (result.type === "nothing") items[winIndex] = { type: "nothing" };
-    else if (result.won?.length) {
-      const wonGift = state.gifts.find(g => g.id === result.won[0].id) || result.won[0];
-      items[winIndex] = { type: "gift", value: wonGift };
-    } else if (result.pityTriggered) {
-      items[winIndex] = { type: "gift", value: state.gifts.find(g => g.available && !g.sold_out) || state.gifts[0] };
-    }
+    const vg=state.gifts.filter(g=>g.available&&!g.sold_out).slice(0,10);
+    const fg=vg.length?vg:state.gifts.slice(0,5);
+    for(let i=0;i<50;i++){if(Math.random()<0.25)items.push({type:"nothing"});else items.push({type:"gift",value:fg[Math.floor(Math.random()*fg.length)]});}
+    if(result.type==="nothing") items[winIndex]={type:"nothing"};
+    else if(result.won?.length){const w=state.gifts.find(g=>g.id===result.won[0].id)||result.won[0]; items[winIndex]={type:"gift",value:w};}
+    else if(result.pityTriggered) items[winIndex]={type:"gift",value:state.gifts.find(g=>g.available&&!g.sold_out)||state.gifts[0]};
   }
   
-  strip.innerHTML = items.map(item => {
-    if (item.type === "star") {
-      return `<div class="r-item star-item"><div class="r-visual"><i class="fas fa-star" style="font-size:36px;color:#000;"></i></div><div class="r-price"><i class="fas fa-star"></i> ${item.value}</div></div>`;
-    }
-    if (item.type === "nothing") {
-      return `<div class="r-item"><div class="r-visual"><i class="fas fa-times" style="font-size:36px;color:var(--text-muted);"></i></div><div class="r-price" style="opacity:0.4;">---</div></div>`;
-    }
-    return `<div class="r-item"><div class="r-visual">${renderGiftVisual(item.value, 50)}</div><div class="r-price"><i class="fas fa-star"></i> ${item.value?.price || '?'}</div></div>`;
+  // В рулетке используем только emoji (не lottie — слишком тяжело)
+  strip.innerHTML=items.map(item=>{
+    if(item.type==="star") return `<div class="r-item star-item"><div class="r-visual"><i class="fas fa-star" style="font-size:36px;color:#000;"></i></div><div class="r-price"><i class="fas fa-star"></i> ${item.value}</div></div>`;
+    if(item.type==="nothing") return `<div class="r-item"><div class="r-visual"><i class="fas fa-times" style="font-size:36px;color:var(--text-muted);"></i></div><div class="r-price" style="opacity:0.4;">---</div></div>`;
+    return `<div class="r-item"><div class="r-visual"><span class="emoji">${item.value?.emoji||'🎁'}</span></div><div class="r-price"><i class="fas fa-star"></i> ${item.value?.price||'?'}</div></div>`;
   }).join("");
   
-  strip.style.transition = "none";
-  strip.style.transform = "translateX(0)";
+  strip.style.transition="none"; strip.style.transform="translateX(0)";
+  requestAnimationFrame(()=>{requestAnimationFrame(()=>{
+    const cw=document.querySelector('.roulette-window').offsetWidth;
+    const advance=120, itemCenter=5+(winIndex*advance)+55, ro=(Math.random()*80)-40;
+    strip.style.transition="transform 4.5s cubic-bezier(0.12,0.8,0.28,1)";
+    strip.style.transform=`translateX(${(cw/2)-itemCenter+ro}px)`;
+  });});
   
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      const containerWidth = document.querySelector('.roulette-window').offsetWidth;
-      const itemWidth = 110;
-      const gap = 10;
-      const advance = itemWidth + gap;
-      const itemCenter = 5 + (winIndex * advance) + (itemWidth / 2);
-      const randomOffset = (Math.random() * 80) - 40;
-      strip.style.transition = "transform 4.5s cubic-bezier(0.12, 0.8, 0.28, 1)";
-      strip.style.transform = `translateX(${(containerWidth / 2) - itemCenter + randomOffset}px)`;
-    });
-  });
-  
-  setTimeout(() => {
-    if (caseData.type === 'stars') {
-      const won = result.starsWon || result.stars_won || 0;
-      resultEl.innerHTML = `<i class="fas fa-star"></i> +${won} Stars!`;
-      resultEl.classList.add("stars");
-      closeBtn.classList.add("success");
-      closeBtn.textContent = "Забрать!";
-    } else if (result.type === "nothing") {
-      resultEl.innerHTML = `<i class="fas fa-times-circle"></i> Ничего...`;
-      resultEl.classList.add("lose");
-      closeBtn.textContent = "Закрыть";
-    } else {
-      const wonPrice = result.won?.[0]?.price || '?';
-      resultEl.innerHTML = `<i class="fas fa-check-circle"></i> 🎁 ${wonPrice}⭐ Подарок!`;
-      resultEl.classList.add("win");
-      closeBtn.classList.add("success");
-      closeBtn.textContent = result.pityTriggered ? "Гарант! 🎉" : "Круто!";
-    }
+  setTimeout(()=>{
+    if(caseData.type==='stars'){const w=result.starsWon||result.stars_won||0;resultEl.innerHTML=`<i class="fas fa-star"></i> +${w} Stars!`;resultEl.classList.add("stars");closeBtn.classList.add("success");closeBtn.textContent="Забрать!";}
+    else if(result.type==="nothing"){resultEl.innerHTML='<i class="fas fa-times-circle"></i> Ничего...';resultEl.classList.add("lose");closeBtn.textContent="Закрыть";}
+    else{const wp=result.won?.[0]?.price||'?';resultEl.innerHTML=`<i class="fas fa-check-circle"></i> 🎁 ${wp}⭐ Подарок!`;resultEl.classList.add("win");closeBtn.classList.add("success");closeBtn.textContent=result.pityTriggered?"Гарант! 🎉":"Круто!";}
     closeBtn.classList.remove("hidden");
-  }, 4700);
+  },4700);
 };
-
 $("rouletteClose").onclick = () => { hideModal("rouletteOverlay"); renderCases(); };
 
 // === DONATE ===
@@ -1005,38 +742,15 @@ const renderDonate = () => {
   $("sectionDonate").innerHTML = `
     <div class="section-head"><div><h2><i class="fas fa-heart"></i> Донат</h2><div class="section-subtitle">Поддержи проект</div></div></div>
     <div class="card">
-      <div class="donate-hero">
-        <div class="donate-visual"><i class="fas fa-heart"></i></div>
-        <div class="donate-title">Поддержите нас!</div>
-        <div class="donate-desc">Ваши донаты помогают развивать проект и добавлять новые функции</div>
-      </div>
-      <div class="donate-amounts" id="donateAmounts">
-        ${DONATE_AMOUNTS.map(a => `<button class="donate-amt" data-amount="${a}"><i class="fas fa-star"></i> ${a}</button>`).join("")}
-      </div>
-      <div class="donate-custom">
-        <input type="number" id="donateCustom" placeholder="Другая сумма" min="1" max="10000">
-        <span>Stars</span>
-      </div>
+      <div class="donate-hero"><div class="donate-visual"><i class="fas fa-heart"></i></div><div class="donate-title">Поддержите нас!</div><div class="donate-desc">Ваши донаты помогают развивать проект</div></div>
+      <div class="donate-amounts">${DONATE_AMOUNTS.map(a=>`<button class="donate-amt" data-amount="${a}"><i class="fas fa-star"></i> ${a}</button>`).join("")}</div>
+      <div class="donate-custom"><input type="number" id="donateCustom" placeholder="Другая сумма" min="1" max="10000"><span>Stars</span></div>
       <button class="donate-send" id="donateSend"><i class="fas fa-paper-plane"></i> Отправить донат</button>
-    </div>
-  `;
-
-  let selectedAmount = null;
-  document.querySelectorAll('.donate-amt').forEach(btn => {
-    btn.onclick = () => { document.querySelectorAll('.donate-amt').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); selectedAmount = parseInt(btn.dataset.amount); $("donateCustom").value = ''; };
-  });
-
-  $("donateCustom").oninput = () => { document.querySelectorAll('.donate-amt').forEach(b => b.classList.remove('selected')); selectedAmount = null; };
-
-  $("donateSend").onclick = async () => {
-    const customVal = $("donateCustom").value;
-    const amount = customVal ? parseInt(customVal) : selectedAmount;
-    if (!amount || amount < 1 || amount > 10000) { alert("Укажите сумму от 1 до 10000"); return; }
-    try {
-      const r = await api("/api/create-donate", { amount });
-      if (r.link && tg) tg.openInvoice(r.link, s => { if (s === 'paid') tg.showAlert("💝 Спасибо за донат!"); });
-    } catch (e) { alert(e.message); }
-  };
+    </div>`;
+  let sel=null;
+  document.querySelectorAll('.donate-amt').forEach(b=>{b.onclick=()=>{document.querySelectorAll('.donate-amt').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');sel=parseInt(b.dataset.amount);$("donateCustom").value='';};});
+  $("donateCustom").oninput=()=>{document.querySelectorAll('.donate-amt').forEach(x=>x.classList.remove('selected'));sel=null;};
+  $("donateSend").onclick=async()=>{const cv=$("donateCustom").value;const amt=cv?parseInt(cv):sel;if(!amt||amt<1||amt>10000){alert("Сумма от 1 до 10000");return;}try{const r=await api("/api/create-donate",{amount:amt});if(r.link&&tg)tg.openInvoice(r.link,s=>{if(s==='paid')tg.showAlert("💝 Спасибо!");});}catch(e){alert(e.message);}};
 };
 
 // === ADMIN ===
@@ -1045,63 +759,32 @@ const renderAdmin = () => {
   $("sectionAdmin").innerHTML = `
     <div class="section-head"><div><h2 style="color:var(--accent-red);"><i class="fas fa-shield-alt"></i> Админ</h2><div class="section-subtitle">Управление промокодами</div></div></div>
     <div class="admin-card">
-      <div class="admin-head"><i class="fas fa-plus-circle"></i><div><h3>Создать промокод</h3><p>Добавьте новый промокод с наградой</p></div></div>
+      <div class="admin-head"><i class="fas fa-plus-circle"></i><div><h3>Создать промокод</h3><p>Добавьте промокод с наградой</p></div></div>
       <div class="admin-body">
         <div class="admin-field"><label>Код</label><input class="admin-input" id="admCode" placeholder="GIFT2024" style="text-transform:uppercase;"></div>
         <div class="admin-field"><label>Тип</label><select class="admin-select" id="admType"><option value="stars">⭐ Stars</option><option value="gift">🎁 Подарок</option><option value="case">📦 Кейс</option></select></div>
         <div class="admin-field"><label>Награда</label><select class="admin-select" id="admReward"></select></div>
-        <div class="admin-field"><label>Использований</label><input class="admin-input" id="admMaxUses" type="number" placeholder="100" value="100"></div>
+        <div class="admin-field"><label>Использований</label><input class="admin-input" id="admMaxUses" type="number" value="100"></div>
         <button class="admin-btn" id="admCreate"><i class="fas fa-plus"></i> Создать</button>
-        <div class="promo-list"><div class="promo-list-head" style="font-weight:700;margin-bottom:12px;">Активные промокоды</div><div id="promoList"></div></div>
+        <div class="promo-list"><div style="font-weight:700;margin:16px 0 12px;">Активные промокоды</div><div id="promoList"></div></div>
       </div>
-    </div>
-  `;
-  
-  const updateRewardOptions = () => {
-    const type = $("admType").value;
-    const select = $("admReward");
-    if (type === "stars") select.innerHTML = [10, 25, 50, 100, 250, 500, 1000].map(v => `<option value="${v}">${v} Stars</option>`).join("");
-    else if (type === "gift") select.innerHTML = state.adminGifts.map(g => `<option value="${g.id}">${g.title}</option>`).join("");
-    else if (type === "case") select.innerHTML = state.adminCases.map(c => `<option value="${c.id}">${c.title} (${c.price}⭐)</option>`).join("");
-  };
-  
-  $("admType").onchange = updateRewardOptions;
-  updateRewardOptions();
-  
-  $("admCreate").onclick = async () => {
-    const code = $("admCode").value.trim().toUpperCase();
-    if (!code) return alert("Введите код");
-    try {
-      await api("/api/admin/create-promocode", { code, rewardType: $("admType").value, rewardId: $("admReward").value, maxUses: parseInt($("admMaxUses").value) || 100 });
-      $("admCode").value = ""; await loadPromocodes(); alert("✅ Промокод создан!");
-    } catch (e) { alert("Ошибка: " + e.message); }
-  };
+    </div>`;
+  const upd=()=>{const t=$("admType").value,s=$("admReward");
+    if(t==="stars")s.innerHTML=[10,25,50,100,250,500,1000].map(v=>`<option value="${v}">${v} Stars</option>`).join("");
+    else if(t==="gift")s.innerHTML=state.adminGifts.map(g=>`<option value="${g.id}">${g.title}</option>`).join("");
+    else s.innerHTML=state.adminCases.map(c=>`<option value="${c.id}">${c.title} (${c.price}⭐)</option>`).join("");};
+  $("admType").onchange=upd; upd();
+  $("admCreate").onclick=async()=>{const code=$("admCode").value.trim().toUpperCase();if(!code)return alert("Введите код");
+    try{await api("/api/admin/create-promocode",{code,rewardType:$("admType").value,rewardId:$("admReward").value,maxUses:parseInt($("admMaxUses").value)||100});$("admCode").value="";await loadPromocodes();alert("✅ Создан!");}catch(e){alert(e.message);}};
   loadPromocodes();
 };
-
 const loadPromocodes = async () => {
-  try {
-    const r = await api("/api/admin/get-promocodes");
-    state.promocodes = r.promocodes || [];
-    const list = $("promoList");
-    if (!list) return;
-    if (!state.promocodes.length) { list.innerHTML = '<div class="empty-state" style="padding:20px;"><i class="fas fa-ticket-alt"></i><p>Нет промокодов</p></div>'; return; }
-    list.innerHTML = state.promocodes.map(p => `
-      <div class="promo-item">
-        <div class="promo-item-info"><div class="promo-item-code">${p.code}</div><div class="promo-item-meta">${p.rewardType}: ${p.rewardId} • ${p.uses}/${p.maxUses} исп.</div></div>
-        <button class="promo-item-del" onclick="deletePromo('${p.code}')"><i class="fas fa-trash"></i></button>
-      </div>
-    `).join("");
-  } catch (e) {}
-};
+  try{const r=await api("/api/admin/get-promocodes");state.promocodes=r.promocodes||[];const l=$("promoList");if(!l)return;
+  if(!state.promocodes.length){l.innerHTML='<div class="empty-state" style="padding:20px;"><p>Нет промокодов</p></div>';return;}
+  l.innerHTML=state.promocodes.map(p=>`<div class="promo-item"><div><div class="promo-item-code">${p.code}</div><div class="promo-item-meta">${p.rewardType}: ${p.rewardId} • ${p.uses}/${p.maxUses}</div></div><button class="promo-item-del" onclick="deletePromo('${p.code}')"><i class="fas fa-trash"></i></button></div>`).join("");}catch(e){}};
+window.deletePromo = async code => { if(!confirm(`Удалить ${code}?`))return; try{await api("/api/admin/delete-promocode",{code});await loadPromocodes();}catch(e){alert(e.message);}};
 
-window.deletePromo = async (code) => {
-  if (!confirm(`Удалить ${code}?`)) return;
-  try { await api("/api/admin/delete-promocode", { code }); await loadPromocodes(); } catch (e) { alert("Ошибка: " + e.message); }
-};
-
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-else init();
+if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 </script>
 </body>
 </html>
