@@ -406,6 +406,14 @@ const initLottie = (containerId, animData) => {
   const container = document.getElementById(containerId);
   if (!container || !animData) return;
   try {
+    // ВАЖНО: Очищаем контейнер от серого квадрата загрузки
+    container.innerHTML = ''; 
+    
+    // Делаем контейнер flex-ом чтобы анимация была по центру
+    container.style.display = 'flex';
+    container.style.alignItems = 'center';
+    container.style.justifyContent = 'center';
+
     const inst = lottie.loadAnimation({
       container: container,
       renderer: 'svg',
@@ -413,6 +421,13 @@ const initLottie = (containerId, animData) => {
       autoplay: true,
       animationData: animData
     });
+    
+    // Заставляем SVG занимать всю высоту
+    if (container.querySelector('svg')) {
+      container.querySelector('svg').style.width = '100%';
+      container.querySelector('svg').style.height = '100%';
+    }
+    
     state.lottieInstances.push(inst);
   } catch (e) {
     console.error('Lottie init error:', e);
