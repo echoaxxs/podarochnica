@@ -447,24 +447,48 @@ const showModal = id => $(id).classList.remove("hidden");
 const hideModal = id => $(id).classList.add("hidden");
 
 // === Рендер визуала подарка ===
+// === Рендер визуала подарка ===
 const renderGiftVisual = (gift, size = 60) => {
   if (!gift) return `<i class="fas fa-gift placeholder" style="font-size:${size*0.5}px;"></i>`;
   
+  // Приоритет: sticker_url -> emoji -> placeholder
   if (gift.sticker_url) {
-    if (gift.sticker_url.endsWith('.webm')) {
-      return `<video src="${gift.sticker_url}" style="width:${size}px;height:${size}px;object-fit:contain;" autoplay loop muted playsinline></video>`;
+    const type = gift.sticker_type || '';
+    
+    // Video стикеры (.webm)
+    if (type === 'webm' || gift.sticker_url.endsWith('.webm')) {
+      return `<video 
+        src="${gift.sticker_url}" 
+        style="width:${size}px;height:${size}px;object-fit:contain;" 
+        autoplay loop muted playsinline
+        onerror="this.parentElement.innerHTML='<span class=\\'emoji\\' style=\\'font-size:${size*0.6}px;\\'>${gift.emoji || '🎁'}</span>'"
+      ></video>`;
     }
-    return `<img src="${gift.sticker_url}" style="width:${size}px;height:${size}px;object-fit:contain;" alt="" loading="lazy">`;
+    
+    // Lottie стикеры (.tgs) - показываем emoji, т.к. tgs нужен специальный плеер
+    if (type === 'tgs' || gift.sticker_url.endsWith('.tgs')) {
+      // TGS - это сжатый Lottie JSON, браузер его не покажет напрямую
+      // Показываем emoji как фоллбэк
+      return `<span class="emoji" style="font-size:${size*0.6}px;">${gift.emoji || '🎁'}</span>`;
+    }
+    
+    // Статичные стикеры (.webp) или другие изображения
+    return `<img 
+      src="${gift.sticker_url}" 
+      style="width:${size}px;height:${size}px;object-fit:contain;" 
+      alt="${gift.title || ''}" 
+      loading="lazy"
+      onerror="this.parentElement.innerHTML='<span class=\\'emoji\\' style=\\'font-size:${size*0.6}px;\\'>${gift.emoji || '🎁'}</span>'"
+    >`;
   }
-  if (gift.icon) {
-    return `<img src="${gift.icon}" style="width:${size}px;height:${size}px;object-fit:contain;" alt="" loading="lazy">`;
-  }
+  
+  // Нет стикера - показываем emoji
   if (gift.emoji) {
     return `<span class="emoji" style="font-size:${size*0.6}px;">${gift.emoji}</span>`;
   }
+  
   return `<i class="fas fa-gift placeholder" style="font-size:${size*0.5}px;"></i>`;
 };
-
 const init = async () => {
   if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#000000'); tg.setBackgroundColor('#000000'); }
   try {
